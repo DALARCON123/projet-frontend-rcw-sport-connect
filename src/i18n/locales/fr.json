@@ -1,0 +1,17 @@
+{
+  "appTitle": "SportConnectIA",
+  "nav": { "home": "Accueil", "sports": "Sports", "reco": "Recommandations", "chat": "Chatbot", "login": "Connexion", "register": "Inscription" },
+  "hero": {
+    "title": "Bougeons ensemble : bien-être sportif pour toutes et tous",
+    "subtitle": "Des recommandations personnalisées, inclusives et intelligentes — adaptées à vos objectifs, votre temps et votre style de vie.",
+    "cta_primary": "Commencer mes recommandations",
+    "cta_secondary": "Explorer les sports",
+    "badge_women": "Femmes",
+    "badge_men": "Hommes",
+    "badge_all": "Toutes les identités",
+    "card_1": "Santé & récupération",
+    "card_2": "Force & performance",
+    "card_3": "Motivation intelligente",
+    "disclaimer": "Approche inclusive, accessible et respectueuse — adaptée à tous les âges et niveaux."
+  }
+}

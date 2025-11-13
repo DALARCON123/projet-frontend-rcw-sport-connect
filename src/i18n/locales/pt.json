@@ -1,0 +1,17 @@
+{
+  "appTitle": "SportConnectIA",
+  "nav": { "home": "Início", "sports": "Esportes", "reco": "Recomendações", "chat": "Chatbot", "login": "Entrar", "register": "Registrar" },
+  "hero": {
+    "title": "Vamos nos mover: bem-estar esportivo para todas as pessoas",
+    "subtitle": "Recomendações personalizadas, inclusivas e inteligentes — de acordo com seus objetivos, tempo e estilo de vida.",
+    "cta_primary": "Começar minhas recomendações",
+    "cta_secondary": "Explorar esportes",
+    "badge_women": "Mulheres",
+    "badge_men": "Homens",
+    "badge_all": "Todas as identidades",
+    "card_1": "Saúde e recuperação",
+    "card_2": "Força e desempenho",
+    "card_3": "Motivação inteligente",
+    "disclaimer": "Abordagem inclusiva, acessível e respeitosa — para todas as idades e níveis."
+  }
+}
