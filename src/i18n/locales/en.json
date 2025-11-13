@@ -1,0 +1,37 @@
+{
+  "appTitle": "SportConnectIA",
+  "nav": {
+    "home": "Home",
+    "sports": "Sports",
+    "reco": "Recommendations",
+    "chat": "Chatbot",
+    "login": "Login",
+    "register": "Sign up",
+    "dashboard": "Dashboard"
+  },
+  "hero": {
+    "title": "Let’s move together: fitness and wellbeing for everyone",
+    "subtitle": "Personalized, inclusive and smart recommendations — based on your goals, time and lifestyle.",
+    "cta_primary": "Start my recommendations",
+    "cta_secondary": "Explore sports",
+    "badge_women": "Women",
+    "badge_men": "Men",
+    "badge_all": "All identities",
+    "card_1": "Health & recovery",
+    "card_2": "Strength & performance",
+    "card_3": "Smart motivation",
+    "disclaimer": "Inclusive, accessible and respectful — for all ages and levels."
+  },
+  "chat": {
+    "title": "Coaching chat",
+    "placeholder": "Type your question...",
+    "send": "Send",
+    "typing": "Coach is typing...",
+    "welcome": "Hi! I’m your SportConnectIA coach. Ask me about training, health or motivation 😊",
+    "empty": "Start the conversation with a question about your habits or training.",
+    "emptyAnswer": "I need a bit more context to help you better 🙂"
+  },
+  "welcome": "Hi, {{name}}!",
+  "welcome_generic": "Hi!",
+  "logout": "Logout"
+}

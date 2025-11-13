@@ -1,27 +1,47 @@
-import type { Config } from 'tailwindcss'
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-export default {
-  content: [
-    './index.html',
-    './src/**/*.{ts,tsx,js,jsx}',
-  ],
-  theme: {
-    extend: {
-      colors: {
-        // Paleta 2025: inclusiva, deportiva y con buen contraste
-        primary: '#0EA5E9',     // azul deportivo
-        accent: '#F97316',      // naranja energía
-        leaf: '#22C55E',        // bienestar
-        ink: '#0F172A',         // texto principal (slate-900)
-        soft: '#94A3B8',        // texto secundario
+// ====================================================
+// ⚙️ Configuración Vite + Proxy para microservicios
+// ====================================================
+
+export default defineConfig({
+  plugins: [react()],
+
+  server: {
+    port: 5173, // Puedes cambiarlo si ya lo usa otro
+    open: true, // abre automáticamente el navegador
+    cors: true,
+    proxy: {
+      // 🔐 Servicio de autenticación Flask
+      '/auth': {
+        target: 'http://localhost:8001',
+        changeOrigin: true,
       },
-      fontFamily: {
-        display: ['Inter', 'ui-sans-serif', 'system-ui'],
+      // ⚽ Servicio de deportes
+      '/sports': {
+        target: 'http://localhost:8002',
+        changeOrigin: true,
       },
-      boxShadow: {
-        glass: '0 8px 30px rgba(2, 6, 23, 0.18)',
+      // 💡 Servicio de recomendaciones
+      '/reco': {
+        target: 'http://localhost:8003',
+        changeOrigin: true,
+      },
+      // 🤖 Servicio de chatbot
+      '/chat': {
+        target: 'http://localhost:8010',
+        changeOrigin: true,
       },
     },
   },
-  plugins: [],
-} satisfies Config
+
+  // ====================================================
+  // 🧩 Compatibilidad para React + TS + Tailwind
+  // ====================================================
+  resolve: {
+    alias: {
+      '@': '/src',
+    },
+  },
+})

@@ -1,6 +1,14 @@
 {
   "appTitle": "SportConnectIA",
-  "nav": { "home": "Inicio", "sports": "Deportes", "reco": "Recomendaciones", "chat": "Chatbot", "login": "Entrar", "register": "Registro" },
+  "nav": {
+    "home": "Inicio",
+    "sports": "Deportes",
+    "reco": "Recomendaciones",
+    "chat": "Chatbot",
+    "login": "Entrar",
+    "register": "Registro",
+    "dashboard": "Panel"
+  },
   "hero": {
     "title": "Movámonos juntos: bienestar deportivo para todas y todos",
     "subtitle": "Recomendaciones personalizadas, inclusivas e inteligentes — según tus metas, tiempo y estilo de vida.",
@@ -13,5 +21,17 @@
     "card_2": "Fuerza y rendimiento",
     "card_3": "Motivación inteligente",
     "disclaimer": "Enfoque inclusivo, accesible y respetuoso — para todas las edades y niveles."
-  }
+  },
+  "chat": {
+    "title": "Chat de asesoramiento",
+    "placeholder": "Escribe tu pregunta...",
+    "send": "Enviar",
+    "typing": "El entrenador está escribiendo...",
+    "welcome": "¡Hola! Soy tu entrenador SportConnectIA. Pregúntame sobre entrenamiento, salud o motivación 😊",
+    "empty": "Empieza la conversación con una pregunta sobre tus hábitos o tu entrenamiento.",
+    "emptyAnswer": "Necesito un poco más de contexto para ayudarte mejor 🙂"
+  },
+  "welcome": "¡Hola, {{name}}!",
+  "welcome_generic": "¡Hola!",
+  "logout": "Salir"
 }

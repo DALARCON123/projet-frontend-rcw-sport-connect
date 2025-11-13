@@ -1,17 +1,37 @@
 {
   "appTitle": "SportConnectIA",
-  "nav": { "home": "Accueil", "sports": "Sports", "reco": "Recommandations", "chat": "Chatbot", "login": "Connexion", "register": "Inscription" },
+  "nav": {
+    "home": "Accueil",
+    "sports": "Sports",
+    "reco": "Recommandations",
+    "chat": "Chat",
+    "login": "Connexion",
+    "register": "Créer un compte",
+    "dashboard": "Tableau de bord"
+  },
   "hero": {
     "title": "Bougeons ensemble : bien-être sportif pour toutes et tous",
-    "subtitle": "Des recommandations personnalisées, inclusives et intelligentes — adaptées à vos objectifs, votre temps et votre style de vie.",
+    "subtitle": "Des recommandations personnalisées, inclusives et intelligentes — selon tes objectifs, ton temps et ton style de vie.",
     "cta_primary": "Commencer mes recommandations",
     "cta_secondary": "Explorer les sports",
     "badge_women": "Femmes",
     "badge_men": "Hommes",
     "badge_all": "Toutes les identités",
-    "card_1": "Santé & récupération",
-    "card_2": "Force & performance",
+    "card_1": "Santé et récupération",
+    "card_2": "Force et performance",
     "card_3": "Motivation intelligente",
-    "disclaimer": "Approche inclusive, accessible et respectueuse — adaptée à tous les âges et niveaux."
-  }
+    "disclaimer": "Approche inclusive, accessible et respectueuse — pour tous les âges et niveaux."
+  },
+  "chat": {
+    "title": "Chat d’accompagnement",
+    "placeholder": "Écris ta question…",
+    "send": "Envoyer",
+    "typing": "Le coach est en train d’écrire…",
+    "welcome": "Bonjour ! Je suis ton coach SportConnectIA. Pose-moi des questions sur l’entraînement, la santé ou la motivation 😊",
+    "empty": "Commence la conversation avec une question sur tes habitudes ou ton entraînement.",
+    "emptyAnswer": "J’ai besoin d’un peu plus de contexte pour mieux t’aider 🙂"
+  },
+  "welcome": "Bonjour, {{name}} !",
+  "welcome_generic": "Bonjour !",
+  "logout": "Déconnexion"
 }
