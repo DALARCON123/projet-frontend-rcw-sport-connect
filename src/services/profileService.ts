@@ -1,50 +1,38 @@
-import { recoClient } from './apiClient'
+// src/services/profileService.ts
 
-export type ProfileDto = {
-  age: number
-  height_cm: number
-  weight_kg: number
-  gender: 'female' | 'male' | 'other'
-  activity: 'low' | 'medium' | 'high'
-  goal: string
-}
+export type Profile = {
+  age?: number;          // edad
+  weightKg?: number;     // peso en kg
+  heightCm?: number;     // talla en cm
+  goal?: string;         // objetivo principal (p.ej. "Perte de poids")
+  daysPerWeek?: number;  // cuántos días a la semana quiere entrenar
+  minutesPerSession?: number; // minutos por sesión
+  level?: "debutant" | "intermediaire" | "avance";
+};
 
-const KEY = 'profile_v1'
+const STORAGE_KEY = "profile_v1";
 
-export function getProfileLocal(): ProfileDto | null {
+export function getProfileLocal(): Profile | null {
   try {
-    const raw = localStorage.getItem(KEY)
-    return raw ? (JSON.parse(raw) as ProfileDto) : null
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as Profile;
   } catch {
-    return null
+    return null;
   }
 }
 
-export function saveProfileLocal(p: ProfileDto) {
-  localStorage.setItem(KEY, JSON.stringify(p))
+/**
+ * Guarda (o actualiza) el perfil en localStorage.
+ * Puedes pasar solo algunos campos: hace merge con lo que ya había.
+ */
+export function saveProfileLocal(partial: Partial<Profile>): Profile {
+  const current = getProfileLocal() || {};
+  const merged: Profile = { ...current, ...partial };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+  return merged;
 }
 
-/** Envía/actualiza el perfil en el microservicio de recomendaciones (ajusta ruta real si difiere). */
-export async function upsertProfile(p: ProfileDto) {
-  // cambia '/profile' por la ruta que tengas (p.ej. '/reco/profile')
-  try {
-    await recoClient.post('/profile', p)
-  } catch (e) {
-    // si tu backend aún no está listo, puedes ignorarlo y trabajar offline
-    // throw e
-  }
-}
-
-/** Extrae nombre del JWT para saludo en navbar, si existe */
-export function userNameFromToken(): string | undefined {
-  const token = localStorage.getItem('token')
-  if (!token) return
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]))
-    const name = payload?.name || payload?.email
-    if (name) localStorage.setItem('user_name', name)
-    return name
-  } catch {
-    return
-  }
+export function clearProfileLocal() {
+  localStorage.removeItem(STORAGE_KEY);
 }

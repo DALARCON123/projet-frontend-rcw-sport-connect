@@ -9,29 +9,44 @@
     "register": "Sign up",
     "dashboard": "Dashboard"
   },
-  "hero": {
-    "title": "Let’s move together: fitness and wellbeing for everyone",
-    "subtitle": "Personalized, inclusive and smart recommendations — based on your goals, time and lifestyle.",
-    "cta_primary": "Start my recommendations",
-    "cta_secondary": "Explore sports",
-    "badge_women": "Women",
-    "badge_men": "Men",
-    "badge_all": "All identities",
-    "card_1": "Health & recovery",
-    "card_2": "Strength & performance",
-    "card_3": "Smart motivation",
-    "disclaimer": "Inclusive, accessible and respectful — for all ages and levels."
-  },
-  "chat": {
-    "title": "Coaching chat",
-    "placeholder": "Type your question...",
-    "send": "Send",
-    "typing": "Coach is typing...",
-    "welcome": "Hi! I’m your SportConnectIA coach. Ask me about training, health or motivation 😊",
-    "empty": "Start the conversation with a question about your habits or training.",
-    "emptyAnswer": "I need a bit more context to help you better 🙂"
-  },
-  "welcome": "Hi, {{name}}!",
-  "welcome_generic": "Hi!",
-  "logout": "Logout"
+
+  "home": {
+    "hero": {
+      "title_1": "Your fitness coach",
+      "title_highlight": "intelligent",
+      "title_2": "and personalized",
+      "description": "SportConnectIA uses artificial intelligence to create training programs tailored to your goals, level, and preferences. Chat with our expert assistant to receive personalized guidance.",
+      "start": "Start for free",
+      "learn_more": "Learn more"
+    },
+
+    "badges": {
+      "b1": "AI & wellness",
+      "b2": "Personalized programs",
+      "b3": "Real-time tracking"
+    },
+
+    "features": {
+      "title": "Smart features",
+      "subtitle": "Discover how SportConnectIA revolutionizes your training with advanced AI.",
+      "f1_title": "AI Expert Chatbot",
+      "f1_text": "Ask our 24/7 assistant about training, nutrition, and recovery.",
+      "f2_title": "Personalized recommendations",
+      "f2_text": "Exercise programs adapted to your goals and level.",
+      "f3_title": "Progress tracking",
+      "f3_text": "Track your evolution through detailed charts and live stats.",
+      "f4_title": "Gamification",
+      "f4_text": "Earn badges, complete challenges, and stay motivated.",
+      "f5_title": "Dynamic adjustments",
+      "f5_text": "AI adapts your training plan based on your performance.",
+      "f6_title": "Real-time coaching",
+      "f6_text": "Receive instant recommendations during your sessions."
+    },
+
+    "cta": {
+      "title": "Ready to transform your training?",
+      "subtitle": "Join thousands of users achieving their goals.",
+      "button": "Start for free"
+    }
+  }
 }

@@ -1,128 +1,202 @@
-// src/pages/Onboarding.tsx
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { getProfileLocal, saveProfileLocal, upsertProfile, userNameFromToken } from '../services/profileService'
-import type { ProfileDto } from '../services/profileService'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import {
+  getProfileLocal,
+  saveProfileLocal
+} from "../services/profileService";
+
+import type { Profile } from "../services/profileService";
 
 export default function Onboarding() {
-  const nav = useNavigate()
-  const [form, setForm] = useState<ProfileDto>({
-    age: 25,
-    height_cm: 165,
-    weight_kg: 60,
-    gender: 'female',
-    activity: 'medium',
-    goal: 'stay_fit',
-  })
-  const [msg, setMsg] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
+  const existing = getProfileLocal();
 
-  // Si ya tiene perfil, va directo al dashboard
-  useEffect(() => {
-    const has = getProfileLocal()
-    if (has) nav('/dashboard')
-  }, [nav])
+  const [form, setForm] = useState<Profile>({
+    age: existing?.age ?? undefined,
+    weightKg: existing?.weightKg ?? undefined,
+    heightCm: existing?.heightCm ?? undefined,
+    goal: existing?.goal ?? "",
+    daysPerWeek: existing?.daysPerWeek ?? 3,
+    minutesPerSession: existing?.minutesPerSession ?? 30,
+    level: existing?.level ?? "debutant",
+  });
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setMsg(null)
-    try {
-      setLoading(true)
-      // opcional: enviar al microservicio de recomendaciones
-      await upsertProfile(form)
-      // persistimos local
-      saveProfileLocal(form)
-      // opcional: guardar nombre del token para saludo
-      userNameFromToken()
-      nav('/dashboard')
-    } catch (err: any) {
-      setMsg(String(err?.message || err?.detail || 'Error al guardar el perfil'))
-    } finally {
-      setLoading(false)
-    }
-  }
+  const handleNum = (field: keyof Profile) => (e: any) => {
+    const val = e.target.value === "" ? undefined : Number(e.target.value);
+    setForm((prev) => ({ ...prev, [field]: val }));
+  };
+
+  const handleText = (field: keyof Profile) => (e: any) => {
+    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  };
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    saveProfileLocal(form);
+    navigate("/dashboard");
+  };
+
+  const isEdit = !!existing;
 
   return (
-    <section className="max-w-3xl mx-auto px-4 py-10">
-      <h1 className="text-2xl font-bold mb-6">Completa tu perfil</h1>
+    <section className="max-w-xl mx-auto px-4 py-10">
 
-      <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2">
-        <Field label="Edad" type="number" value={String(form.age)} onChange={v => setForm({ ...form, age: Number(v) })} />
-        <Field label="Altura (cm)" type="number" value={String(form.height_cm)} onChange={v => setForm({ ...form, height_cm: Number(v) })} />
-        <Field label="Peso (kg)" type="number" value={String(form.weight_kg)} onChange={v => setForm({ ...form, weight_kg: Number(v) })} />
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-extrabold text-slate-900">
+          {isEdit ? "Mettre à jour mon profil" : "Configurer mon profil"}
+        </h1>
+        <p className="mt-1 text-slate-600">
+          Ces infos nous aident à personnaliser vos recommandations.
+        </p>
+      </div>
 
-        <label className="block">
-          <span className="text-sm text-slate-600">Género</span>
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-2xl bg-white shadow-xl border border-slate-200 px-6 py-8 space-y-6"
+      >
+        {/* Grid de edad, peso, talla */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Âge
+            </label>
+            <input
+              type="number"
+              value={form.age ?? ""}
+              onChange={handleNum("age")}
+              className="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-fuchsia-500"
+              placeholder="ex: 30"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Poids (kg)
+            </label>
+            <input
+              type="number"
+              value={form.weightKg ?? ""}
+              onChange={handleNum("weightKg")}
+              className="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-fuchsia-500"
+              placeholder="70"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Taille (cm)
+            </label>
+            <input
+              type="number"
+              value={form.heightCm ?? ""}
+              onChange={handleNum("heightCm")}
+              className="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-fuchsia-500"
+              placeholder="165"
+            />
+          </div>
+        </div>
+
+        {/* Objectif */}
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
+            Objectif principal
+          </label>
+
           <select
-            className="mt-1 w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2"
-            value={form.gender}
-            onChange={e => setForm({ ...form, gender: e.target.value as ProfileDto['gender'] })}
+            value={form.goal || ""}
+            onChange={handleText("goal")}
+            className="w-full rounded-xl border px-3 py-2 focus:ring-2 focus:ring-fuchsia-500"
           >
-            <option value="female">Femenino</option>
-            <option value="male">Masculino</option>
-            <option value="other">Otro</option>
+            <option value="">Choisir…</option>
+            <option value="Perte de poids">Perte de poids</option>
+            <option value="Remise en forme">Remise en forme</option>
+            <option value="Prise de masse">Prise de masse</option>
+            <option value="Bien-être général">Bien-être général</option>
           </select>
-        </label>
+        </div>
 
-        <label className="block">
-          <span className="text-sm text-slate-600">Actividad</span>
-          <select
-            className="mt-1 w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2"
-            value={form.activity}
-            onChange={e => setForm({ ...form, activity: e.target.value as ProfileDto['activity'] })}
-          >
-            <option value="low">Baja</option>
-            <option value="medium">Media</option>
-            <option value="high">Alta</option>
-          </select>
-        </label>
+        {/* Nivel */}
+        <div>
+          <label className="block text-xs font-semibold mb-1">
+            Niveau actuel
+          </label>
 
-        <label className="sm:col-span-2 block">
-          <span className="text-sm text-slate-600">Objetivo</span>
-          <input
-            className="mt-1 w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2"
-            value={form.goal}
-            onChange={e => setForm({ ...form, goal: e.target.value })}
-            placeholder="Perder grasa, ganar masa, mantenerse en forma…"
-          />
-        </label>
+          <div className="flex gap-2">
+            {["debutant", "intermediaire", "avance"].map((lvl) => (
+              <button
+                key={lvl}
+                type="button"
+                onClick={() =>
+                  setForm((p) => ({ ...p, level: lvl as Profile["level"] }))
+                }
+                className={`px-3 py-2 rounded-full border text-xs transition
+                  ${
+                    form.level === lvl
+                      ? "bg-gradient-to-r from-fuchsia-500 via-indigo-500 to-sky-500 text-white border-transparent"
+                      : "bg-white border-slate-300 text-slate-700 hover:border-fuchsia-400"
+                  }
+                `}
+              >
+                {lvl === "debutant"
+                  ? "Débutant"
+                  : lvl === "intermediaire"
+                  ? "Intermédiaire"
+                  : "Avancé"}
+              </button>
+            ))}
+          </div>
+        </div>
 
-        {msg && <p className="sm:col-span-2 text-sm text-red-600">{msg}</p>}
+        {/* Días / Duración */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-        <div className="sm:col-span-2">
+          <div>
+            <label className="block text-xs font-semibold mb-1">
+              Jours / semaine
+            </label>
+            <input
+              type="number"
+              value={form.daysPerWeek ?? ""}
+              onChange={handleNum("daysPerWeek")}
+              className="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold mb-1">
+              Minutes / séance
+            </label>
+            <input
+              type="number"
+              value={form.minutesPerSession ?? ""}
+              onChange={handleNum("minutesPerSession")}
+              className="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
+
+        {/* Botones */}
+        <div className="flex gap-3 justify-end pt-3">
           <button
-            disabled={loading}
-            className="w-full rounded-xl px-6 py-3 font-semibold text-white bg-slate-900 hover:bg-slate-800 transition disabled:opacity-60"
-            type="submit"
+            type="button"
+            onClick={() => navigate("/dashboard")}
+            className="px-5 py-2 rounded-xl border bg-white hover:bg-slate-50 text-sm"
           >
-            {loading ? 'Guardando…' : 'Guardar y continuar'}
+            Annuler
+          </button>
+
+          <button
+            type="submit"
+            className="px-6 py-2 rounded-xl text-white text-sm font-semibold 
+              bg-gradient-to-r from-fuchsia-600 via-indigo-600 to-sky-500 shadow-md hover:brightness-110"
+          >
+            {isEdit ? "Enregistrer" : "Créer mon profil"}
           </button>
         </div>
       </form>
     </section>
-  )
-}
-
-function Field({
-  label,
-  type,
-  value,
-  onChange,
-}: {
-  label: string
-  type: string
-  value: string
-  onChange: (v: string) => void
-}) {
-  return (
-    <label className="block">
-      <span className="text-sm text-slate-600">{label}</span>
-      <input
-        className="mt-1 w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2"
-        type={type}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-      />
-    </label>
-  )
+  );
 }

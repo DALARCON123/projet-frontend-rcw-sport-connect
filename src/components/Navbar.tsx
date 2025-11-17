@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next'
 import LangSwitcher from './LangSwitcher'
 import { Sparkles } from 'lucide-react'
 
-const link = 'px-3 py-2 rounded-xl hover:bg-white/70 transition'
-const active = 'bg-white/80 text-ink'
+const link =
+  'px-4 py-2 rounded-xl text-sm font-medium transition-all hover:bg-white/80 hover:shadow-sm'
+const active =
+  'bg-white/90 text-ink shadow-sm border border-slate-200'
 
 export default function Navbar() {
   const { t } = useTranslation()
@@ -19,61 +21,106 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white/60 backdrop-blur-xl border-b border-white/60">
+    <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-2xl border-b border-white/50 shadow-sm">
       <nav className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-        {/* Logo */}
-        <Link to={isAuth ? '/dashboard' : '/'} className="flex items-center gap-2">
-          <Sparkles className="text-accent" />
-          <span className="font-extrabold tracking-tight text-xl">SportConnectIA</span>
+        
+        {/* LOGO — más profesional, estilo SportConnectIA */}
+        <Link
+          to={isAuth ? '/dashboard' : '/'}
+          className="flex items-center gap-2 group"
+        >
+          <Sparkles className="text-fuchsia-600 group-hover:rotate-12 transition" />
+          <span className="font-extrabold tracking-tight text-xl text-slate-800">
+            SportConnectIA
+          </span>
         </Link>
 
         {/* Menú */}
-        <div className="flex items-center gap-1">
-          {/* Home solo si NO está autenticado */}
-          {!isAuth && (
-            <NavLink to="/" className={({isActive}) => `${link} ${isActive ? active : ''}`}>
-              {t('nav.home')}
-            </NavLink>
-          )}
-
-          {/* Zonas protegidas */}
-          {isAuth && (
-            <>
-              <NavLink to="/dashboard" className={({isActive}) => `${link} ${isActive ? active : ''}`}>
-                {t('nav.dashboard')}
-              </NavLink>
-              <NavLink to="/reco" className={({isActive}) => `${link} ${isActive ? active : ''}`}>
-                {t('nav.reco')}
-              </NavLink>
-              <NavLink to="/sports" className={({isActive}) => `${link} ${isActive ? active : ''}`}>
-                {t('nav.sports')}
-              </NavLink>
-              <NavLink to="/chat" className={({isActive}) => `${link} ${isActive ? active : ''}`}>
-                {t('nav.chat')}
-              </NavLink>
-            </>
-          )}
-
-          {/* Auth links cuando NO hay sesión */}
+        <div className="flex items-center gap-2">
+          
+          {/* Public links (solo si NO está logueado) */}
           {!isAuth && (
             <>
-              <NavLink to="/login" className={({isActive}) => `${link} ${isActive ? active : ''}`}>
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `${link} ${isActive ? active : ''}`
+                }
+              >
+                {t('nav.home')}
+              </NavLink>
+
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `${link} ${isActive ? active : ''}`
+                }
+              >
                 {t('nav.login')}
               </NavLink>
-              <NavLink to="/register" className={({isActive}) => `${link} ${isActive ? active : ''}`}>
+
+              <NavLink
+                to="/register"
+                className={({ isActive }) =>
+                  `${link} ${isActive ? active : ''}`
+                }
+              >
                 {t('nav.register')}
               </NavLink>
             </>
           )}
 
-          {/* Idioma SIEMPRE al final */}
-          <div className="ml-2"><LangSwitcher /></div>
+          {/* Private links */}
+          {isAuth && (
+            <>
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  `${link} ${isActive ? active : ''}`
+                }
+              >
+                {t('nav.dashboard')}
+              </NavLink>
 
-          {/* Logout (sin “welcome” en el navbar) */}
+              <NavLink
+                to="/reco"
+                className={({ isActive }) =>
+                  `${link} ${isActive ? active : ''}`
+                }
+              >
+                {t('nav.reco')}
+              </NavLink>
+
+              <NavLink
+                to="/sports"
+                className={({ isActive }) =>
+                  `${link} ${isActive ? active : ''}`
+                }
+              >
+                {t('nav.sports')}
+              </NavLink>
+
+              <NavLink
+                to="/chat"
+                className={({ isActive }) =>
+                  `${link} ${isActive ? active : ''}`
+                }
+              >
+                {t('nav.chat')}
+              </NavLink>
+            </>
+          )}
+
+          {/* Idioma */}
+          <div className="ml-2">
+            <LangSwitcher />
+          </div>
+
+          {/* Logout */}
           {isAuth && (
             <button
               onClick={handleLogout}
-              className="ml-2 px-3 py-2 rounded-xl border border-slate-300/70 bg-white/70 hover:bg-white transition"
+              className="ml-2 px-4 py-2 rounded-xl text-sm font-medium border border-slate-300/60 bg-white/80 hover:bg-white transition shadow-sm"
             >
               Logout
             </button>
