@@ -1,5 +1,6 @@
 {
   "appTitle": "SportConnectIA",
+
   "nav": {
     "home": "Accueil",
     "sports": "Sports",
@@ -9,6 +10,7 @@
     "register": "Créer un compte",
     "dashboard": "Tableau de bord"
   },
+
 
   "home.hero.title_1": "Votre coach fitness",
   "home.hero.title_highlight": "intelligent",
@@ -38,6 +40,33 @@
 
   "home.cta.title": "Prêt à transformer votre entraînement ?",
   "home.cta.subtitle": "Rejoignez des milliers d’utilisateurs qui atteignent leurs objectifs.",
-  "home.cta.button": "Commencer gratuitement"
-}
+  "home.cta.button": "Commencer gratuitement",
 
+
+  "chat.title": "Assistant Coach IA",
+  "chat.subtitle": "Discutez avec votre coach personnel alimenté par l’intelligence artificielle.",
+  "chat.placeholder": "Posez votre question au coach… (ex : Comment reprendre le sport en douceur ?)",
+  "chat.send": "Envoyer",
+  "chat.typing": "Le coach est en train d’écrire…",
+  "chat.welcome": "Bonjour ! Je suis ton coach SportConnectIA. Pose-moi tes questions sur l’entraînement, la santé ou la motivation 😊",
+  "chat.empty": "Commence la conversation avec une question sur tes habitudes ou ton entraînement.",
+  "chat.emptyAnswer": "J’ai besoin d’un peu plus de contexte pour mieux t’aider 🙂",
+  "chat.error": "Une erreur est survenue. Réessayez dans quelques instants.",
+  "chat.history_title": "Conversations",
+  "chat.new": "Nouveau",
+  "chat.no_conversations": "Aucune conversation enregistrée pour l’instant.",
+  "chat.faq_title": "Questions fréquentes",
+  "chat.faq_1": "Comment créer un programme de musculation pour débutant ?",
+  "chat.faq_2": "Quel est le meilleur type de cardio pour perdre du poids ?",
+  "chat.faq_3": "Quels aliments privilégier pour la prise de muscle ?",
+  "chat.faq_4": "Comment optimiser ma récupération après l’entraînement ?",
+
+
+
+  "welcome": "Bonjour, {{name}} !",
+  "welcome_generic": "Bonjour !",
+  "logout": "Déconnexion"
+
+
+  
+}
