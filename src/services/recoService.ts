@@ -1,15 +1,39 @@
-import { recoClient } from './apiClient'
+// src/services/recoService.ts
+const RECO_API_URL =
+  import.meta.env.VITE_RECO_API_URL ?? "http://localhost:8003";
 
-export type ProfileDto = {
-  age: number; height_cm: number; weight_kg: number;
-  gender: 'female'|'male'|'other';
-  activity: 'low'|'medium'|'high';
-  goal: 'lose_weight'|'stay_fit'|'gain_muscle';
+export type RecoItem = {
+  id: string;
+  question?: string;
+  answer?: string;
+  createdAt?: string;
+  age?: number;
+  weightKg?: number;
+  heightCm?: number;
+  mainGoal?: string;
+  lang?: string;
+};
+
+export async function generateReco(userId: string, lang: string) {
+  const resp = await fetch(`${RECO_API_URL}/reco/generate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user_id: userId, lang }),
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(text || `Error ${resp.status} en /reco/generate`);
+  }
+
+  return (await resp.json()) as { answer: string; profile: any };
 }
 
-export async function getPersonalizedRecs(profile: ProfileDto) {
-  return recoClient.post<Array<{
-    id: string; title: string; description: string;
-    freq_per_week: number; duration_min: number; intensity: string;
-  }>>('/reco/personalized', profile)
+export async function fetchRecoHistory(userId: string): Promise<RecoItem[]> {
+  const resp = await fetch(`${RECO_API_URL}/reco/history/${userId}`);
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(text || `Error ${resp.status} en /reco/history`);
+  }
+  return (await resp.json()) as RecoItem[];
 }

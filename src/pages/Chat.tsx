@@ -147,7 +147,7 @@ export default function Chat() {
   return (
     <div className="w-full h-[calc(100vh-4rem)] flex overflow-hidden bg-gradient-to-br from-white via-slate-50 to-indigo-50">
       {/* -------------------------------------------------
-         PANEL IZQUIERDO – HISTORIAL (más ancho)
+         PANEL IZQUIERDO – HISTORIAL
       --------------------------------------------------- */}
       <aside className="w-96 border-r bg-white/90 backdrop-blur-xl p-4 overflow-y-auto">
         <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
@@ -204,9 +204,9 @@ export default function Chat() {
       {/* -------------------------------------------------
          PANEL DERECHO – CHAT + INPUT + FAQ
       --------------------------------------------------- */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden min-h-0">
         {/* Header */}
-        <div className="px-8 py-4 border-b bg-white/80 backdrop-blur-xl">
+        <div className="px-8 py-4 border-b bg-white/80 backdrop-blur-xl shrink-0">
           <h1 className="text-2xl font-bold flex items-center gap-2 text-slate-900">
             <Bot className="text-fuchsia-600" />
             Assistant Coach IA
@@ -217,7 +217,7 @@ export default function Chat() {
         </div>
 
         {/* Contenido principal */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-h-0">
           {/* Mensajes */}
           <div
             ref={listRef}
@@ -235,7 +235,7 @@ export default function Chat() {
           </div>
 
           {/* Input */}
-          <div className="px-10 py-3 border-t bg-white/80 backdrop-blur-xl">
+          <div className="px-10 py-3 border-t bg-white/80 backdrop-blur-xl shrink-0">
             <div className="flex gap-2">
               <input
                 value={input}
@@ -263,8 +263,8 @@ export default function Chat() {
             </div>
           </div>
 
-          {/* Preguntas frecuentes – ancho completo */}
-          <div className="px-10 py-4 border-t bg-white/80">
+          {/* Preguntas frecuentes */}
+          <div className="px-10 py-4 border-t bg-white/80 shrink-0">
             <p className="text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wide">
               {t("chat.faq_title") as string}
             </p>
