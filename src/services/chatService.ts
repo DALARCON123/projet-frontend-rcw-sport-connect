@@ -10,7 +10,7 @@ export type ChatResp = {
 // profile = datos opcionales (edad, peso, etc.)
 export async function askBot(
   message: string,
-  lang: string = "es",
+  lang: string = "fr",
   profile?: any
 ): Promise<ChatResp> {
   // OJO: aquí solo "/ask" porque la base ya es "/chat"

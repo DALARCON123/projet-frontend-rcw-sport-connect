@@ -8,11 +8,11 @@ export default function LangSwitcher() {
       onChange={(e) => i18n.changeLanguage(e.target.value)}
       className="px-2 py-1 rounded-lg border"
     >
+      {/* FR: Sélecteur de langue simple */}
       <option value="es">ES</option>
       <option value="fr">FR</option>
       <option value="en">EN</option>
-      <option value="en">PT</option>
-
+      <option value="pt">PT</option>
     </select>
   );
 }

@@ -19,15 +19,25 @@ export default function Register() {
     setErr(null);
 
     if (!form.name || !form.email || !form.password) {
-      setErr("Todos los campos son obligatorios.");
+      setErr(t("pages.register.errors.required", "Todos los campos son obligatorios."));
       return;
     }
     if (form.password.length < 6) {
-      setErr("La contraseña debe tener al menos 6 caracteres.");
+      setErr(
+        t(
+          "pages.register.errors.min_length",
+          "La contraseña debe tener al menos 6 caracteres."
+        )
+      );
       return;
     }
     if (form.password !== form.confirm) {
-      setErr("Las contraseñas no coinciden.");
+      setErr(
+        t(
+          "pages.register.errors.mismatch",
+          "Las contraseñas no coinciden."
+        )
+      );
       return;
     }
 
@@ -39,7 +49,7 @@ export default function Register() {
       // Auto-login
       const res = await loginUser({ email: form.email.trim(), password: form.password });
       const token = (res as any)?.token ?? (res as any)?.access_token;
-      if (!token) throw new Error("No se recibió el token.");
+      if (!token) throw new Error(t("pages.register.errors.no_token", "No se recibió el token."));
 
       localStorage.setItem("token", token);
       saveUserSnapshotFromToken();
@@ -47,7 +57,13 @@ export default function Register() {
       // primera vez → onboarding
       nav("/onboarding");
     } catch (e: any) {
-      setErr(String(e?.message || e?.detail || "No se pudo registrar."));
+      setErr(
+        String(
+          e?.message ||
+          e?.detail ||
+          t("pages.register.errors.generic", "No se pudo registrar.")
+        )
+      );
     } finally {
       setLoading(false);
     }
@@ -59,28 +75,28 @@ export default function Register() {
         <Field
           icon={<User className="h-5 w-5" />}
           type="text"
-          placeholder="Nombre completo"
+          placeholder={t("pages.register.fields.name", "Nombre completo") as string}
           value={form.name}
           onChange={(v) => setForm({ ...form, name: v })}
         />
         <Field
           icon={<AtSign className="h-5 w-5" />}
           type="email"
-          placeholder="Email"
+          placeholder={t("pages.register.fields.email", "Email") as string}
           value={form.email}
           onChange={(v) => setForm({ ...form, email: v })}
         />
         <Field
           icon={<Lock className="h-5 w-5" />}
           type="password"
-          placeholder="Contraseña"
+          placeholder={t("pages.register.fields.password", "Contraseña") as string}
           value={form.password}
           onChange={(v) => setForm({ ...form, password: v })}
         />
         <Field
           icon={<Lock className="h-5 w-5" />}
           type="password"
-          placeholder="Confirmar contraseña"
+          placeholder={t("pages.register.fields.confirm", "Confirmar contraseña") as string}
           value={form.confirm}
           onChange={(v) => setForm({ ...form, confirm: v })}
         />
@@ -97,7 +113,7 @@ export default function Register() {
         </button>
 
         <p className="text-sm text-slate-600">
-          {t("nav.login") as string}?{" "}
+          {t("pages.register.have_account", "¿Ya tienes cuenta?") as string}{" "}
           <Link to="/login" className="underline">
             {t("pages.login.title") as string}
           </Link>

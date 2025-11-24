@@ -22,9 +22,9 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-2xl border-b border-white/50 shadow-sm">
-      {/* AHORA EL NAV OCUPA TODO EL ANCHO */}
+      {/* FR: Barre de navigation principale */}
       <nav className="w-full flex items-center justify-between px-6 py-3">
-        {/* LOGO */}
+        {/* Logo / lien d’accueil */}
         <Link
           to={isAuth ? "/dashboard" : "/"}
           className="flex items-center gap-2 group"
@@ -37,7 +37,7 @@ export default function Navbar() {
 
         {/* Menú */}
         <div className="flex items-center gap-2">
-          {/* Public links (NO autenticado) */}
+          {/* Liens publics (non authentifié) */}
           {!isAuth && (
             <>
               <NavLink
@@ -69,7 +69,7 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Private links (AUTENTICADO) */}
+          {/* Liens privés (authentifié) */}
           {isAuth && (
             <>
               <NavLink
@@ -110,18 +110,18 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Idioma */}
+          {/* Sélecteur de langue */}
           <div className="ml-2">
             <LangSwitcher />
           </div>
 
-          {/* Logout */}
+          {/* Bouton de déconnexion */}
           {isAuth && (
             <button
               onClick={handleLogout}
               className="ml-2 px-4 py-2 rounded-xl text-sm font-medium border border-slate-300/60 bg-white/80 hover:bg-white transition shadow-sm"
             >
-              Logout
+              {t("nav.logout", "Logout")}
             </button>
           )}
         </div>
