@@ -1,0 +1,72 @@
+{
+  "appTitle": "SportConnectIA",
+
+  "nav": {
+    "home": "Accueil",
+    "sports": "Sports",
+    "reco": "Recommandations",
+    "chat": "Chat",
+    "login": "Connexion",
+    "register": "Créer un compte",
+    "dashboard": "Tableau de bord"
+  },
+
+
+  "home.hero.title_1": "Votre coach fitness",
+  "home.hero.title_highlight": "intelligent",
+  "home.hero.title_2": "et personnalisé",
+  "home.hero.description": "SportConnectIA utilise l’intelligence artificielle pour créer des programmes d’entraînement adaptés à vos objectifs, votre niveau et vos préférences. Discutez avec notre chatbot expert pour obtenir des conseils personnalisés.",
+  "home.hero.start": "Commencer gratuitement",
+  "home.hero.learn_more": "En savoir plus",
+
+  "home.badges.b1": "IA & bien-être",
+  "home.badges.b2": "Programmes personnalisés",
+  "home.badges.b3": "Suivi en temps réel",
+
+  "home.features.title": "Fonctionnalités intelligentes",
+  "home.features.subtitle": "Découvrez comment SportConnectIA révolutionne votre entraînement avec des technologies d'IA avancées.",
+  "home.features.f1_title": "Chatbot IA Expert",
+  "home.features.f1_text": "Discutez avec notre assistant intelligent disponible 24/7 pour répondre à vos questions sur la nutrition, l'entraînement et la récupération.",
+  "home.features.f2_title": "Recommandations personnalisées",
+  "home.features.f2_text": "Des programmes adaptés à votre niveau, vos objectifs et vos préférences.",
+  "home.features.f3_title": "Suivi de progression",
+  "home.features.f3_text": "Visualisez vos progrès avec des graphiques détaillés et des statistiques en temps réel.",
+  "home.features.f4_title": "Gamification",
+  "home.features.f4_text": "Gagnez des badges, relevez des défis quotidiens et restez motivé.",
+  "home.features.f5_title": "Ajustements dynamiques",
+  "home.features.f5_text": "L’IA adapte automatiquement vos programmes selon vos performances.",
+  "home.features.f6_title": "Conseils en temps réel",
+  "home.features.f6_text": "Recevez des recommandations instantanées pendant vos séances.",
+
+  "home.cta.title": "Prêt à transformer votre entraînement ?",
+  "home.cta.subtitle": "Rejoignez des milliers d’utilisateurs qui atteignent leurs objectifs.",
+  "home.cta.button": "Commencer gratuitement",
+
+
+  "chat.title": "Assistant Coach IA",
+  "chat.subtitle": "Discutez avec votre coach personnel alimenté par l’intelligence artificielle.",
+  "chat.placeholder": "Posez votre question au coach… (ex : Comment reprendre le sport en douceur ?)",
+  "chat.send": "Envoyer",
+  "chat.typing": "Le coach est en train d’écrire…",
+  "chat.welcome": "Bonjour ! Je suis ton coach SportConnectIA. Pose-moi tes questions sur l’entraînement, la santé ou la motivation 😊",
+  "chat.empty": "Commence la conversation avec une question sur tes habitudes ou ton entraînement.",
+  "chat.emptyAnswer": "J’ai besoin d’un peu plus de contexte pour mieux t’aider 🙂",
+  "chat.error": "Une erreur est survenue. Réessayez dans quelques instants.",
+  "chat.history_title": "Conversations",
+  "chat.new": "Nouveau",
+  "chat.no_conversations": "Aucune conversation enregistrée pour l’instant.",
+  "chat.faq_title": "Questions fréquentes",
+  "chat.faq_1": "Comment créer un programme de musculation pour débutant ?",
+  "chat.faq_2": "Quel est le meilleur type de cardio pour perdre du poids ?",
+  "chat.faq_3": "Quels aliments privilégier pour la prise de muscle ?",
+  "chat.faq_4": "Comment optimiser ma récupération après l’entraînement ?",
+
+
+
+  "welcome": "Bonjour, {{name}} !",
+  "welcome_generic": "Bonjour !",
+  "logout": "Déconnexion"
+
+
+  
+}

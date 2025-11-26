@@ -1,0 +1,52 @@
+{
+  "appTitle": "SportConnectIA",
+  "nav": {
+    "home": "Início",
+    "sports": "Esportes",
+    "reco": "Recomendações",
+    "chat": "Chatbot",
+    "login": "Entrar",
+    "register": "Registrar",
+    "dashboard": "Painel"
+  },
+
+  "home": {
+    "hero": {
+      "title_1": "Seu treinador fitness",
+      "title_highlight": "inteligente",
+      "title_2": "e personalizado",
+      "description": "O SportConnectIA usa inteligência artificial para criar treinos personalizados para seus objetivos, nível e preferências. Converse com nosso assistente para receber orientações personalizadas.",
+      "start": "Começar grátis",
+      "learn_more": "Saiba mais"
+    },
+
+    "badges": {
+      "b1": "IA & bem-estar",
+      "b2": "Programas personalizados",
+      "b3": "Monitoramento em tempo real"
+    },
+
+    "features": {
+      "title": "Funcionalidades inteligentes",
+      "subtitle": "Descubra como o SportConnectIA transforma seu treino com IA avançada.",
+      "f1_title": "Chatbot IA especialista",
+      "f1_text": "Converse com nosso assistente 24/7 sobre treinos, nutrição e recuperação.",
+      "f2_title": "Recomendações personalizadas",
+      "f2_text": "Rotinas ajustadas ao seu nível e aos seus objetivos.",
+      "f3_title": "Acompanhamento de progresso",
+      "f3_text": "Acompanhe seu desempenho com gráficos e estatísticas ao vivo.",
+      "f4_title": "Gamificação",
+      "f4_text": "Ganhe medalhas, desafios e mantenha-se motivado.",
+      "f5_title": "Ajustes dinâmicos",
+      "f5_text": "A IA adapta seus treinos conforme seu desempenho.",
+      "f6_title": "Dicas em tempo real",
+      "f6_text": "Receba orientações instantâneas durante os treinos."
+    },
+
+    "cta": {
+      "title": "Pronto para transformar seu treino?",
+      "subtitle": "Junte-se a milhares de usuários que já alcançam seus objetivos.",
+      "button": "Começar grátis"
+    }
+  }
+}
