@@ -25,21 +25,34 @@ export default function Login() {
     try {
       setLoading(true);
 
-      // login contra el microservicio
-      const res = await loginUser({ email: form.email, password: form.password });
+      // 1) Login contra el microservicio Auth
+      const res = await loginUser({
+        email: form.email,
+        password: form.password,
+      });
 
       // acepta { token } ó { access_token }
       const token = (res as any)?.token ?? (res as any)?.access_token;
       if (!token) throw new Error("No se recibió el token.");
 
+      // guardar token en localStorage
       localStorage.setItem("token", token);
 
       // guardar snapshot del nombre para el saludo en el navbar
       saveUserSnapshotFromToken();
 
-      // si ya tiene perfil local → dashboard; si no → onboarding
-      const hasProfile = !!localStorage.getItem("profile_v1");
-      nav(hasProfile ? "/dashboard" : "/onboarding");
+      // 2) Determinar si es admin según el email que escribió
+      const emailLower = form.email.trim().toLowerCase();
+      const isAdmin = emailLower === "dianaalarcon@teccart.com";
+
+      if (isAdmin) {
+        // 👉 si es admin, lo enviamos al panel de administración
+        nav("/admin/users");
+      } else {
+        // 👉 si NO es admin, usamos tu lógica anterior
+        const hasProfile = !!localStorage.getItem("profile_v1");
+        nav(hasProfile ? "/dashboard" : "/onboarding");
+      }
     } catch (e: any) {
       setErr(String(e?.message || e?.detail || "Credenciales inválidas."));
     } finally {

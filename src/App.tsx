@@ -14,6 +14,7 @@ import Chat from "./pages/Chat";
 import Tracking from "./pages/Tracking";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
+import AdminUsers from "./pages/AdminUsers"; // 👈 NUEVO
 
 export default function App() {
   return (
@@ -21,7 +22,7 @@ export default function App() {
       <Navbar />
 
       <Routes>
-        {/* PÚBLICAS */}
+        {/* PUBLIQUES */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -34,6 +35,8 @@ export default function App() {
           <Route path="/chat" element={<Chat />} />
           <Route path="/tracking" element={<Tracking />} />
           <Route path="/onboarding" element={<Onboarding />} />
+          {/* 👇 Ruta Admin protegida (solo usuarios conectados) */}
+          <Route path="/admin/users" element={<AdminUsers />} />
         </Route>
 
         {/* redirecciones / 404 */}
