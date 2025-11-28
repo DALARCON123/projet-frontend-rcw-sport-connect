@@ -120,7 +120,7 @@ export default function Navbar() {
                   }
                 >
                   <ShieldCheck className="w-4 h-4" />
-                  {t("nav.admin", "Admin")}
+                  {t("nav.admin")}
                 </NavLink>
               )}
             </>
@@ -137,7 +137,7 @@ export default function Navbar() {
               onClick={handleLogout}
               className="ml-2 px-4 py-2 rounded-xl text-sm font-medium border border-slate-300/60 bg-white/80 hover:bg-white transition shadow-sm"
             >
-              {t("nav.logout", "Logout")}
+              {t("nav.logout")}
             </button>
           )}
         </div>

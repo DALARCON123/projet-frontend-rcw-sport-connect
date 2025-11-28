@@ -26,15 +26,14 @@ export default function Tracking() {
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-8">
-      {/* FR: Titre de la page de suivi */}
       <h1 className="text-2xl font-bold mb-4">
-        {t("pages.tracking.title", "Seguimiento")}
+        {t("pages.tracking.title")}
       </h1>
 
       <div className="flex gap-2 mb-4">
         <input
           className="rounded-xl border px-3 py-2"
-          placeholder={t("pages.tracking.weight_placeholder", "Peso (kg)")}
+          placeholder={t("pages.tracking.weight_placeholder")}
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
         />
@@ -42,7 +41,7 @@ export default function Tracking() {
           className="px-4 py-2 rounded-xl bg-slate-900 text-white"
           onClick={save}
         >
-          {t("pages.tracking.save_button", "Guardar")}
+          {t("pages.tracking.save_button")}
         </button>
       </div>
 
@@ -51,16 +50,16 @@ export default function Tracking() {
           <thead className="bg-slate-50">
             <tr>
               <th className="px-3 py-2 text-left">
-                {t("pages.tracking.table.date", "Fecha")}
+                {t("pages.tracking.table.date")}
               </th>
               <th className="px-3 py-2 text-left">
-                {t("pages.tracking.table.weight", "Peso (kg)")}
+                {t("pages.tracking.table.weight")}
               </th>
               <th className="px-3 py-2 text-left">
-                {t("pages.tracking.table.waist", "Cintura (cm)")}
+                {t("pages.tracking.table.waist")}
               </th>
               <th className="px-3 py-2 text-left">
-                {t("pages.tracking.table.notes", "Notas")}
+                {t("pages.tracking.table.notes")}
               </th>
             </tr>
           </thead>

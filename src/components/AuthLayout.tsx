@@ -37,13 +37,10 @@ export default function AuthLayout({
             <div className="text-slate-600 text-center px-6">
               <div className="text-7xl mb-4">💪🫀</div>
               <p className="font-semibold">
-                {t("auth.hero.title", "Entrena con IA, a tu ritmo")}
+                {t("auth.hero.title")}
               </p>
               <p className="text-sm mt-1">
-                {t(
-                  "auth.hero.subtitle",
-                  "Programas, retos y seguimiento inteligente"
-                )}
+                {t("auth.hero.subtitle")}
               </p>
             </div>
           </div>
