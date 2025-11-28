@@ -1,400 +1,425 @@
-// src/pages/AdminUsers.tsx
-import React, { useEffect, useState } from "react";
-import {
-  adminListerUtilisateurs,
-  adminModifierUtilisateur,
-  adminEnvoyerNotification,
-  type UtilisateurDto,
-} from "../services/authService";
+import { useEffect, useState } from "react";
+import { authClient } from "../services/apiClient";
 
 /**
- * Page d’administration des utilisateurs :
- * - liste des utilisateurs
- * - édition (nom, email, actif, admin, mot de passe)
- * - envoi de notifications
+ * Représentation d'un utilisateur côté frontend.
  */
-const AdminUsers: React.FC = () => {
+type UtilisateurDto = {
+  id: number;
+  name: string | null;
+  email: string;
+  is_active: boolean;
+  is_admin: boolean;
+  created_at?: string;
+};
+
+/**
+ * Statistiques pour l'en-tête de la page.
+ */
+type StatsDto = {
+  total: number;
+  actifs: number;
+  admins: number;
+};
+
+export default function AdminUsers() {
   const [utilisateurs, setUtilisateurs] = useState<UtilisateurDto[]>([]);
-  const [selection, setSelection] = useState<UtilisateurDto | null>(null);
+  const [stats, setStats] = useState<StatsDto>({
+    total: 0,
+    actifs: 0,
+    admins: 0,
+  });
+  const [filtre, setFiltre] = useState("");
   const [chargement, setChargement] = useState(false);
-  const [messageInfo, setMessageInfo] = useState<string | null>(null);
-  const [messageErreur, setMessageErreur] = useState<string | null>(null);
+  const [erreur, setErreur] = useState<string | null>(null);
 
-  // Champs du formulaire d’édition
-  const [nom, setNom] = useState("");
-  const [email, setEmail] = useState("");
-  const [actif, setActif] = useState(true);
-  const [admin, setAdmin] = useState(false);
-  const [nouveauMotDePasse, setNouveauMotDePasse] = useState("");
+  const [utilisateurSelectionne, setUtilisateurSelectionne] =
+    useState<UtilisateurDto | null>(null);
 
-  // Champs pour la notification
-  const [titreNotif, setTitreNotif] = useState("");
+  const [sujetNotif, setSujetNotif] = useState("");
   const [messageNotif, setMessageNotif] = useState("");
+  const [envoiNotifEnCours, setEnvoiNotifEnCours] = useState(false);
 
-  // Charger la liste des utilisateurs
-  useEffect(() => {
-    const charger = async () => {
-      try {
-        setChargement(true);
-        setMessageErreur(null);
-        const data = await adminListerUtilisateurs();
-        setUtilisateurs(data);
-      } catch (err) {
-        console.error(err);
-        setMessageErreur(
-          "Impossible de charger la liste des utilisateurs. Vérifiez que vous êtes connecté(e) en tant qu’administrateur."
-        );
-      } finally {
-        setChargement(false);
-      }
-    };
-
-    charger();
-  }, []);
-
-  // Sélectionner un utilisateur dans la liste
-  const handleSelect = (user: UtilisateurDto) => {
-    setSelection(user);
-    setNom(user.name || "");
-    setEmail(user.email);
-    setActif(user.is_active);
-    setAdmin(user.is_admin);
-    setNouveauMotDePasse("");
-    setTitreNotif("");
-    setMessageNotif("");
-    setMessageInfo(null);
-    setMessageErreur(null);
-  };
-
-  // Sauvegarder les modifications
-  const handleSave = async () => {
-    if (!selection) return;
-
+  /**
+   * Charge la liste des utilisateurs depuis le microservice d'authentification.
+   * Adapter l'URL selon les routes définies dans le backend.
+   */
+  async function chargerUtilisateurs() {
     try {
       setChargement(true);
-      setMessageInfo(null);
-      setMessageErreur(null);
+      setErreur(null);
 
-      await adminModifierUtilisateur(selection.id, {
-        name: nom,
-        email,
-        is_active: actif,
-        is_admin: admin,
-        new_password: nouveauMotDePasse || undefined,
-      });
+      // Exemple d'endpoint backend : GET /auth/admin/users
+      const data = await authClient.get<UtilisateurDto[]>("/admin/users");
 
-      // Recharger la liste à jour
-      const updatedList = await adminListerUtilisateurs();
-      setUtilisateurs(updatedList);
-      const refreshed =
-        updatedList.find(
-          (u: UtilisateurDto) => u.id === selection.id
-        ) || null;
-      setSelection(refreshed);
+      setUtilisateurs(data);
 
-      setMessageInfo("Modifications enregistrées avec succès.");
-      setNouveauMotDePasse("");
-    } catch (err) {
-      console.error(err);
-      setMessageErreur(
-        "Erreur lors de l’enregistrement des modifications de l’utilisateur."
+      const total = data.length;
+      const actifs = data.filter((u) => u.is_active).length;
+      const admins = data.filter((u) => u.is_admin).length;
+
+      setStats({ total, actifs, admins });
+    } catch (e: any) {
+      setErreur(
+        String(
+          e?.message ||
+            e?.detail ||
+            "Erreur lors du chargement des utilisateurs."
+        )
       );
     } finally {
       setChargement(false);
     }
-  };
+  }
 
-  // Envoyer une notification
-  const handleSendNotification = async () => {
-    if (!selection) return;
+  useEffect(() => {
+    chargerUtilisateurs();
+  }, []);
 
-    if (!titreNotif.trim() || !messageNotif.trim()) {
-      setMessageErreur(
-        "Le titre et le message de la notification sont obligatoires."
+  /**
+   * Filtre les utilisateurs par nom ou email côté client.
+   */
+  const utilisateursFiltres = utilisateurs.filter((u) => {
+    if (!filtre.trim()) return true;
+    const f = filtre.toLowerCase();
+    return (
+      (u.name || "").toLowerCase().includes(f) ||
+      u.email.toLowerCase().includes(f)
+    );
+  });
+
+  /**
+   * Met à jour les champs is_active et/ou is_admin pour un utilisateur.
+   * Adapter l'URL selon l'API (PUT /admin/users/{id}, etc.).
+   */
+  async function mettreAJourUtilisateur(
+    id: number,
+    champs: Partial<Pick<UtilisateurDto, "is_active" | "is_admin">>
+  ) {
+    try {
+      setErreur(null);
+
+      const utilisateur = utilisateurs.find((u) => u.id === id);
+      if (!utilisateur) return;
+
+      const miseAJour: UtilisateurDto = { ...utilisateur, ...champs };
+
+      await authClient.put(`/admin/users/${id}`, miseAJour);
+
+      const listeMaj = utilisateurs.map((u) =>
+        u.id === id ? miseAJour : u
       );
+      setUtilisateurs(listeMaj);
+
+      const total = listeMaj.length;
+      const actifs = listeMaj.filter((u) => u.is_active).length;
+      const admins = listeMaj.filter((u) => u.is_admin).length;
+      setStats({ total, actifs, admins });
+    } catch (e: any) {
+      setErreur(
+        String(
+          e?.message ||
+            e?.detail ||
+            "Erreur lors de la mise à jour de l'utilisateur."
+        )
+      );
+    }
+  }
+
+  /**
+   * Envoie une notification à l'utilisateur sélectionné.
+   * Adapter l'URL selon l'API (POST /admin/users/{id}/notify, etc.).
+   */
+  async function envoyerNotification() {
+    if (!utilisateurSelectionne) return;
+    if (!sujetNotif.trim() || !messageNotif.trim()) {
+      setErreur("Le sujet et le message de la notification sont requis.");
       return;
     }
 
     try {
-      setChargement(true);
-      setMessageInfo(null);
-      setMessageErreur(null);
+      setEnvoiNotifEnCours(true);
+      setErreur(null);
 
-      await adminEnvoyerNotification(
-        selection.id,
-        titreNotif.trim(),
-        messageNotif.trim()
-      );
+      await authClient.post(`/admin/users/${utilisateurSelectionne.id}/notify`, {
+        subject: sujetNotif,
+        message: messageNotif,
+      });
 
-      setMessageInfo("Notification envoyée avec succès.");
-      setTitreNotif("");
+      setSujetNotif("");
       setMessageNotif("");
-    } catch (err) {
-      console.error(err);
-      setMessageErreur("Erreur lors de l’envoi de la notification.");
+    } catch (e: any) {
+      setErreur(
+        String(
+          e?.message ||
+            e?.detail ||
+            "Erreur lors de l'envoi de la notification."
+        )
+      );
     } finally {
-      setChargement(false);
+      setEnvoiNotifEnCours(false);
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Bandeau supérieur */}
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-semibold text-slate-900">
-              Espace administrateur
-            </h1>
+    <main className="max-w-6xl mx-auto px-4 py-10 space-y-8">
+      {/* En-tête de page */}
+      <section className="flex flex-col gap-2">
+        <h1 className="text-2xl font-semibold text-slate-900">
+          Espace administrateur
+        </h1>
+        <p className="text-sm text-slate-600">
+          Gestion des utilisateurs de SportConnectIA et envoi de notifications.
+        </p>
+      </section>
+
+      {/* Barre de recherche et bouton d'actualisation */}
+      <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <input
+          type="text"
+          placeholder="Rechercher par nom ou email..."
+          className="w-full md:max-w-md rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-400"
+          value={filtre}
+          onChange={(e) => setFiltre(e.target.value)}
+        />
+
+        <button
+          type="button"
+          onClick={chargerUtilisateurs}
+          className="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-500 hover:from-fuchsia-600 hover:via-purple-600 hover:to-sky-600 transition shadow-lg"
+        >
+          Actualiser
+        </button>
+      </section>
+
+      {/* Cartes de statistiques avec une palette proche de la page d'accueil */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Total utilisateurs */}
+        <div className="rounded-2xl border border-slate-200 bg-white/90 px-4 py-5 shadow-sm">
+          <p className="text-xs font-medium uppercase text-slate-500">
+            Utilisateurs
+          </p>
+          <p className="mt-2 text-3xl font-semibold text-slate-900">
+            {stats.total}
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Total des utilisateurs enregistrés
+          </p>
+        </div>
+
+        {/* Comptes actifs */}
+        <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-fuchsia-500/10 via-purple-500/10 to-sky-500/10 px-4 py-5 shadow-sm">
+          <p className="text-xs font-medium uppercase text-slate-600">
+            Comptes actifs
+          </p>
+          <p className="mt-2 text-3xl font-semibold text-slate-900">
+            {stats.actifs}
+          </p>
+          <p className="mt-1 text-xs text-slate-600">
+            Utilisateurs pouvant se connecter
+          </p>
+        </div>
+
+        {/* Administrateurs */}
+        <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-sky-500/5 via-purple-500/5 to-fuchsia-500/5 px-4 py-5 shadow-sm">
+          <p className="text-xs font-medium uppercase text-slate-500">
+            Administrateurs
+          </p>
+          <p className="mt-2 text-3xl font-semibold text-slate-900">
+            {stats.admins}
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Comptes avec accès administrateur
+          </p>
+        </div>
+      </section>
+
+      {/* Tableau et panneau latéral */}
+      <section className="grid grid-cols-1 lg:grid-cols-[2fr,1.2fr] gap-6 items-start">
+        {/* Tableau des utilisateurs */}
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-sm">
+          <div className="border-b border-slate-100 px-4 py-3">
+            <h2 className="text-sm font-semibold text-slate-800">
+              Utilisateurs enregistrés
+            </h2>
             <p className="text-xs text-slate-500">
-              Gestion des utilisateurs et des notifications SportConnectIA.
+              Cliquez sur une ligne pour afficher ou modifier les informations.
             </p>
           </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-slate-50">
+                <tr className="text-left text-xs font-semibold uppercase text-slate-500">
+                  <th className="px-4 py-3">ID</th>
+                  <th className="px-4 py-3">Nom</th>
+                  <th className="px-4 py-3">Email</th>
+                  <th className="px-4 py-3 text-center">Actif</th>
+                  <th className="px-4 py-3 text-center">Admin</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {utilisateursFiltres.map((u) => (
+                  <tr
+                    key={u.id}
+                    className={`border-t border-slate-100 hover:bg-slate-50 cursor-pointer ${
+                      u.id === utilisateurSelectionne?.id ? "bg-sky-50" : ""
+                    }`}
+                    onClick={() => setUtilisateurSelectionne(u)}
+                  >
+                    <td className="px-4 py-2 text-xs text-slate-500">
+                      {u.id}
+                    </td>
+                    <td className="px-4 py-2 text-slate-800">
+                      {u.name || "(Sans nom)"}
+                    </td>
+                    <td className="px-4 py-2 text-slate-700">{u.email}</td>
+                    <td className="px-4 py-2 text-center">
+                      <input
+                        type="checkbox"
+                        checked={u.is_active}
+                        onChange={(e) =>
+                          mettreAJourUtilisateur(u.id, {
+                            is_active: e.target.checked,
+                          })
+                        }
+                      />
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      <input
+                        type="checkbox"
+                        checked={u.is_admin}
+                        onChange={(e) =>
+                          mettreAJourUtilisateur(u.id, {
+                            is_admin: e.target.checked,
+                          })
+                        }
+                      />
+                    </td>
+                    <td className="px-4 py-2 text-right">
+                      <button
+                        type="button"
+                        className="rounded-lg border border-slate-200 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                        onClick={() => setUtilisateurSelectionne(u)}
+                      >
+                        Détails
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+
+                {utilisateursFiltres.length === 0 && !chargement && (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-4 py-6 text-center text-sm text-slate-500"
+                    >
+                      Aucun utilisateur ne correspond au filtre.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {chargement && (
+            <div className="border-t border-slate-100 px-4 py-3 text-xs text-slate-500">
+              Chargement des données...
+            </div>
+          )}
+
+          {erreur && (
+            <div className="border-t border-rose-100 bg-rose-50 px-4 py-3 text-xs text-rose-700">
+              {erreur}
+            </div>
+          )}
         </div>
-      </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-        {messageInfo && (
-          <div className="rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            {messageInfo}
-          </div>
-        )}
-        {messageErreur && (
-          <div className="rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-            {messageErreur}
-          </div>
-        )}
+        {/* Panneau latéral : détails et notification */}
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-sm">
+            <h2 className="text-sm font-semibold text-slate-800">
+              Détails de l'utilisateur
+            </h2>
 
-        <div className="grid gap-6 lg:grid-cols-2 items-start">
-          {/* Tableau des utilisateurs */}
-          <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
-              <div>
-                <h2 className="text-sm font-semibold text-slate-900">
-                  Utilisateurs enregistrés
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Cliquez sur un utilisateur pour afficher ses détails.
+            {utilisateurSelectionne ? (
+              <div className="mt-3 space-y-1 text-sm text-slate-700">
+                <p>
+                  <span className="font-medium">Nom : </span>
+                  {utilisateurSelectionne.name || "(Sans nom)"}
+                </p>
+                <p>
+                  <span className="font-medium">Email : </span>
+                  {utilisateurSelectionne.email}
+                </p>
+                <p>
+                  <span className="font-medium">Actif : </span>
+                  {utilisateurSelectionne.is_active ? "Oui" : "Non"}
+                </p>
+                <p>
+                  <span className="font-medium">Administrateur : </span>
+                  {utilisateurSelectionne.is_admin ? "Oui" : "Non"}
                 </p>
               </div>
-              {chargement && (
-                <span className="text-xs text-slate-400">
-                  Chargement en cours…
-                </span>
-              )}
-            </div>
+            ) : (
+              <p className="mt-3 text-sm text-slate-500">
+                Sélectionnez un utilisateur dans le tableau pour afficher ses
+                informations.
+              </p>
+            )}
+          </div>
 
-            <div className="overflow-auto max-h-[480px]">
-              <table className="min-w-full text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200">
-                  <tr>
-                    <th className="px-3 py-2 text-left font-medium text-slate-500">
-                      ID
-                    </th>
-                    <th className="px-3 py-2 text-left font-medium text-slate-500">
-                      Nom
-                    </th>
-                    <th className="px-3 py-2 text-left font-medium text-slate-500">
-                      Email
-                    </th>
-                    <th className="px-3 py-2 text-center font-medium text-slate-500">
-                      Actif
-                    </th>
-                    <th className="px-3 py-2 text-center font-medium text-slate-500">
-                      Admin
-                    </th>
-                    <th className="px-3 py-2" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {utilisateurs.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan={6}
-                        className="px-3 py-6 text-center text-slate-400"
-                      >
-                        Aucun utilisateur pour le moment.
-                      </td>
-                    </tr>
-                  )}
+          <div className="rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-sm">
+            <h2 className="text-sm font-semibold text-slate-800">
+              Envoyer une notification
+            </h2>
 
-                  {utilisateurs.map((u: UtilisateurDto) => (
-                    <tr
-                      key={u.id}
-                      className={`border-b border-slate-100 text-slate-700 ${
-                        selection?.id === u.id
-                          ? "bg-indigo-50/80"
-                          : "hover:bg-slate-50"
-                      }`}
-                    >
-                      <td className="px-3 py-2">{u.id}</td>
-                      <td className="px-3 py-2">
-                        {u.name || (
-                          <span className="text-slate-400">Sans nom</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-2">{u.email}</td>
-                      <td className="px-3 py-2 text-center">
-                        {u.is_active ? "✅" : "⛔"}
-                      </td>
-                      <td className="px-3 py-2 text-center">
-                        {u.is_admin ? "⭐" : "—"}
-                      </td>
-                      <td className="px-3 py-2 text-right">
-                        <button
-                          onClick={() => handleSelect(u)}
-                          className="inline-flex items-center rounded-full bg-indigo-600 px-3 py-1 text-[11px] font-medium text-white hover:bg-indigo-500"
-                        >
-                          Modifier
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          {/* Panneau de droite : édition + notification */}
-          <section className="space-y-4">
-            {/* Carte édition utilisateur */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
-              <h2 className="text-sm font-semibold text-slate-900">
-                Détails de l’utilisateur
-              </h2>
-
-              {!selection ? (
+            {utilisateurSelectionne ? (
+              <div className="mt-3 space-y-3">
                 <p className="text-xs text-slate-500">
-                  Sélectionnez un utilisateur dans le tableau pour afficher et
-                  modifier ses informations.
+                  Notification destinée à{" "}
+                  <span className="font-medium">
+                    {utilisateurSelectionne.email}
+                  </span>
+                  .
                 </p>
-              ) : (
-                <>
-                  <div className="space-y-2 text-xs">
-                    <div className="flex flex-col gap-1">
-                      <label className="text-slate-600">Nom complet</label>
-                      <input
-                        className="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value={nom}
-                        onChange={(e) => setNom(e.target.value)}
-                      />
-                    </div>
 
-                    <div className="flex flex-col gap-1">
-                      <label className="text-slate-600">
-                        Adresse courriel
-                      </label>
-                      <input
-                        className="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
+                <input
+                  type="text"
+                  placeholder="Sujet de la notification"
+                  className="w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-400"
+                  value={sujetNotif}
+                  onChange={(e) => setSujetNotif(e.target.value)}
+                />
 
-                    <div className="flex gap-4 items-center pt-1">
-                      <label className="flex items-center gap-2 text-slate-600">
-                        <input
-                          type="checkbox"
-                          checked={actif}
-                          onChange={(e) => setActif(e.target.checked)}
-                        />
-                        <span>Compte actif</span>
-                      </label>
-                      <label className="flex items-center gap-2 text-slate-600">
-                        <input
-                          type="checkbox"
-                          checked={admin}
-                          onChange={(e) => setAdmin(e.target.checked)}
-                        />
-                        <span>Administrateur</span>
-                      </label>
-                    </div>
+                <textarea
+                  rows={4}
+                  placeholder="Message à envoyer à l'utilisateur..."
+                  className="w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-400"
+                  value={messageNotif}
+                  onChange={(e) => setMessageNotif(e.target.value)}
+                />
 
-                    <div className="flex flex-col gap-1 pt-1">
-                      <label className="text-slate-600">
-                        Nouveau mot de passe (optionnel)
-                      </label>
-                      <input
-                        type="password"
-                        className="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value={nouveauMotDePasse}
-                        onChange={(e) =>
-                          setNouveauMotDePasse(e.target.value)
-                        }
-                        placeholder="Laisser vide pour ne pas modifier"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="pt-2">
-                    <button
-                      onClick={handleSave}
-                      disabled={chargement}
-                      className="inline-flex items-center rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
-                    >
-                      {chargement
-                        ? "Enregistrement…"
-                        : "Enregistrer les modifications"}
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Carte notification */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
-              <h2 className="text-sm font-semibold text-slate-900">
-                Envoyer une notification
-              </h2>
-
-              {!selection ? (
-                <p className="text-xs text-slate-500">
-                  Sélectionnez un utilisateur pour lui envoyer une notification.
-                </p>
-              ) : (
-                <>
-                  <p className="text-[11px] text-slate-500">
-                    Notification destinée à :{" "}
-                    <span className="font-semibold text-slate-800">
-                      {selection.email}
-                    </span>
-                  </p>
-
-                  <div className="flex flex-col gap-1 text-xs">
-                    <label className="text-slate-600">Titre</label>
-                    <input
-                      className="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      value={titreNotif}
-                      onChange={(e) => setTitreNotif(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1 text-xs">
-                    <label className="text-slate-600">Message</label>
-                    <textarea
-                      className="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[80px]"
-                      value={messageNotif}
-                      onChange={(e) => setMessageNotif(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="pt-2">
-                    <button
-                      onClick={handleSendNotification}
-                      disabled={chargement}
-                      className="inline-flex items-center rounded-xl bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-500 disabled:opacity-60"
-                    >
-                      {chargement ? "Envoi…" : "Envoyer la notification"}
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </section>
+                <button
+                  type="button"
+                  disabled={envoiNotifEnCours}
+                  onClick={envoyerNotification}
+                  className="w-full rounded-xl px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-500 hover:from-fuchsia-600 hover:via-purple-600 hover:to-sky-600 disabled:opacity-60 shadow-lg"
+                >
+                  {envoiNotifEnCours
+                    ? "Envoi en cours..."
+                    : "Envoyer la notification"}
+                </button>
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-slate-500">
+                Sélectionnez d'abord un utilisateur pour envoyer un message.
+              </p>
+            )}
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
-};
-
-export default AdminUsers;
+}
