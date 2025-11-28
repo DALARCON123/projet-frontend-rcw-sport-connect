@@ -1,16 +1,17 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LangSwitcher from "./LangSwitcher";
-import { Sparkles } from "lucide-react";
+import { Sparkles, ShieldCheck } from "lucide-react";
+import { isAdminFromToken } from "../services/authService";
 
 const link =
   "px-4 py-2 rounded-xl text-sm font-medium transition-all hover:bg-white/80 hover:shadow-sm";
-const active =
-  "bg-white/90 text-ink shadow-sm border border-slate-200";
+const active = "bg-white/90 text-ink shadow-sm border border-slate-200";
 
 export default function Navbar() {
   const { t } = useTranslation();
   const isAuth = !!localStorage.getItem("token");
+  const isAdmin = isAdminFromToken();
   const location = useLocation();
 
   const handleLogout = () => {
@@ -107,6 +108,21 @@ export default function Navbar() {
               >
                 {t("nav.chat")}
               </NavLink>
+
+              {/* Botão Admin - apenas para administradores */}
+              {isAdmin && (
+                <NavLink
+                  to="/admin/users"
+                  className={({ isActive }) =>
+                    `${link} ${
+                      isActive ? active : ""
+                    } flex items-center gap-1.5`
+                  }
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  {t("nav.admin", "Admin")}
+                </NavLink>
+              )}
             </>
           )}
 
