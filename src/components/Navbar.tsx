@@ -1,4 +1,4 @@
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LangSwitcher from "./LangSwitcher";
 import { Sparkles, ShieldCheck } from "lucide-react";
@@ -12,7 +12,6 @@ export default function Navbar() {
   const { t } = useTranslation();
   const isAuth = !!localStorage.getItem("token");
   const isAdmin = isAdminFromToken();
-  const location = useLocation();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
