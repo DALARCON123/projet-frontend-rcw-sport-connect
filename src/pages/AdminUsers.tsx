@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { authClient } from "../services/apiClient";
 import { Users, Plus, RefreshCw } from "lucide-react";
 import { getUserSnapshot } from "../services/authService";
+import { useTranslation } from "react-i18next";
 
 /**
  * Modèle utilisateur côté frontend.
@@ -25,6 +26,7 @@ type StatsDto = {
 };
 
 export default function AdminUsers() {
+  const { t } = useTranslation();
   const [utilisateurs, setUtilisateurs] = useState<UtilisateurDto[]>([]);
   const [stats, setStats] = useState<StatsDto>({
     total: 0,
@@ -51,7 +53,7 @@ export default function AdminUsers() {
   function messageErreur(e: any, defaut: string): string {
     const brut = String(e?.message || e?.detail || defaut || "");
     if (brut.toLowerCase().includes("body stream already read")) {
-      return "Erreur de communication avec le service d’authentification.";
+      return t("pages.admin.errors.load");
     }
     return brut || defaut;
   }
@@ -78,12 +80,7 @@ export default function AdminUsers() {
       setUtilisateurs(data);
       recalculerStats(data);
     } catch (e: any) {
-      setErreur(
-        messageErreur(
-          e,
-          "Erreur lors du chargement des utilisateurs."
-        )
-      );
+      setErreur(messageErreur(e, t("pages.admin.errors.load")));
     } finally {
       setChargement(false);
     }
@@ -125,18 +122,11 @@ export default function AdminUsers() {
 
       await authClient.put(`/admin/users/${id}`, miseAJour);
 
-      const listeMaj = utilisateurs.map((u) =>
-        u.id === id ? miseAJour : u
-      );
+      const listeMaj = utilisateurs.map((u) => (u.id === id ? miseAJour : u));
       setUtilisateurs(listeMaj);
       recalculerStats(listeMaj);
     } catch (e: any) {
-      setErreur(
-        messageErreur(
-          e,
-          "Erreur lors de la mise à jour de l’utilisateur."
-        )
-      );
+      setErreur(messageErreur(e, t("pages.admin.errors.update")));
     }
   }
 
@@ -144,7 +134,7 @@ export default function AdminUsers() {
    * Supprime un utilisateur.
    */
   async function supprimerUtilisateur(id: number) {
-    if (!window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
+    if (!window.confirm(t("pages.admin.confirm_delete"))) {
       return;
     }
 
@@ -161,12 +151,7 @@ export default function AdminUsers() {
       setUtilisateurs(listeMaj);
       recalculerStats(listeMaj);
     } catch (e: any) {
-      setErreur(
-        messageErreur(
-          e,
-          "Erreur lors de la suppression de l’utilisateur."
-        )
-      );
+      setErreur(messageErreur(e, t("pages.admin.errors.delete")));
     }
   }
 
@@ -177,7 +162,7 @@ export default function AdminUsers() {
     e.preventDefault();
 
     if (!nouveauNom.trim() || !nouvelEmail.trim() || !nouveauPass.trim()) {
-      setErreur("Nom, email et mot de passe sont obligatoires.");
+      setErreur(t("pages.admin.errors.required"));
       return;
     }
 
@@ -209,12 +194,7 @@ export default function AdminUsers() {
       setNouveauEstActif(true);
       setAfficherFormNouveau(false);
     } catch (e: any) {
-      setErreur(
-        messageErreur(
-          e,
-          "Erreur lors de la création du nouvel utilisateur."
-        )
-      );
+      setErreur(messageErreur(e, t("pages.admin.errors.create")));
     } finally {
       setCreationEnCours(false);
     }
@@ -237,7 +217,9 @@ export default function AdminUsers() {
         }`}
       >
         <td className="px-5 py-2.5 text-xs text-slate-500">{u.id}</td>
-        <td className="px-5 py-2.5 text-slate-800">{u.name || "(Sans nom)"}</td>
+        <td className="px-5 py-2.5 text-slate-800">
+          {u.name || t("pages.admin.no_name")}
+        </td>
         <td className="px-5 py-2.5 text-slate-700">{u.email}</td>
         <td className="px-5 py-2.5 text-center">
           <input
@@ -265,14 +247,16 @@ export default function AdminUsers() {
               mettreAJourUtilisateur(u.id, { is_active: !u.is_active })
             }
           >
-            {u.is_active ? "Désactiver" : "Activer"}
+            {u.is_active
+              ? t("pages.admin.deactivate")
+              : t("pages.admin.activate")}
           </button>
           <button
             type="button"
             className="rounded-lg bg-rose-500 px-3 py-1 text-xs font-medium text-white hover:bg-rose-600"
             onClick={() => supprimerUtilisateur(u.id)}
           >
-            Supprimer
+            {t("pages.admin.delete")}
           </button>
         </td>
       </tr>
@@ -286,10 +270,10 @@ export default function AdminUsers() {
         <aside className="lg:w-64 flex-shrink-0 rounded-3xl bg-white/90 border border-slate-200 shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-100">
             <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
-              Panneau
+              {t("pages.admin.users")}
             </p>
             <p className="mt-1 text-sm font-semibold text-slate-900">
-              Administration
+              {t("nav.admin")}
             </p>
           </div>
 
@@ -298,7 +282,7 @@ export default function AdminUsers() {
               <span className="rounded-xl bg-white/20 p-1.5">
                 <Users className="h-4 w-4" />
               </span>
-              <span>Utilisateurs</span>
+              <span>{t("pages.admin.users")}</span>
             </div>
           </nav>
         </aside>
@@ -309,10 +293,11 @@ export default function AdminUsers() {
           <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
               <h1 className="text-2xl font-semibold text-slate-900">
-                Espace administrateur{adminName ? ` – ${adminName}` : ""}
+                {t("pages.admin.title")}
+                {adminName ? ` – ${adminName}` : ""}
               </h1>
               <p className="text-sm text-slate-600">
-                Gestion des utilisateurs de SportConnectIA.
+                {t("pages.admin.subtitle")}
               </p>
             </div>
 
@@ -323,7 +308,7 @@ export default function AdminUsers() {
                 className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 shadow-sm"
               >
                 <RefreshCw className="h-4 w-4" />
-                Actualiser
+                {t("pages.admin.refresh")}
               </button>
 
               <button
@@ -332,7 +317,7 @@ export default function AdminUsers() {
                 className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-500 hover:from-fuchsia-600 hover:via-purple-600 hover:to-sky-600 shadow-lg"
               >
                 <Plus className="h-4 w-4" />
-                Nouveau utilisateur
+                {t("pages.admin.new_user")}
               </button>
             </div>
           </section>
@@ -341,7 +326,7 @@ export default function AdminUsers() {
           {afficherFormNouveau && (
             <section className="rounded-3xl border border-slate-200 bg-white/95 px-5 py-5 shadow-sm">
               <h2 className="text-sm font-semibold text-slate-800 mb-3">
-                Créer un nouveau compte
+                {t("pages.admin.create_account")}
               </h2>
               <form
                 onSubmit={creerNouvelUtilisateur}
@@ -349,7 +334,7 @@ export default function AdminUsers() {
               >
                 <div className="space-y-1">
                   <label className="text-xs font-medium text-slate-600">
-                    Nom complet
+                    {t("pages.admin.full_name")}
                   </label>
                   <input
                     type="text"
@@ -361,7 +346,7 @@ export default function AdminUsers() {
 
                 <div className="space-y-1">
                   <label className="text-xs font-medium text-slate-600">
-                    Email
+                    {t("pages.admin.email")}
                   </label>
                   <input
                     type="email"
@@ -373,7 +358,7 @@ export default function AdminUsers() {
 
                 <div className="space-y-1">
                   <label className="text-xs font-medium text-slate-600">
-                    Mot de passe
+                    {t("pages.admin.password")}
                   </label>
                   <input
                     type="password"
@@ -390,7 +375,7 @@ export default function AdminUsers() {
                       checked={nouveauEstActif}
                       onChange={(e) => setNouveauEstActif(e.target.checked)}
                     />
-                    Compte actif
+                    {t("pages.admin.active_account")}
                   </label>
                   <label className="inline-flex items-center gap-2 text-xs text-slate-700">
                     <input
@@ -398,7 +383,7 @@ export default function AdminUsers() {
                       checked={nouveauEstAdmin}
                       onChange={(e) => setNouveauEstAdmin(e.target.checked)}
                     />
-                    Compte administrateur
+                    {t("pages.admin.admin_account")}
                   </label>
                 </div>
 
@@ -415,7 +400,7 @@ export default function AdminUsers() {
                       setNouveauEstActif(true);
                     }}
                   >
-                    Annuler
+                    {t("pages.admin.cancel")}
                   </button>
                   <button
                     type="submit"
@@ -423,8 +408,8 @@ export default function AdminUsers() {
                     className="rounded-xl px-5 py-2 text-xs font-semibold text-white bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-500 hover:from-fuchsia-600 hover:via-purple-600 hover:to-sky-600 disabled:opacity-60 shadow-md"
                   >
                     {creationEnCours
-                      ? "Création en cours..."
-                      : "Créer l’utilisateur"}
+                      ? t("pages.admin.creating")
+                      : t("pages.admin.create_user")}
                   </button>
                 </div>
               </form>
@@ -435,7 +420,7 @@ export default function AdminUsers() {
           <section>
             <input
               type="text"
-              placeholder="Rechercher par nom ou email..."
+              placeholder={t("pages.admin.search_placeholder")}
               className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-sky-400"
               value={filtre}
               onChange={(e) => setFiltre(e.target.value)}
@@ -446,37 +431,37 @@ export default function AdminUsers() {
           <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="rounded-3xl border border-slate-200 bg-white/95 px-5 py-5 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Utilisateurs
+                {t("pages.admin.stats_total")}
               </p>
               <p className="mt-2 text-3xl font-semibold text-slate-900">
                 {stats.total}
               </p>
               <p className="mt-1 text-xs text-slate-500">
-                Nombre total de comptes
+                {t("pages.admin.stats_total_desc")}
               </p>
             </div>
 
             <div className="rounded-3xl border border-slate-200 bg-gradient-to-r from-fuchsia-500/10 via-purple-500/10 to-sky-500/10 px-5 py-5 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">
-                Comptes actifs
+                {t("pages.admin.stats_active")}
               </p>
               <p className="mt-2 text-3xl font-semibold text-slate-900">
                 {stats.actifs}
               </p>
               <p className="mt-1 text-xs text-slate-600">
-                Utilisateurs pouvant se connecter
+                {t("pages.admin.stats_active_desc")}
               </p>
             </div>
 
             <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-sky-500/5 via-purple-500/5 to-fuchsia-500/5 px-5 py-5 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Administrateurs
+                {t("pages.admin.stats_admins")}
               </p>
               <p className="mt-2 text-3xl font-semibold text-slate-900">
                 {stats.admins}
               </p>
               <p className="mt-1 text-xs text-slate-500">
-                Comptes avec rôle administrateur
+                {t("pages.admin.stats_admins_desc")}
               </p>
             </div>
           </section>
@@ -485,10 +470,10 @@ export default function AdminUsers() {
           <section className="rounded-3xl border border-slate-200 bg-white/95 shadow-sm overflow-hidden">
             <div className="border-b border-slate-100 px-5 py-4 bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-500">
               <h2 className="text-sm font-semibold text-white">
-                Administrateurs
+                {t("pages.admin.admins_title")}
               </h2>
               <p className="text-xs text-white/80">
-                Comptes ayant accès à l’espace administrateur.
+                {t("pages.admin.admins_desc")}
               </p>
             </div>
 
@@ -496,12 +481,20 @@ export default function AdminUsers() {
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500">
-                    <th className="px-5 py-3">ID</th>
-                    <th className="px-5 py-3">Nom</th>
-                    <th className="px-5 py-3">Email</th>
-                    <th className="px-5 py-3 text-center">Actif</th>
-                    <th className="px-5 py-3 text-center">Admin</th>
-                    <th className="px-5 py-3 text-right">Actions</th>
+                    <th className="px-5 py-3">{t("pages.admin.table_id")}</th>
+                    <th className="px-5 py-3">{t("pages.admin.table_name")}</th>
+                    <th className="px-5 py-3">
+                      {t("pages.admin.table_email")}
+                    </th>
+                    <th className="px-5 py-3 text-center">
+                      {t("pages.admin.table_active")}
+                    </th>
+                    <th className="px-5 py-3 text-center">
+                      {t("pages.admin.table_admin")}
+                    </th>
+                    <th className="px-5 py-3 text-right">
+                      {t("pages.admin.table_actions")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -514,7 +507,7 @@ export default function AdminUsers() {
                         colSpan={6}
                         className="px-5 py-4 text-center text-xs text-slate-500"
                       >
-                        Aucun administrateur trouvé.
+                        {t("pages.admin.no_admins")}
                       </td>
                     </tr>
                   )}
@@ -527,10 +520,10 @@ export default function AdminUsers() {
           <section className="rounded-3xl border border-slate-200 bg-white/95 shadow-sm overflow-hidden">
             <div className="border-b border-slate-100 px-5 py-4 bg-slate-50">
               <h2 className="text-sm font-semibold text-slate-800">
-                Utilisateurs
+                {t("pages.admin.users_title")}
               </h2>
               <p className="text-xs text-slate-500">
-                Comptes classiques sans rôle administrateur.
+                {t("pages.admin.users_desc")}
               </p>
             </div>
 
@@ -538,12 +531,20 @@ export default function AdminUsers() {
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500">
-                    <th className="px-5 py-3">ID</th>
-                    <th className="px-5 py-3">Nom</th>
-                    <th className="px-5 py-3">Email</th>
-                    <th className="px-5 py-3 text-center">Actif</th>
-                    <th className="px-5 py-3 text-center">Admin</th>
-                    <th className="px-5 py-3 text-right">Actions</th>
+                    <th className="px-5 py-3">{t("pages.admin.table_id")}</th>
+                    <th className="px-5 py-3">{t("pages.admin.table_name")}</th>
+                    <th className="px-5 py-3">
+                      {t("pages.admin.table_email")}
+                    </th>
+                    <th className="px-5 py-3 text-center">
+                      {t("pages.admin.table_active")}
+                    </th>
+                    <th className="px-5 py-3 text-center">
+                      {t("pages.admin.table_admin")}
+                    </th>
+                    <th className="px-5 py-3 text-right">
+                      {t("pages.admin.table_actions")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -556,7 +557,7 @@ export default function AdminUsers() {
                         colSpan={6}
                         className="px-5 py-4 text-center text-xs text-slate-500"
                       >
-                        Aucun utilisateur classique trouvé.
+                        {t("pages.admin.no_users")}
                       </td>
                     </tr>
                   )}
@@ -566,7 +567,7 @@ export default function AdminUsers() {
 
             {chargement && (
               <div className="border-t border-slate-100 px-5 py-3 text-xs text-slate-500">
-                Chargement des données...
+                {t("pages.admin.loading")}
               </div>
             )}
 

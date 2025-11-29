@@ -1,8 +1,9 @@
 import { Link, NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LangSwitcher from "./LangSwitcher";
-import { Sparkles, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { isAdminFromToken } from "../services/authService";
+import logo from "../assets/logo.png";
 
 const link =
   "px-4 py-2 rounded-xl text-sm font-medium transition-all hover:bg-white/80 hover:shadow-sm";
@@ -24,12 +25,16 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-2xl border-b border-white/50 shadow-sm">
       {/* FR: Barre de navigation principale */}
       <nav className="w-full flex items-center justify-between px-6 py-3">
-        {/* Logo / lien d’accueil */}
+        {/* Logo / lien d'accueil */}
         <Link
           to={isAuth ? "/dashboard" : "/"}
           className="flex items-center gap-2 group"
         >
-          <Sparkles className="text-fuchsia-600 group-hover:rotate-12 transition" />
+          <img
+            src={logo}
+            alt="SportConnectIA"
+            className="w-14 h-14 object-contain group-hover:scale-110 transition-transform"
+          />
           <span className="font-extrabold tracking-tight text-xl text-slate-800">
             SportConnectIA
           </span>
