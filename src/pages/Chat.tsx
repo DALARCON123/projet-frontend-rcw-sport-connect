@@ -1,5 +1,5 @@
 // src/pages/Chat.tsx
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { askBot } from "../services/chatService";
 import type { ChatResp } from "../services/chatService";
@@ -105,14 +105,15 @@ export default function Chat() {
       };
       setMsgs((m) => [...m, botMsg]);
     } catch (e) {
-      console.error(e);
+      console.error("Error en el chatbot:", e);
+      const errorMessage = e instanceof Error ? e.message : "Error desconocido";
       setMsgs((m) => [
         ...m,
         {
           id: crypto.randomUUID(),
           role: "assistant",
           text:
-            (t("chat.error") as string) ||
+            (t("chat.error") as string) + ` (${errorMessage})` ||
             "Une erreur est survenue. Réessayez dans quelques instants.",
         },
       ]);
@@ -140,6 +141,24 @@ export default function Chat() {
           "Bonjour ! Je suis ton coach SportConnectIA 😊",
       },
     ]);
+  }
+
+  function deleteChat(chatId: string) {
+    if (!window.confirm(t("chat.confirm_delete") as string || "¿Eliminar esta conversación?")) {
+      return;
+    }
+
+    // Eliminar del localStorage
+    localStorage.removeItem("chat_" + chatId);
+
+    // Actualizar el historial
+    const newHistory = history.filter((h) => h !== chatId);
+    setHistory(newHistory);
+
+    // Si es el chat activo, cambiar a uno nuevo
+    if (chatId === activeChatId) {
+      startNewChat();
+    }
   }
 
   const faqKeys = ["chat.faq_1", "chat.faq_2", "chat.faq_3", "chat.faq_4"];
@@ -170,33 +189,41 @@ export default function Chat() {
           )}
 
           {history.map((h) => (
-            <button
-              key={h}
-              onClick={() => {
-                setActiveChatId(h);
-                const saved = localStorage.getItem("chat_" + h);
-                setMsgs(
-                  saved
-                    ? JSON.parse(saved)
-                    : [
-                        {
-                          id: crypto.randomUUID(),
-                          role: "assistant",
-                          text:
-                            (t("chat.welcome") as string) ||
-                            "Bonjour ! Je suis ton coach SportConnectIA 😊",
-                        },
-                      ]
-                );
-              }}
-              className={`w-full text-left px-3 py-2 rounded-lg border text-sm transition ${
-                h === activeChatId
-                  ? "border-fuchsia-600 bg-fuchsia-50 text-fuchsia-700"
-                  : "border-slate-200 hover:bg-slate-50"
-              }`}
-            >
-              💬 {t("chat.history_title") as string}
-            </button>
+            <div key={h} className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setActiveChatId(h);
+                  const saved = localStorage.getItem("chat_" + h);
+                  setMsgs(
+                    saved
+                      ? JSON.parse(saved)
+                      : [
+                          {
+                            id: crypto.randomUUID(),
+                            role: "assistant",
+                            text:
+                              (t("chat.welcome") as string) ||
+                              "Bonjour ! Je suis ton coach SportConnectIA 😊",
+                          },
+                        ]
+                  );
+                }}
+                className={`flex-1 text-left px-3 py-2 rounded-lg border text-sm transition ${
+                  h === activeChatId
+                    ? "border-fuchsia-600 bg-fuchsia-50 text-fuchsia-700"
+                    : "border-slate-200 hover:bg-slate-50"
+                }`}
+              >
+                💬 {t("chat.history_title") as string}
+              </button>
+              <button
+                onClick={() => deleteChat(h)}
+                className="px-2 py-2 rounded-lg border border-red-200 bg-white hover:bg-red-50 text-red-600 text-sm transition"
+                title="Eliminar"
+              >
+                🗑️
+              </button>
+            </div>
           ))}
         </div>
       </aside>

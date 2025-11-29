@@ -1,44 +1,10 @@
 // src/services/authService.ts
 import { authClient } from "./apiClient";
 
-// ------------------------------------------------------
-// Types de base pour Auth
-// ------------------------------------------------------
 export type RegisterDto = { name: string; email: string; password: string };
 export type LoginDto = { email: string; password: string };
 
-// ------------------------------------------------------
-// Types pour l'administration
-// ------------------------------------------------------
-export interface UtilisateurDto {
-  id: number;
-  name: string | null;
-  email: string;
-  is_active: boolean;
-  is_admin: boolean;
-  created_at: string;
-}
-
-export interface NotificationDto {
-  id: number;
-  user_id: number;
-  title: string;
-  message: string;
-  is_read: boolean;
-  created_at: string;
-}
-
-export interface AdminUpdateUserDto {
-  name?: string | null;
-  email?: string;
-  is_active?: boolean;
-  is_admin?: boolean;
-  new_password?: string;
-}
-
-// ------------------------------------------------------
-// Helpers JWT : décoder le token pour récupérer des infos
-// ------------------------------------------------------
+// ---- Helpers JWT ----
 function parseJwt(token: string): any | null {
   try {
     const base64Url = token.split(".")[1];
@@ -55,10 +21,7 @@ function parseJwt(token: string): any | null {
   }
 }
 
-/**
- * Lit le token depuis localStorage, extrait name/email
- * et enregistre un “snapshot” local de l’utilisateur.
- */
+/** Lee el token de localStorage, extrae nombre/email y guarda un snapshot local */
 export function saveUserSnapshotFromToken() {
   const token = localStorage.getItem("token");
   if (!token) return;
@@ -69,14 +32,13 @@ export function saveUserSnapshotFromToken() {
     payload.given_name ||
     payload.fullname ||
     payload.sub?.split("@")?.[0] ||
-    "Utilisateur";
+    "User";
   const email = payload.email || "";
 
   localStorage.setItem("user_name", name);
   localStorage.setItem("user_email", email);
 }
 
-/** Retourne le snapshot (nom / email) stocké localement */
 export function getUserSnapshot() {
   return {
     name: localStorage.getItem("user_name") || "",
@@ -84,16 +46,37 @@ export function getUserSnapshot() {
   };
 }
 
-// =======================================================
-//                 API AUTH (public)
-// =======================================================
+/** Devuelve el payload completo del JWT guardado (o null si no hay) */
+export function getAuthPayload(): any | null {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  return parseJwt(token) || null;
+}
 
-/** Inscription d’un nouvel utilisateur */
+/** Devuelve true si el token actual corresponde a un admin */
+export function isAdminFromToken(): boolean {
+  const payload = getAuthPayload();
+  if (!payload) return false;
+
+  // 1) Si el backend ya envía un flag is_admin en el token
+  if (typeof payload.is_admin === "boolean") {
+    return payload.is_admin;
+  }
+
+  // 2) Fallback: comprobar por email del admin del proyecto
+  const email =
+    (payload.email || payload.sub || "").toString().trim().toLowerCase();
+  return email === "dianaalarcon@teccart.com";
+}
+
+// ---- API ----
+
+// En dev: AUTH_BASE = '/auth'  ->  '/auth/register'
 export async function registerUser(dto: RegisterDto) {
   return authClient.post<{ message: string; user?: any }>("/register", dto);
 }
 
-/** Connexion : renvoie le token et le stocke dans localStorage */
+// En dev: AUTH_BASE = '/auth'  ->  '/auth/login'
 export async function loginUser(dto: LoginDto) {
   const data = await authClient.post<{
     token?: string;
@@ -101,60 +84,19 @@ export async function loginUser(dto: LoginDto) {
     user?: any;
   }>("/login", dto);
 
+  // Guarda el token (si viene) para las siguientes peticiones
   const token = data.access_token ?? data.token;
   if (token) {
     localStorage.setItem("token", token);
+    // opcional: rellenar snapshot local
     saveUserSnapshotFromToken();
   }
 
   return data;
 }
 
-/** Déconnexion : nettoie les infos locales */
 export function logout() {
   localStorage.removeItem("token");
   localStorage.removeItem("user_name");
   localStorage.removeItem("user_email");
-}
-
-// =======================================================
-//                 API ADMIN (protégée)
-// =======================================================
-
-/** Liste de tous les utilisateurs (réservé à l’admin) */
-export async function adminListerUtilisateurs(): Promise<UtilisateurDto[]> {
-  const data = await authClient.get<UtilisateurDto[]>("/admin/users");
-  return data;
-}
-
-/** Modifier un utilisateur (nom, email, actif, admin, mot de passe) */
-export async function adminModifierUtilisateur(
-  userId: number,
-  payload: AdminUpdateUserDto
-): Promise<UtilisateurDto> {
-  const data = await authClient.put<UtilisateurDto>(
-    `/admin/users/${userId}`,
-    payload
-  );
-  return data;
-}
-
-/** Envoyer une notification à un utilisateur */
-export async function adminEnvoyerNotification(
-  userId: number,
-  titre: string,
-  message: string
-): Promise<NotificationDto> {
-  const data = await authClient.post<NotificationDto>("/admin/notifications", {
-    user_id: userId,
-    title: titre,
-    message,
-  });
-  return data;
-}
-
-/** Récupérer les notifications de l’utilisateur connecté */
-export async function recupererMesNotifications(): Promise<NotificationDto[]> {
-  const data = await authClient.get<NotificationDto[]>("/me/notifications");
-  return data;
 }

@@ -53,8 +53,9 @@ type Measurement = {
 };
 
 // 🔗 URL del microservicio de recomendaciones & tracking
-const API_URL =
-  import.meta.env.VITE_RECO_API_URL ?? "http://localhost:8003";
+// En desarrollo usa el proxy de Vite, en producción usa la variable de entorno
+const isDev = import.meta.env.DEV;
+const API_URL = isDev ? "" : (import.meta.env.VITE_RECO_URL ?? "http://localhost:8003");
 
 /**
  * Parsea el texto plano generado por la IA (con **títulos** y *viñetas)
@@ -105,9 +106,34 @@ function parseRecoToSections(text: string): ParsedSection[] {
 export default function RecoPage() {
   const { t, i18n } = useTranslation();
 
-  // UID: primero el que tengas en localStorage, si no, fallback.
-  const userId =
-    localStorage.getItem("firebase_uid") || "4JHfLr9xOabc9Qp2kD21";
+  // Obtener el user_id del token JWT (sub) o del email guardado
+  const getUserId = (): string => {
+    // Intentar obtener del token JWT
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const base64Url = token.split(".")[1];
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split("")
+            .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+            .join("")
+        );
+        const payload = JSON.parse(jsonPayload);
+        
+        // Preferir sub (subject) del JWT, sino email
+        return payload.sub || payload.email || payload.user_id || "";
+      } catch {
+        // Si falla el parse, continuar con email
+      }
+    }
+    
+    // Fallback: usar email guardado
+    return localStorage.getItem("user_email") || "";
+  };
+
+  const userId = getUserId();
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [latestReco, setLatestReco] = useState<string>("");
@@ -170,6 +196,27 @@ export default function RecoPage() {
     latestMeasure?.weight_kg != null && prevMeasure?.weight_kg != null
       ? latestMeasure.weight_kg - prevMeasure.weight_kg
       : null;
+
+  // -------- Cargar perfil desde localStorage al inicio --------
+  useEffect(() => {
+    const storedProfile = localStorage.getItem("profile_v1");
+    if (storedProfile) {
+      try {
+        const parsed = JSON.parse(storedProfile);
+        setProfile({
+          name: localStorage.getItem("user_name") || undefined,
+          email: localStorage.getItem("user_email") || undefined,
+          age: parsed.age,
+          weightKg: parsed.weightKg,
+          heightCm: parsed.heightCm,
+          mainGoal: parsed.goal,
+          lang: i18n.language,
+        });
+      } catch (e) {
+        console.error("Error parsing profile:", e);
+      }
+    }
+  }, [i18n.language]);
 
   // -------- Cargar historial al entrar --------
   useEffect(() => {
@@ -250,25 +297,50 @@ export default function RecoPage() {
       return;
     }
 
+    // Verificar que tenemos perfil completo
+    const localProfile = localStorage.getItem("profile_v1");
+    if (!localProfile) {
+      setError("Tu perfil no está completo. Ve a 'Perfil' pour le compléter.");
+      return;
+    }
+
     try {
       setLoadingReco(true);
       setError(null);
 
+      const profileData = JSON.parse(localProfile);
+      
+      // Construir el objeto de perfil para enviar al backend
+      const requestBody = {
+        user_id: userId,
+        lang: i18n.language,
+        age: profileData.age || 30,
+        weight_kg: profileData.weightKg || 70,
+        height_cm: profileData.heightCm || 170,
+        main_goal: profileData.goal || "Perte de poids",
+        days_per_week: profileData.daysPerWeek || 3,
+        minutes_per_session: profileData.minutesPerSession || 45,
+        level: profileData.level || "debutant",
+      };
+
+      console.log("🔍 Generando recomendación con:", requestBody);
+
       const resp = await fetch(`${API_URL}/reco/generate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: userId,
-          lang: i18n.language,
-        }),
+        headers: { 
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
       });
 
       if (!resp.ok) {
         const text = await resp.text();
+        console.error("❌ Error del servidor:", text);
         throw new Error(text || "Error HTTP " + resp.status);
       }
 
       const data = await resp.json();
+      console.log("✅ Respuesta recibida:", data);
 
       const answer: string = data.answer || "";
       setLatestReco(answer);
@@ -278,7 +350,7 @@ export default function RecoPage() {
     } catch (e: any) {
       console.error("Erreur handleGenerate:", e);
       setError(
-        "Une erreur est survenue lors de la génération des recommandations."
+        "Une erreur est survenue lors de la génération des recommandations. Détails: " + e.message
       );
     } finally {
       setLoadingReco(false);
