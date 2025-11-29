@@ -35,9 +35,16 @@ function Sports() {
 
   // Charger vidéos par catégorie cliquée
   const chargerVideosCategorie = (nomCategorie: string) => {
+    // Incluir edad y objetivo del usuario para personalizar los videos
+    const params = new URLSearchParams({
+      name: nomCategorie,
+      age: String(userProfile?.age ?? 30),
+      objectif: String(userProfile?.mainGoal ?? "Bien-être"),
+    });
+
     sportsClient
       .get<{ categorie: string; videos: SportActivity[] }>(
-        `/category?name=${nomCategorie}`
+        `/category?${params}`
       )
       .then((res) => {
         setCategorie(res.categorie);
@@ -45,6 +52,7 @@ function Sports() {
       })
       .catch((err) => {
         console.error("Erreur catégorie :", err);
+        setVideos([]);
       });
   };
 
@@ -81,6 +89,9 @@ function Sports() {
                   src={cat.image}
                   className="h-full w-full object-cover group-hover:scale-110 transition duration-500"
                   alt={cat.titre}
+                  onError={(e) => {
+                    e.currentTarget.src = `https://via.placeholder.com/400x300/9333EA/FFFFFF?text=${encodeURIComponent(cat.titre)}`;
+                  }}
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/60"></div>
@@ -119,32 +130,44 @@ function Sports() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-            {videos.map((v, index) => (
-              <div
-                key={index}
-                className="shadow-md rounded-xl overflow-hidden bg-white hover:shadow-xl transition"
-              >
-                <img
-                  src={v.image}
-                  alt={v.title}
-                  className="h-48 w-full object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="font-semibold">{v.title}</h3>
+          {videos.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">
+                Aucune vidéo disponible pour cette catégorie. Sélectionne une catégorie ci-dessus.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+              {videos.map((v, index) => (
+                <div
+                  key={index}
+                  className="shadow-md rounded-xl overflow-hidden bg-white hover:shadow-xl transition"
+                >
+                  <img
+                    src={v.image}
+                    alt={v.title}
+                    className="h-48 w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://via.placeholder.com/400x300/9333EA/FFFFFF?text=" + encodeURIComponent(categorie);
+                    }}
+                  />
+                  <div className="p-4">
+                    <h3 className="font-semibold">{v.title}</h3>
 
-                  <a
-                    href={v.link}
-                    target="_blank"
-                    className="block mt-3 bg-purple-600 hover:bg-purple-700 
-                    text-white text-center py-2 rounded-lg transition"
-                  >
-                    ▶ Voir la vidéo
-                  </a>
+                    <a
+                      href={v.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block mt-3 bg-purple-600 hover:bg-purple-700 
+                      text-white text-center py-2 rounded-lg transition"
+                    >
+                      ▶ Voir la vidéo
+                    </a>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
       </div>

@@ -16,7 +16,7 @@ export default defineConfig({
         changeOrigin: true,
       },
 
-      // 🏋️ SERVICE SPORTS ⭐ CORRECTO → 8004
+      // 🏋️ SERVICE SPORTS
       '/sports': {
         target: 'http://localhost:8004',
         changeOrigin: true,
@@ -24,13 +24,13 @@ export default defineConfig({
 
       // 🤖 SERVICE RECOMMANDATION
       '/reco': {
-        target: 'http://localhost:8002',
+        target: 'http://localhost:8003',
         changeOrigin: true,
       },
 
       // 💬 SERVICE CHATBOT
       '/chat': {
-        target: 'http://localhost:8003',
+        target: 'http://localhost:8010',
         changeOrigin: true,
       },
     },
