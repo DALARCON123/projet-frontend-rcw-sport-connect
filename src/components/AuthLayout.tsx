@@ -12,36 +12,22 @@ export default function AuthLayout({
   const { t } = useTranslation();
 
   return (
-    <div className="relative min-h-screen w-full bg-gradient-to-b from-white via-slate-50 to-slate-100">
+    <div className="relative min-h-screen w-full overflow-x-hidden bg-gradient-to-b from-white via-slate-50 to-slate-100">
       {/* blobs décoratifs */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-fuchsia-400/25 blur-3xl" />
         <div className="absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-sky-400/25 blur-3xl" />
       </div>
 
-      {/* header pour login/register */}
-      <header className="w-full px-6 py-4 flex items-center gap-2">
-        <Link to="/" className="flex items-center gap-2">
-          <Sparkles className="text-fuchsia-600" />
-          <span className="font-extrabold tracking-tight text-slate-800">
-            SportConnectIA
-          </span>
-        </Link>
-      </header>
-
       {/* contenu principal */}
-      <main className="w-full px-6 pb-16 grid md:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
+      <main className="w-full py-40 px-6 pb-16 grid md:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
         {/* Illustration motivante */}
         <div className="order-2 md:order-1">
           <div className="aspect-[4/3] rounded-3xl bg-white/70 border border-white/60 shadow-xl grid place-items-center">
             <div className="text-slate-600 text-center px-6">
               <div className="text-7xl mb-4">💪🫀</div>
-              <p className="font-semibold">
-                {t("auth.hero.title")}
-              </p>
-              <p className="text-sm mt-1">
-                {t("auth.hero.subtitle")}
-              </p>
+              <p className="font-semibold">{t("auth.hero.title")}</p>
+              <p className="text-sm mt-1">{t("auth.hero.subtitle")}</p>
             </div>
           </div>
         </div>
