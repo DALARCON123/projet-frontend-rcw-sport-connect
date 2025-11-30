@@ -24,7 +24,6 @@ export default function Home() {
         
         {/* HERO */}
         <section className="grid md:grid-cols-2 gap-12 items-center">
-          {/* Texto izquierda */}
           <div>
             <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">
               {t("home.hero.title_1")}{" "}
@@ -57,7 +56,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Ilustración derecha */}
+          {/* Imagen */}
           <div className="flex justify-center">
             <div className="w-full max-w-md aspect-[4/3] rounded-3xl bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50 border border-white/70 shadow-xl flex items-center justify-center relative overflow-hidden">
 
@@ -65,8 +64,6 @@ export default function Home() {
               <div className="absolute -bottom-10 -left-16 h-40 w-40 rounded-full bg-sky-400/20 blur-3xl" />
 
               <div className="relative flex flex-col items-center gap-4">
-                
-                {/* Icono principal */}
                 <div className="h-28 w-28 rounded-full bg-gradient-to-tr from-fuchsia-500 via-indigo-500 to-sky-500 flex items-center justify-center shadow-xl">
                   <svg
                     viewBox="0 0 64 64"
@@ -88,7 +85,6 @@ export default function Home() {
                   </svg>
                 </div>
 
-                {/* Badges */}
                 <div className="flex flex-wrap justify-center gap-2 text-[11px]">
                   <span className="px-3 py-1 rounded-full bg-white/80 text-slate-700 shadow-sm border border-slate-100">
                     {t("home.badges.b1")}
@@ -117,32 +113,49 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
+            
+            {/* Chatbot IA Expert → /chat */}
             <FeatureCard
+              to="/chat"
               icon={<MessageCircle className="h-6 w-6" />}
               title={t("home.features.f1_title")}
               text={t("home.features.f1_text")}
             />
+
+            {/* Recommandations personnalisées → /reco */}
             <FeatureCard
+              to="/reco"
               icon={<Activity className="h-6 w-6" />}
               title={t("home.features.f2_title")}
               text={t("home.features.f2_text")}
             />
+
+            {/* Suivi de progression → /tracking */}
             <FeatureCard
+              to="/tracking"
               icon={<LineChart className="h-6 w-6" />}
               title={t("home.features.f3_title")}
               text={t("home.features.f3_text")}
             />
+
+            {/* Gamification – sem rota */}
             <FeatureCard
               icon={<Trophy className="h-6 w-6" />}
               title={t("home.features.f4_title")}
               text={t("home.features.f4_text")}
             />
+
+            {/* Ajustements dynamiques → /dashboard */}
             <FeatureCard
+              to="/dashboard"
               icon={<Zap className="h-6 w-6" />}
               title={t("home.features.f5_title")}
               text={t("home.features.f5_text")}
             />
+
+            {/* Conseils en temps réel → /chat */}
             <FeatureCard
+              to="/chat"
               icon={<MessageSquare className="h-6 w-6" />}
               title={t("home.features.f6_title")}
               text={t("home.features.f6_text")}
@@ -176,7 +189,7 @@ export default function Home() {
       <footer className="border-t border-slate-200 mt-10 bg-white/70">
         <div className="max-w-6xl mx-auto px-4 py-4 text-xs md:text-sm text-slate-500 text-center">
           © 2025 FIAI – Système de Recommandation d'Activités Physiques.  
-          Développé par Diana Alarcon & Ana Claudia.
+          Développé par Diana Alarcon & Ana Claudia & Lucas Lareira.
         </div>
       </footer>
     </div>
@@ -187,11 +200,12 @@ type FeatureProps = {
   icon: React.ReactNode;
   title: string;
   text: string;
+  to?: string; // rota opcional
 };
 
-function FeatureCard({ icon, title, text }: FeatureProps) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white/90 px-5 py-4 flex gap-3 items-start shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition">
+function FeatureCard({ icon, title, text, to }: FeatureProps) {
+  const content = (
+    <div className="rounded-2xl border border-slate-200 bg-white/90 px-5 py-4 flex gap-3 items-start shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition cursor-pointer">
       <div className="mt-1">
         <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-emerald-400 via-sky-400 to-indigo-400 flex items-center justify-center text-white">
           {icon}
@@ -203,4 +217,6 @@ function FeatureCard({ icon, title, text }: FeatureProps) {
       </div>
     </div>
   );
+
+  return to ? <Link to={to}>{content}</Link> : content;
 }

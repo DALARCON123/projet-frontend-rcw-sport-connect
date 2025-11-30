@@ -52,9 +52,13 @@ export default function Register() {
       if (!token) throw new Error(t("pages.register.errors.no_token", "No se recibió el token."));
 
       localStorage.setItem("token", token);
+
+      // 👇 IMPORTANTE: salvar e-mail e nome para o Reco.tsx e saudação do e-mail
+      localStorage.setItem("user_email", form.email.trim());
+      localStorage.setItem("user_name", form.name.trim());
+
       saveUserSnapshotFromToken();
 
-      // primera vez → onboarding
       nav("/onboarding");
     } catch (e: any) {
       setErr(

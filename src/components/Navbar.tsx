@@ -28,14 +28,15 @@ export default function Navbar() {
         {/* Logo / lien d'accueil */}
         <Link
           to={isAuth ? "/dashboard" : "/"}
-          className="flex items-center gap-2 group"
+          className="flex items-center gap-3"
         >
           <img
             src={logo}
             alt="SportConnectIA"
-            className="w-14 h-14 object-contain group-hover:scale-110 transition-transform"
+            className="w-16 h-16 object-contain rounded-xl"
           />
-          <span className="font-extrabold tracking-tight text-xl text-slate-800">
+
+          <span className="font-extrabold text-2xl tracking-tight text-fuchsia-600">
             SportConnectIA
           </span>
         </Link>

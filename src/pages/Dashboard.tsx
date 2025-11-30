@@ -1,7 +1,10 @@
+// src/pages/Dashboard.tsx
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getProfileLocal } from "../services/profileService";
 import { User2, Activity, Ruler, Target, Brain } from "lucide-react";
+
 
 type StatCardProps = {
   label: string;
@@ -177,6 +180,120 @@ export default function Dashboard() {
           {profile ? t("pages.dashboard.update_profile") : t("pages.dashboard.configure_profile")}
         </Link>
       </div>
+
+      {/* FONCTIONNALITÉS INTELLIGENTES */}
+      <section className="pt-4">
+        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
+          Fonctionnalités intelligentes
+        </h2>
+        <p className="text-sm text-slate-600 mb-6">
+          Découvrez comment SportConnectIA révolutionne votre entraînement avec des technologies d&apos;IA avancées.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Chatbot IA Expert -> /chat */}
+          <Link to="/chat" className="block">
+            <div className="rounded-2xl bg-white shadow-sm border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-fuchsia-50 via-indigo-50 to-sky-50 flex items-center justify-center text-fuchsia-600">
+                  <Brain className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Chatbot IA Expert
+                </h3>
+              </div>
+              <p className="text-sm text-slate-600">
+                Discutez avec notre assistant intelligent disponible 24/7 pour répondre à vos questions sur la nutrition, l&apos;entraînement et la récupération.
+              </p>
+            </div>
+          </Link>
+
+          {/* Recommandations personnalisées -> /reco */}
+          <Link to="/reco" className="block">
+            <div className="rounded-2xl bg-white shadow-sm border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-fuchsia-50 via-indigo-50 to-sky-50 flex items-center justify-center text-fuchsia-600">
+                  <Activity className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Recommandations personnalisées
+                </h3>
+              </div>
+              <p className="text-sm text-slate-600">
+                Des programmes adaptés à votre niveau, vos objectifs et vos préférences.
+              </p>
+            </div>
+          </Link>
+
+          {/* Suivi de progression -> /tracking */}
+          <Link to="/tracking" className="block">
+            <div className="rounded-2xl bg-white shadow-sm border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-fuchsia-50 via-indigo-50 to-sky-50 flex items-center justify-center text-fuchsia-600">
+                  <Target className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Suivi de progression
+                </h3>
+              </div>
+              <p className="text-sm text-slate-600">
+                Visualisez vos progrès avec des graphiques détaillés et des statistiques en temps réel.
+              </p>
+            </div>
+          </Link>
+
+          {/* Gamification -> /gamification */}
+          <Link to="/gamification" className="block">
+            <div className="rounded-2xl bg-white shadow-sm border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-fuchsia-50 via-indigo-50 to-sky-50 flex items-center justify-center">
+                  <span className="text-2xl">⭐</span>
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Gamification
+                </h3>
+              </div>
+              <p className="text-sm text-slate-600">
+                Gagnez des badges, relevez des défis quotidiens et restez motivé·e.
+              </p>
+            </div>
+          </Link>
+
+          {/* Ajustements dynamiques -> /dashboard (Objectif du jour) */}
+          <Link to="/dashboard" className="block">
+            <div className="rounded-2xl bg-white shadow-sm border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-fuchsia-50 via-indigo-50 to-sky-50 flex items-center justify-center text-fuchsia-600">
+                  <Activity className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Ajustements dynamiques
+                </h3>
+              </div>
+              <p className="text-sm text-slate-600">
+                L&apos;IA adapte automatiquement vos objectifs du jour selon vos performances.
+              </p>
+            </div>
+          </Link>
+
+          {/* Conseils en temps réel -> /chat */}
+          <Link to="/chat" className="block">
+            <div className="rounded-2xl bg-white shadow-sm border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-fuchsia-50 via-indigo-50 to-sky-50 flex items-center justify-center text-fuchsia-600">
+                  <Brain className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Conseils en temps réel
+                </h3>
+              </div>
+              <p className="text-sm text-slate-600">
+                Recevez des recommandations instantanées pendant vos séances.
+              </p>
+            </div>
+          </Link>
+        </div>
+      </section>
     </section>
   );
 }
