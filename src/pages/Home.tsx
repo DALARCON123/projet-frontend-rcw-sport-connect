@@ -122,29 +122,29 @@ export default function Home() {
               text={t("home.features.f1_text")}
             />
 
-            {/* Recommandations personnalisées → /reco */}
+            {/* Recommandations personnalisées → /reco (parte alta: Recommandation IA actuelle) */}
             <FeatureCard
-              to="/reco"
+              to="/reco#plan"
               icon={<Activity className="h-6 w-6" />}
               title={t("home.features.f2_title")}
               text={t("home.features.f2_text")}
             />
 
-            {/* Suivi de progression → /tracking */}
+            {/* Suivi de progression → /reco (seção “Suivi de ton évolution”) */}
             <FeatureCard
-              to="/tracking"
+              to="/reco#tracking"
               icon={<LineChart className="h-6 w-6" />}
               title={t("home.features.f3_title")}
               text={t("home.features.f3_text")}
             />
 
-            {/* Gamification – sem rota */}
+            {/* Gamification – agora com rota */}
             <FeatureCard
+              to="/gamification"
               icon={<Trophy className="h-6 w-6" />}
               title={t("home.features.f4_title")}
               text={t("home.features.f4_text")}
             />
-
             {/* Ajustements dynamiques → /dashboard */}
             <FeatureCard
               to="/dashboard"

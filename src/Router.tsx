@@ -14,6 +14,7 @@ import Tracking from "./pages/Tracking";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 import AdminUsers from "./pages/AdminUsers";
+import Gamification from "./pages/Gamification";
 
 export default function Router() {
   return (
@@ -37,6 +38,25 @@ export default function Router() {
           <Route path="/admin/users" element={<AdminUsers />} />
         </Route>
       </Route>
+
+            {/* PÁGINAS PROTEGIDAS (Requieren autenticación) */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/reco" element={<Reco />} />
+        <Route path="/sports" element={<Sports />} />
+        <Route path="/chat" element={<Chat />} />
+        <Route path="/tracking" element={<Tracking />} />
+        <Route path="/onboarding" element={<Onboarding />} />
+
+        {/* NOVO: página de Gamification */}
+        <Route path="/gamification" element={<Gamification />} />
+
+        {/* RUTAS DE ADMINISTRADOR (Requieren autenticación + privilegios de admin) */}
+        <Route element={<AdminRoute />}>
+          <Route path="/admin/users" element={<AdminUsers />} />
+        </Route>
+      </Route>
+
 
       {/* REDIRECCIONES / 404 */}
       <Route path="/home" element={<Navigate to="/" replace />} />
