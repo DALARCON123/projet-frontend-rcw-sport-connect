@@ -5,6 +5,34 @@ import AuthLayout from "../components/AuthLayout";
 import { loginUser, saveUserSnapshotFromToken } from "../services/authService";
 import { useTranslation } from "react-i18next";
 
+/**
+ * Décode un token JWT et renvoie true si l'utilisateur est administrateur.
+ * On vérifie les champs is_admin ou role === "admin" dans la charge utile.
+ */
+function isAdminFromToken(token: string | null): boolean {
+  if (!token) return false;
+
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    const payload = JSON.parse(jsonPayload);
+
+    if (payload.is_admin === true) return true;
+    if (payload.role && String(payload.role).toLowerCase() === "admin") {
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 export default function Login() {
   const { t } = useTranslation();
   const nav = useNavigate();
@@ -13,48 +41,68 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  /**
+   * Soumission du formulaire de connexion.
+   */
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
 
     if (!form.email || !form.password) {
-      setErr("Email y contraseña son obligatorios.");
+      setErr("Email et mot de passe sont obligatoires.");
       return;
     }
 
     try {
       setLoading(true);
 
-      // 1) Login contra el microservicio Auth
+      // Appel au microservice d'authentification
       const res = await loginUser({
         email: form.email,
         password: form.password,
       });
 
-      // acepta { token } ó { access_token }
-      const token = (res as any)?.token ?? (res as any)?.access_token;
-      if (!token) throw new Error("No se recibió el token.");
+      // Récupération du token (retourné par l'API ou déjà stocké par loginUser)
+      const token =
+        (res as any)?.access_token ??
+        (res as any)?.token ??
+        localStorage.getItem("token");
 
-      // guardar token en localStorage
+      if (!token) {
+        throw new Error("Le jeton JWT n'a pas été reçu.");
+      }
+
+      // Sauvegarde du token au cas où loginUser ne l'aurait pas déjà fait
       localStorage.setItem("token", token);
 
-      // guardar snapshot del nombre para el saludo en el navbar
+      // Sauvegarde du nom et de l'email pour le navbar
       saveUserSnapshotFromToken();
 
-      // 2) Determinar si es admin según el email que escribió
-      const emailLower = form.email.trim().toLowerCase();
-      const isAdmin = emailLower === "dianaalarcon@teccart.com";
+      // Détection admin à partir du token
+      const estAdminDepuisToken = isAdminFromToken(token);
 
-      if (isAdmin) {
-        // 👉 si es admin, lo enviamos al panel de administración
+      // Fallback simple : email spécifique de l'admin
+      const emailLower = form.email.trim().toLowerCase();
+      const estAdminParEmail = emailLower === "dianaalarcon@teccart.com";
+
+      const estAdmin = estAdminDepuisToken || estAdminParEmail;
+
+      if (estAdmin) {
+        // Redirection vers l'espace administrateur
         nav("/admin/users");
       } else {
-        // 👉 si NO es admin, usamos tu lógica anterior
+        // Logique classique pour les utilisateurs normaux
         const hasProfile = !!localStorage.getItem("profile_v1");
         nav(hasProfile ? "/dashboard" : "/onboarding");
       }
     } catch (e: any) {
-      setErr(String(e?.message || e?.detail || "Credenciales inválidas."));
+      setErr(
+        String(
+          e?.message ||
+            e?.detail ||
+            "Erreur de connexion. Vérifiez vos identifiants."
+        )
+      );
     } finally {
       setLoading(false);
     }
@@ -73,7 +121,7 @@ export default function Login() {
         <Field
           icon={<Lock className="h-5 w-5" />}
           type="password"
-          placeholder="Contraseña"
+          placeholder="Mot de passe"
           value={form.password}
           onChange={(v) => setForm({ ...form, password: v })}
         />
@@ -90,7 +138,7 @@ export default function Login() {
         </button>
 
         <p className="text-sm text-slate-600">
-          {t("nav.register") as string}?{" "}
+          {t("nav.register") as string}{" "}
           <Link to="/register" className="underline">
             {t("pages.register.title") as string}
           </Link>
@@ -100,6 +148,9 @@ export default function Login() {
   );
 }
 
+/**
+ * Champ de formulaire avec icône à gauche.
+ */
 function Field({
   icon,
   type,

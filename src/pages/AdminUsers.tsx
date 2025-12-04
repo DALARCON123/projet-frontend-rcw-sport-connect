@@ -1,400 +1,584 @@
-// src/pages/AdminUsers.tsx
-import React, { useEffect, useState } from "react";
-import {
-  adminListerUtilisateurs,
-  adminModifierUtilisateur,
-  adminEnvoyerNotification,
-  type UtilisateurDto,
-} from "../services/authService";
+import { useEffect, useState } from "react";
+import { authClient } from "../services/apiClient";
+import { Users, Plus, RefreshCw } from "lucide-react";
+import { getUserSnapshot } from "../services/authService";
+import { useTranslation } from "react-i18next";
 
 /**
- * Page d’administration des utilisateurs :
- * - liste des utilisateurs
- * - édition (nom, email, actif, admin, mot de passe)
- * - envoi de notifications
+ * Modèle utilisateur côté frontend.
  */
-const AdminUsers: React.FC = () => {
+type UtilisateurDto = {
+  id: number;
+  name: string | null;
+  email: string;
+  is_active: boolean;
+  is_admin: boolean;
+  created_at?: string;
+};
+
+/**
+ * Statistiques affichées dans les cartes.
+ */
+type StatsDto = {
+  total: number;
+  actifs: number;
+  admins: number;
+};
+
+export default function AdminUsers() {
+  const { t } = useTranslation();
   const [utilisateurs, setUtilisateurs] = useState<UtilisateurDto[]>([]);
-  const [selection, setSelection] = useState<UtilisateurDto | null>(null);
+  const [stats, setStats] = useState<StatsDto>({
+    total: 0,
+    actifs: 0,
+    admins: 0,
+  });
+  const [filtre, setFiltre] = useState("");
   const [chargement, setChargement] = useState(false);
-  const [messageInfo, setMessageInfo] = useState<string | null>(null);
-  const [messageErreur, setMessageErreur] = useState<string | null>(null);
+  const [erreur, setErreur] = useState<string | null>(null);
 
-  // Champs du formulaire d’édition
-  const [nom, setNom] = useState("");
-  const [email, setEmail] = useState("");
-  const [actif, setActif] = useState(true);
-  const [admin, setAdmin] = useState(false);
-  const [nouveauMotDePasse, setNouveauMotDePasse] = useState("");
+  const [afficherFormNouveau, setAfficherFormNouveau] = useState(false);
+  const [nouveauNom, setNouveauNom] = useState("");
+  const [nouvelEmail, setNouvelEmail] = useState("");
+  const [nouveauPass, setNouveauPass] = useState("");
+  const [nouveauEstAdmin, setNouveauEstAdmin] = useState(false);
+  const [nouveauEstActif, setNouveauEstActif] = useState(true);
+  const [creationEnCours, setCreationEnCours] = useState(false);
 
-  // Champs pour la notification
-  const [titreNotif, setTitreNotif] = useState("");
-  const [messageNotif, setMessageNotif] = useState("");
+  const { name: adminName } = getUserSnapshot();
 
-  // Charger la liste des utilisateurs
-  useEffect(() => {
-    const charger = async () => {
-      try {
-        setChargement(true);
-        setMessageErreur(null);
-        const data = await adminListerUtilisateurs();
-        setUtilisateurs(data);
-      } catch (err) {
-        console.error(err);
-        setMessageErreur(
-          "Impossible de charger la liste des utilisateurs. Vérifiez que vous êtes connecté(e) en tant qu’administrateur."
-        );
-      } finally {
-        setChargement(false);
-      }
-    };
+  /**
+   * Normalise le message d’erreur pour éviter les messages techniques.
+   */
+  function messageErreur(e: any, defaut: string): string {
+    const brut = String(e?.message || e?.detail || defaut || "");
+    if (brut.toLowerCase().includes("body stream already read")) {
+      return t("pages.admin.errors.load");
+    }
+    return brut || defaut;
+  }
 
-    charger();
-  }, []);
+  /**
+   * Recalcule les statistiques à partir de la liste actuelle.
+   */
+  function recalculerStats(liste: UtilisateurDto[]) {
+    const total = liste.length;
+    const actifs = liste.filter((u) => u.is_active).length;
+    const admins = liste.filter((u) => u.is_admin).length;
+    setStats({ total, actifs, admins });
+  }
 
-  // Sélectionner un utilisateur dans la liste
-  const handleSelect = (user: UtilisateurDto) => {
-    setSelection(user);
-    setNom(user.name || "");
-    setEmail(user.email);
-    setActif(user.is_active);
-    setAdmin(user.is_admin);
-    setNouveauMotDePasse("");
-    setTitreNotif("");
-    setMessageNotif("");
-    setMessageInfo(null);
-    setMessageErreur(null);
-  };
-
-  // Sauvegarder les modifications
-  const handleSave = async () => {
-    if (!selection) return;
-
+  /**
+   * Charge les utilisateurs depuis le microservice d’authentification.
+   */
+  async function chargerUtilisateurs() {
     try {
       setChargement(true);
-      setMessageInfo(null);
-      setMessageErreur(null);
+      setErreur(null);
 
-      await adminModifierUtilisateur(selection.id, {
-        name: nom,
-        email,
-        is_active: actif,
-        is_admin: admin,
-        new_password: nouveauMotDePasse || undefined,
-      });
-
-      // Recharger la liste à jour
-      const updatedList = await adminListerUtilisateurs();
-      setUtilisateurs(updatedList);
-      const refreshed =
-        updatedList.find(
-          (u: UtilisateurDto) => u.id === selection.id
-        ) || null;
-      setSelection(refreshed);
-
-      setMessageInfo("Modifications enregistrées avec succès.");
-      setNouveauMotDePasse("");
-    } catch (err) {
-      console.error(err);
-      setMessageErreur(
-        "Erreur lors de l’enregistrement des modifications de l’utilisateur."
-      );
+      const data = await authClient.get<UtilisateurDto[]>("/admin/users");
+      setUtilisateurs(data);
+      recalculerStats(data);
+    } catch (e: any) {
+      setErreur(messageErreur(e, t("pages.admin.errors.load")));
     } finally {
       setChargement(false);
     }
-  };
+  }
 
-  // Envoyer une notification
-  const handleSendNotification = async () => {
-    if (!selection) return;
+  useEffect(() => {
+    chargerUtilisateurs();
+  }, []);
 
-    if (!titreNotif.trim() || !messageNotif.trim()) {
-      setMessageErreur(
-        "Le titre et le message de la notification sont obligatoires."
-      );
+  /**
+   * Liste filtrée par nom ou email.
+   */
+  const utilisateursFiltres = utilisateurs.filter((u) => {
+    if (!filtre.trim()) return true;
+    const f = filtre.toLowerCase();
+    return (
+      (u.name || "").toLowerCase().includes(f) ||
+      u.email.toLowerCase().includes(f)
+    );
+  });
+
+  const admins = utilisateursFiltres.filter((u) => u.is_admin);
+  const simplesUtilisateurs = utilisateursFiltres.filter((u) => !u.is_admin);
+
+  /**
+   * Met à jour les champs is_active ou is_admin pour un utilisateur.
+   */
+  async function mettreAJourUtilisateur(
+    id: number,
+    champs: Partial<Pick<UtilisateurDto, "is_active" | "is_admin">>
+  ) {
+    try {
+      setErreur(null);
+
+      const utilisateur = utilisateurs.find((u) => u.id === id);
+      if (!utilisateur) return;
+
+      const miseAJour: UtilisateurDto = { ...utilisateur, ...champs };
+
+      await authClient.put(`/admin/users/${id}`, miseAJour);
+
+      const listeMaj = utilisateurs.map((u) => (u.id === id ? miseAJour : u));
+      setUtilisateurs(listeMaj);
+      recalculerStats(listeMaj);
+    } catch (e: any) {
+      setErreur(messageErreur(e, t("pages.admin.errors.update")));
+    }
+  }
+
+  /**
+   * Supprime un utilisateur.
+   */
+  async function supprimerUtilisateur(id: number) {
+    if (!window.confirm(t("pages.admin.confirm_delete"))) {
       return;
     }
 
     try {
-      setChargement(true);
-      setMessageInfo(null);
-      setMessageErreur(null);
+      setErreur(null);
 
-      await adminEnvoyerNotification(
-        selection.id,
-        titreNotif.trim(),
-        messageNotif.trim()
+      // Même si le backend renvoie 204 sans corps et que authClient
+      // n’aime pas la réponse, on considère la suppression comme réussie.
+      await authClient.delete(`/admin/users/${id}`).catch(() => {
+        /* on ignore l’erreur de flux */
+      });
+
+      const listeMaj = utilisateurs.filter((u) => u.id !== id);
+      setUtilisateurs(listeMaj);
+      recalculerStats(listeMaj);
+    } catch (e: any) {
+      setErreur(messageErreur(e, t("pages.admin.errors.delete")));
+    }
+  }
+
+  /**
+   * Crée un nouveau compte utilisateur.
+   */
+  async function creerNouvelUtilisateur(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!nouveauNom.trim() || !nouvelEmail.trim() || !nouveauPass.trim()) {
+      setErreur(t("pages.admin.errors.required"));
+      return;
+    }
+
+    try {
+      setCreationEnCours(true);
+      setErreur(null);
+
+      const payload = {
+        name: nouveauNom.trim(),
+        email: nouvelEmail.trim().toLowerCase(),
+        password: nouveauPass,
+        is_admin: nouveauEstAdmin,
+        is_active: nouveauEstActif,
+      };
+
+      const nouvelUtilisateur = await authClient.post<UtilisateurDto>(
+        "/admin/users",
+        payload
       );
 
-      setMessageInfo("Notification envoyée avec succès.");
-      setTitreNotif("");
-      setMessageNotif("");
-    } catch (err) {
-      console.error(err);
-      setMessageErreur("Erreur lors de l’envoi de la notification.");
+      const listeMaj = [...utilisateurs, nouvelUtilisateur];
+      setUtilisateurs(listeMaj);
+      recalculerStats(listeMaj);
+
+      setNouveauNom("");
+      setNouvelEmail("");
+      setNouveauPass("");
+      setNouveauEstAdmin(false);
+      setNouveauEstActif(true);
+      setAfficherFormNouveau(false);
+    } catch (e: any) {
+      setErreur(messageErreur(e, t("pages.admin.errors.create")));
     } finally {
-      setChargement(false);
+      setCreationEnCours(false);
     }
-  };
+  }
+
+  /**
+   * Rendu d’une ligne utilisateur dans un tableau.
+   */
+  function LigneUtilisateur({
+    u,
+    index,
+  }: {
+    u: UtilisateurDto;
+    index: number;
+  }) {
+    return (
+      <tr
+        className={`border-t border-slate-100 ${
+          index % 2 === 0 ? "bg-white" : "bg-slate-50/40"
+        }`}
+      >
+        <td className="px-5 py-2.5 text-xs text-slate-500">{u.id}</td>
+        <td className="px-5 py-2.5 text-slate-800">
+          {u.name || t("pages.admin.no_name")}
+        </td>
+        <td className="px-5 py-2.5 text-slate-700">{u.email}</td>
+        <td className="px-5 py-2.5 text-center">
+          <input
+            type="checkbox"
+            checked={u.is_active}
+            onChange={(e) =>
+              mettreAJourUtilisateur(u.id, { is_active: e.target.checked })
+            }
+          />
+        </td>
+        <td className="px-5 py-2.5 text-center">
+          <input
+            type="checkbox"
+            checked={u.is_admin}
+            onChange={(e) =>
+              mettreAJourUtilisateur(u.id, { is_admin: e.target.checked })
+            }
+          />
+        </td>
+        <td className="px-5 py-2.5 text-right space-x-2">
+          <button
+            type="button"
+            className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-medium text-white hover:bg-sky-600"
+            onClick={() =>
+              mettreAJourUtilisateur(u.id, { is_active: !u.is_active })
+            }
+          >
+            {u.is_active
+              ? t("pages.admin.deactivate")
+              : t("pages.admin.activate")}
+          </button>
+          <button
+            type="button"
+            className="rounded-lg bg-rose-500 px-3 py-1 text-xs font-medium text-white hover:bg-rose-600"
+            onClick={() => supprimerUtilisateur(u.id)}
+          >
+            {t("pages.admin.delete")}
+          </button>
+        </td>
+      </tr>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Bandeau supérieur */}
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-semibold text-slate-900">
-              Espace administrateur
-            </h1>
-            <p className="text-xs text-slate-500">
-              Gestion des utilisateurs et des notifications SportConnectIA.
+    <div className="max-w-6xl mx-auto px-4 py-8 lg:py-10">
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Barre latérale gauche, uniquement section Utilisateurs */}
+        <aside className="lg:w-64 flex-shrink-0 rounded-3xl bg-white/90 border border-slate-200 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100">
+            <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+              {t("pages.admin.users")}
+            </p>
+            <p className="mt-1 text-sm font-semibold text-slate-900">
+              {t("nav.admin")}
             </p>
           </div>
-        </div>
-      </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-        {messageInfo && (
-          <div className="rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            {messageInfo}
-          </div>
-        )}
-        {messageErreur && (
-          <div className="rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-            {messageErreur}
-          </div>
-        )}
+          <nav className="py-3">
+            <div className="flex items-center gap-3 px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-500 shadow-md">
+              <span className="rounded-xl bg-white/20 p-1.5">
+                <Users className="h-4 w-4" />
+              </span>
+              <span>{t("pages.admin.users")}</span>
+            </div>
+          </nav>
+        </aside>
 
-        <div className="grid gap-6 lg:grid-cols-2 items-start">
-          {/* Tableau des utilisateurs */}
-          <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
-              <div>
-                <h2 className="text-sm font-semibold text-slate-900">
-                  Utilisateurs enregistrés
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Cliquez sur un utilisateur pour afficher ses détails.
-                </p>
-              </div>
-              {chargement && (
-                <span className="text-xs text-slate-400">
-                  Chargement en cours…
-                </span>
-              )}
+        {/* Contenu principal */}
+        <main className="flex-1 space-y-6">
+          {/* En-tête avec nom de l’admin et boutons */}
+          <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-semibold text-slate-900">
+                {t("pages.admin.title")}
+                {adminName ? ` – ${adminName}` : ""}
+              </h1>
+              <p className="text-sm text-slate-600">
+                {t("pages.admin.subtitle")}
+              </p>
             </div>
 
-            <div className="overflow-auto max-h-[480px]">
-              <table className="min-w-full text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200">
-                  <tr>
-                    <th className="px-3 py-2 text-left font-medium text-slate-500">
-                      ID
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={chargerUtilisateurs}
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 shadow-sm"
+              >
+                <RefreshCw className="h-4 w-4" />
+                {t("pages.admin.refresh")}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setAfficherFormNouveau((v) => !v)}
+                className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-500 hover:from-fuchsia-600 hover:via-purple-600 hover:to-sky-600 shadow-lg"
+              >
+                <Plus className="h-4 w-4" />
+                {t("pages.admin.new_user")}
+              </button>
+            </div>
+          </section>
+
+          {/* Formulaire de création d’utilisateur */}
+          {afficherFormNouveau && (
+            <section className="rounded-3xl border border-slate-200 bg-white/95 px-5 py-5 shadow-sm">
+              <h2 className="text-sm font-semibold text-slate-800 mb-3">
+                {t("pages.admin.create_account")}
+              </h2>
+              <form
+                onSubmit={creerNouvelUtilisateur}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"
+              >
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-600">
+                    {t("pages.admin.full_name")}
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full rounded-xl border border-slate-200 bg-white/90 px-3 py-2 outline-none focus:ring-2 focus:ring-sky-400"
+                    value={nouveauNom}
+                    onChange={(e) => setNouveauNom(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-600">
+                    {t("pages.admin.email")}
+                  </label>
+                  <input
+                    type="email"
+                    className="w-full rounded-xl border border-slate-200 bg-white/90 px-3 py-2 outline-none focus:ring-2 focus:ring-sky-400"
+                    value={nouvelEmail}
+                    onChange={(e) => setNouvelEmail(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-600">
+                    {t("pages.admin.password")}
+                  </label>
+                  <input
+                    type="password"
+                    className="w-full rounded-xl border border-slate-200 bg-white/90 px-3 py-2 outline-none focus:ring-2 focus:ring-sky-400"
+                    value={nouveauPass}
+                    onChange={(e) => setNouveauPass(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col justify-center gap-2">
+                  <label className="inline-flex items-center gap-2 text-xs text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={nouveauEstActif}
+                      onChange={(e) => setNouveauEstActif(e.target.checked)}
+                    />
+                    {t("pages.admin.active_account")}
+                  </label>
+                  <label className="inline-flex items-center gap-2 text-xs text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={nouveauEstAdmin}
+                      onChange={(e) => setNouveauEstAdmin(e.target.checked)}
+                    />
+                    {t("pages.admin.admin_account")}
+                  </label>
+                </div>
+
+                <div className="md:col-span-2 flex justify-end gap-3 mt-2">
+                  <button
+                    type="button"
+                    className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                    onClick={() => {
+                      setAfficherFormNouveau(false);
+                      setNouveauNom("");
+                      setNouvelEmail("");
+                      setNouveauPass("");
+                      setNouveauEstAdmin(false);
+                      setNouveauEstActif(true);
+                    }}
+                  >
+                    {t("pages.admin.cancel")}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={creationEnCours}
+                    className="rounded-xl px-5 py-2 text-xs font-semibold text-white bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-500 hover:from-fuchsia-600 hover:via-purple-600 hover:to-sky-600 disabled:opacity-60 shadow-md"
+                  >
+                    {creationEnCours
+                      ? t("pages.admin.creating")
+                      : t("pages.admin.create_user")}
+                  </button>
+                </div>
+              </form>
+            </section>
+          )}
+
+          {/* Barre de recherche */}
+          <section>
+            <input
+              type="text"
+              placeholder={t("pages.admin.search_placeholder")}
+              className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-sky-400"
+              value={filtre}
+              onChange={(e) => setFiltre(e.target.value)}
+            />
+          </section>
+
+          {/* Cartes statistiques */}
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="rounded-3xl border border-slate-200 bg-white/95 px-5 py-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {t("pages.admin.stats_total")}
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-slate-900">
+                {stats.total}
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                {t("pages.admin.stats_total_desc")}
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-gradient-to-r from-fuchsia-500/10 via-purple-500/10 to-sky-500/10 px-5 py-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+                {t("pages.admin.stats_active")}
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-slate-900">
+                {stats.actifs}
+              </p>
+              <p className="mt-1 text-xs text-slate-600">
+                {t("pages.admin.stats_active_desc")}
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-sky-500/5 via-purple-500/5 to-fuchsia-500/5 px-5 py-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {t("pages.admin.stats_admins")}
+              </p>
+              <p className="mt-2 text-3xl font-semibold text-slate-900">
+                {stats.admins}
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                {t("pages.admin.stats_admins_desc")}
+              </p>
+            </div>
+          </section>
+
+          {/* Tableau des administrateurs */}
+          <section className="rounded-3xl border border-slate-200 bg-white/95 shadow-sm overflow-hidden">
+            <div className="border-b border-slate-100 px-5 py-4 bg-gradient-to-r from-fuchsia-500 via-purple-500 to-sky-500">
+              <h2 className="text-sm font-semibold text-white">
+                {t("pages.admin.admins_title")}
+              </h2>
+              <p className="text-xs text-white/80">
+                {t("pages.admin.admins_desc")}
+              </p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500">
+                    <th className="px-5 py-3">{t("pages.admin.table_id")}</th>
+                    <th className="px-5 py-3">{t("pages.admin.table_name")}</th>
+                    <th className="px-5 py-3">
+                      {t("pages.admin.table_email")}
                     </th>
-                    <th className="px-3 py-2 text-left font-medium text-slate-500">
-                      Nom
+                    <th className="px-5 py-3 text-center">
+                      {t("pages.admin.table_active")}
                     </th>
-                    <th className="px-3 py-2 text-left font-medium text-slate-500">
-                      Email
+                    <th className="px-5 py-3 text-center">
+                      {t("pages.admin.table_admin")}
                     </th>
-                    <th className="px-3 py-2 text-center font-medium text-slate-500">
-                      Actif
+                    <th className="px-5 py-3 text-right">
+                      {t("pages.admin.table_actions")}
                     </th>
-                    <th className="px-3 py-2 text-center font-medium text-slate-500">
-                      Admin
-                    </th>
-                    <th className="px-3 py-2" />
                   </tr>
                 </thead>
                 <tbody>
-                  {utilisateurs.length === 0 && (
+                  {admins.map((u, index) => (
+                    <LigneUtilisateur key={u.id} u={u} index={index} />
+                  ))}
+                  {admins.length === 0 && (
                     <tr>
                       <td
                         colSpan={6}
-                        className="px-3 py-6 text-center text-slate-400"
+                        className="px-5 py-4 text-center text-xs text-slate-500"
                       >
-                        Aucun utilisateur pour le moment.
+                        {t("pages.admin.no_admins")}
                       </td>
                     </tr>
                   )}
-
-                  {utilisateurs.map((u: UtilisateurDto) => (
-                    <tr
-                      key={u.id}
-                      className={`border-b border-slate-100 text-slate-700 ${
-                        selection?.id === u.id
-                          ? "bg-indigo-50/80"
-                          : "hover:bg-slate-50"
-                      }`}
-                    >
-                      <td className="px-3 py-2">{u.id}</td>
-                      <td className="px-3 py-2">
-                        {u.name || (
-                          <span className="text-slate-400">Sans nom</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-2">{u.email}</td>
-                      <td className="px-3 py-2 text-center">
-                        {u.is_active ? "✅" : "⛔"}
-                      </td>
-                      <td className="px-3 py-2 text-center">
-                        {u.is_admin ? "⭐" : "—"}
-                      </td>
-                      <td className="px-3 py-2 text-right">
-                        <button
-                          onClick={() => handleSelect(u)}
-                          className="inline-flex items-center rounded-full bg-indigo-600 px-3 py-1 text-[11px] font-medium text-white hover:bg-indigo-500"
-                        >
-                          Modifier
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
                 </tbody>
               </table>
             </div>
           </section>
 
-          {/* Panneau de droite : édition + notification */}
-          <section className="space-y-4">
-            {/* Carte édition utilisateur */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
-              <h2 className="text-sm font-semibold text-slate-900">
-                Détails de l’utilisateur
+          {/* Tableau des utilisateurs simples */}
+          <section className="rounded-3xl border border-slate-200 bg-white/95 shadow-sm overflow-hidden">
+            <div className="border-b border-slate-100 px-5 py-4 bg-slate-50">
+              <h2 className="text-sm font-semibold text-slate-800">
+                {t("pages.admin.users_title")}
               </h2>
-
-              {!selection ? (
-                <p className="text-xs text-slate-500">
-                  Sélectionnez un utilisateur dans le tableau pour afficher et
-                  modifier ses informations.
-                </p>
-              ) : (
-                <>
-                  <div className="space-y-2 text-xs">
-                    <div className="flex flex-col gap-1">
-                      <label className="text-slate-600">Nom complet</label>
-                      <input
-                        className="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value={nom}
-                        onChange={(e) => setNom(e.target.value)}
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                      <label className="text-slate-600">
-                        Adresse courriel
-                      </label>
-                      <input
-                        className="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
-
-                    <div className="flex gap-4 items-center pt-1">
-                      <label className="flex items-center gap-2 text-slate-600">
-                        <input
-                          type="checkbox"
-                          checked={actif}
-                          onChange={(e) => setActif(e.target.checked)}
-                        />
-                        <span>Compte actif</span>
-                      </label>
-                      <label className="flex items-center gap-2 text-slate-600">
-                        <input
-                          type="checkbox"
-                          checked={admin}
-                          onChange={(e) => setAdmin(e.target.checked)}
-                        />
-                        <span>Administrateur</span>
-                      </label>
-                    </div>
-
-                    <div className="flex flex-col gap-1 pt-1">
-                      <label className="text-slate-600">
-                        Nouveau mot de passe (optionnel)
-                      </label>
-                      <input
-                        type="password"
-                        className="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value={nouveauMotDePasse}
-                        onChange={(e) =>
-                          setNouveauMotDePasse(e.target.value)
-                        }
-                        placeholder="Laisser vide pour ne pas modifier"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="pt-2">
-                    <button
-                      onClick={handleSave}
-                      disabled={chargement}
-                      className="inline-flex items-center rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
-                    >
-                      {chargement
-                        ? "Enregistrement…"
-                        : "Enregistrer les modifications"}
-                    </button>
-                  </div>
-                </>
-              )}
+              <p className="text-xs text-slate-500">
+                {t("pages.admin.users_desc")}
+              </p>
             </div>
 
-            {/* Carte notification */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
-              <h2 className="text-sm font-semibold text-slate-900">
-                Envoyer une notification
-              </h2>
-
-              {!selection ? (
-                <p className="text-xs text-slate-500">
-                  Sélectionnez un utilisateur pour lui envoyer une notification.
-                </p>
-              ) : (
-                <>
-                  <p className="text-[11px] text-slate-500">
-                    Notification destinée à :{" "}
-                    <span className="font-semibold text-slate-800">
-                      {selection.email}
-                    </span>
-                  </p>
-
-                  <div className="flex flex-col gap-1 text-xs">
-                    <label className="text-slate-600">Titre</label>
-                    <input
-                      className="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      value={titreNotif}
-                      onChange={(e) => setTitreNotif(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1 text-xs">
-                    <label className="text-slate-600">Message</label>
-                    <textarea
-                      className="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[80px]"
-                      value={messageNotif}
-                      onChange={(e) => setMessageNotif(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="pt-2">
-                    <button
-                      onClick={handleSendNotification}
-                      disabled={chargement}
-                      className="inline-flex items-center rounded-xl bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-500 disabled:opacity-60"
-                    >
-                      {chargement ? "Envoi…" : "Envoyer la notification"}
-                    </button>
-                  </div>
-                </>
-              )}
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500">
+                    <th className="px-5 py-3">{t("pages.admin.table_id")}</th>
+                    <th className="px-5 py-3">{t("pages.admin.table_name")}</th>
+                    <th className="px-5 py-3">
+                      {t("pages.admin.table_email")}
+                    </th>
+                    <th className="px-5 py-3 text-center">
+                      {t("pages.admin.table_active")}
+                    </th>
+                    <th className="px-5 py-3 text-center">
+                      {t("pages.admin.table_admin")}
+                    </th>
+                    <th className="px-5 py-3 text-right">
+                      {t("pages.admin.table_actions")}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {simplesUtilisateurs.map((u, index) => (
+                    <LigneUtilisateur key={u.id} u={u} index={index} />
+                  ))}
+                  {simplesUtilisateurs.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="px-5 py-4 text-center text-xs text-slate-500"
+                      >
+                        {t("pages.admin.no_users")}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
+
+            {chargement && (
+              <div className="border-t border-slate-100 px-5 py-3 text-xs text-slate-500">
+                {t("pages.admin.loading")}
+              </div>
+            )}
+
+            {erreur && (
+              <div className="border-t border-rose-100 bg-rose-50 px-5 py-3 text-xs text-rose-700">
+                {erreur}
+              </div>
+            )}
           </section>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
-};
-
-export default AdminUsers;
+}

@@ -1,13 +1,16 @@
 {
   "appTitle": "SportConnectIA",
+
   "nav": {
     "home": "Inicio",
     "sports": "Deportes",
     "reco": "Recomendaciones",
-    "chat": "Chatbot",
+    "chat": "Chat",
     "login": "Entrar",
     "register": "Registro",
-    "dashboard": "Panel"
+    "dashboard": "Panel",
+    "admin": "Administración",
+    "logout": "Cerrar sesión"
   },
 
   "home": {
@@ -19,13 +22,11 @@
       "start": "Comenzar gratis",
       "learn_more": "Saber más"
     },
-
     "badges": {
       "b1": "IA & bienestar",
       "b2": "Programas personalizados",
       "b3": "Seguimiento en tiempo real"
     },
-
     "features": {
       "title": "Funciones inteligentes",
       "subtitle": "Descubre cómo SportConnectIA transforma tu entrenamiento con IA avanzada.",
@@ -42,11 +43,205 @@
       "f6_title": "Consejos en tiempo real",
       "f6_text": "Recibe recomendaciones instantáneas mientras entrenas."
     },
-
     "cta": {
       "title": "¿Listo para transformar tu entrenamiento?",
       "subtitle": "Únete a miles de usuarios alcanzando sus metas.",
       "button": "Comenzar gratis"
     }
-  }
+  },
+
+  "pages": {
+    "notfound": {
+      "title": "Página no encontrada"
+    },
+    "tracking": {
+      "title": "Seguimiento",
+      "weight_placeholder": "Peso (kg)",
+      "save_button": "Guardar",
+      "table": {
+        "date": "Fecha",
+        "weight": "Peso (kg)",
+        "waist": "Cintura (cm)",
+        "notes": "Notas"
+      }
+    },
+    "login": {
+      "title": "Entrar",
+      "cta": "Iniciar sesión",
+      "errors": {
+        "required": "Email y contraseña son obligatorios.",
+        "invalid": "Error de inicio de sesión. Verifica tus credenciales."
+      }
+    },
+    "register": {
+      "title": "Registro",
+      "cta": "Crear cuenta",
+      "have_account": "¿Ya tienes cuenta?",
+      "fields": {
+        "name": "Nombre completo",
+        "email": "Email",
+        "password": "Contraseña",
+        "confirm": "Confirmar contraseña"
+      },
+      "errors": {
+        "required": "Todos los campos son obligatorios.",
+        "min_length": "La contraseña debe tener al menos 6 caracteres.",
+        "mismatch": "Las contraseñas no coinciden.",
+        "no_token": "No se recibió el token.",
+        "generic": "Fallo al registrarse."
+      }
+    },
+    "dashboard": {
+      "title": "Panel",
+      "welcome": "Bienvenido, {{name}}. Este es tu espacio de entrenamiento personalizado.",
+      "welcome_generic": "Bienvenido a tu espacio de entrenamiento personalizado.",
+      "age": "Edad",
+      "weight": "Peso",
+      "height": "Altura",
+      "goal": "Objetivo principal",
+      "not_set": "No establecido",
+      "daily_goal": "Objetivo del día",
+      "configure_goals": "Configura o actualiza tu perfil para afinar tus objetivos diarios.",
+      "configure_btn": "Configurar mis objetivos",
+      "recent_sessions": "Sesiones recientes",
+      "recent_sessions_desc": "Tus últimos entrenamientos y sugerencias asociadas.",
+      "no_sessions": "No hay sesiones registradas todavía.",
+      "view_reco": "Ver recomendaciones",
+      "ai_reco": "Recomendaciones IA",
+      "ai_reco_desc": "Ejercicios sugeridos para ti",
+      "ai_reco_text": "Obtén recomendaciones personalizadas hablando con nuestro asistente IA.",
+      "talk_coach": "Hablar con el coach",
+      "profile_configured": "Perfil configurado",
+      "complete_profile": "Completa tu perfil",
+      "profile_desc": "Puedes actualizar tus objetivos en cualquier momento para afinar tus recomendaciones.",
+      "profile_desc_empty": "Agrega tu edad, peso, altura y objetivos para personalizar aún más tus sesiones.",
+      "update_profile": "Actualizar mi perfil",
+      "configure_profile": "Configurar mi perfil"
+    },
+    "onboarding": {
+      "title_edit": "Actualizar mi perfil",
+      "title_new": "Configurar mi perfil",
+      "subtitle": "Esta información nos ayuda a personalizar tus recomendaciones.",
+      "age": "Edad",
+      "weight": "Peso (kg)",
+      "height": "Altura (cm)",
+      "main_goal": "Objetivo principal",
+      "select_goal": "Elegir…",
+      "goal_weight_loss": "Pérdida de peso",
+      "goal_fitness": "Ponerse en forma",
+      "goal_muscle": "Ganancia muscular",
+      "goal_wellness": "Bienestar general",
+      "level": "Nivel actual",
+      "level_beginner": "Principiante",
+      "level_intermediate": "Intermedio",
+      "level_advanced": "Avanzado",
+      "days_week": "Días / semana",
+      "minutes_session": "Minutos / sesión",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "create": "Crear mi perfil"
+    },
+    "sports": {
+      "title": "Recomendaciones deportivas personalizadas",
+      "categories": "Categorías deportivas",
+      "selected_category": "Categoría seleccionada",
+      "videos": "Videos",
+      "watch_video": "Ver video"
+    },
+    "reco": {
+      "title": "Recomendaciones personalizadas",
+      "subtitle": "SportConnectIA analiza tu perfil para ofrecerte un plan saludable de entrenamiento, alimentación y recuperación.",
+      "generate": "Generar mis recomendaciones IA",
+      "age": "Edad",
+      "weight": "Peso",
+      "height": "Altura",
+      "mainGoal": "Objetivo principal",
+      "latest": "Recomendación IA actual",
+      "loading": "Generando recomendaciones...",
+      "empty": "Haz clic en el botón de arriba para generar tus primeras recomendaciones.",
+      "historyTitle": "Historial de tus recomendaciones",
+      "loadingHistory": "Actualizando...",
+      "historyEmpty": "No hay recomendaciones registradas todavía."
+    },
+    "admin": {
+      "title": "Espacio de administrador",
+      "subtitle": "Gestión de usuarios de SportConnectIA.",
+      "users": "Usuarios",
+      "refresh": "Actualizar",
+      "new_user": "Nuevo usuario",
+      "create_account": "Crear nueva cuenta",
+      "full_name": "Nombre completo",
+      "email": "Email",
+      "password": "Contraseña",
+      "active_account": "Cuenta activa",
+      "admin_account": "Cuenta de administrador",
+      "cancel": "Cancelar",
+      "creating": "Creando...",
+      "create_user": "Crear usuario",
+      "search_placeholder": "Buscar por nombre o email...",
+      "stats_total": "Usuarios",
+      "stats_total_desc": "Número total de cuentas",
+      "stats_active": "Cuentas activas",
+      "stats_active_desc": "Usuarios que pueden iniciar sesión",
+      "stats_admins": "Administradores",
+      "stats_admins_desc": "Cuentas con rol de administrador",
+      "admins_title": "Administradores",
+      "admins_desc": "Cuentas con acceso al espacio de administrador.",
+      "users_title": "Usuarios",
+      "users_desc": "Cuentas regulares sin rol de administrador.",
+      "table_id": "ID",
+      "table_name": "Nombre",
+      "table_email": "Email",
+      "table_active": "Activo",
+      "table_admin": "Admin",
+      "table_actions": "Acciones",
+      "no_name": "(Sin nombre)",
+      "deactivate": "Desactivar",
+      "activate": "Activar",
+      "delete": "Eliminar",
+      "no_admins": "No se encontraron administradores.",
+      "no_users": "No se encontraron usuarios regulares.",
+      "loading": "Cargando datos...",
+      "confirm_delete": "¿Realmente quieres eliminar este usuario?",
+      "errors": {
+        "required": "Nombre, email y contraseña son obligatorios.",
+        "load": "Error al cargar usuarios.",
+        "update": "Error al actualizar usuario.",
+        "delete": "Error al eliminar usuario.",
+        "create": "Error al crear nuevo usuario."
+      }
+    }
+  },
+
+  "auth": {
+    "hero": {
+      "title": "Entrena con IA, a tu ritmo",
+      "subtitle": "Programas, retos y seguimiento inteligente"
+    }
+  },
+
+  "chat": {
+    "title": "Asistente Coach IA",
+    "subtitle": "Chatea con tu coach personal impulsado por inteligencia artificial.",
+    "placeholder": "Hazle tu pregunta al coach… (ej: ¿Cómo retomar el ejercicio suavemente?)",
+    "send": "Enviar",
+    "typing": "El coach está escribiendo…",
+    "welcome": "¡Hola! Soy tu coach SportConnectIA. Hazme preguntas sobre entrenamiento, salud o motivación 😊",
+    "empty": "Comienza la conversación con una pregunta sobre tus hábitos o entrenamiento.",
+    "emptyAnswer": "Necesito un poco más de contexto para ayudarte mejor 🙂",
+    "error": "Ocurrió un error. Inténtalo de nuevo en unos momentos.",
+    "history_title": "Conversaciones",
+    "new": "Nuevo",
+    "no_conversations": "No hay conversaciones guardadas todavía.",
+    "confirm_delete": "¿Realmente quieres eliminar esta conversación?",
+    "faq_title": "Preguntas frecuentes",
+    "faq_1": "¿Cómo crear un programa de musculación para principiantes?",
+    "faq_2": "¿Cuál es el mejor tipo de cardio para perder peso?",
+    "faq_3": "¿Qué alimentos priorizar para ganar músculo?",
+    "faq_4": "¿Cómo optimizar mi recuperación después del entrenamiento?"
+  },
+
+  "welcome": "¡Hola, {{name}}!",
+  "welcome_generic": "¡Hola!",
+  "logout": "Cerrar sesión"
 }

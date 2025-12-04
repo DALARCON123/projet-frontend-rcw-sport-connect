@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { getProfileLocal } from "../services/profileService";
 import { User2, Activity, Ruler, Target, Brain } from "lucide-react";
 
@@ -31,6 +32,7 @@ const StatCard = ({ label, value, subtitle, icon }: StatCardProps) => (
 );
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const profile = getProfileLocal();
   const name = (localStorage.getItem("user_name") || "").trim();
 
@@ -86,18 +88,17 @@ export default function Dashboard() {
       <div className="rounded-2xl bg-white shadow-sm border border-slate-200 px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="font-semibold text-slate-900 text-sm md:text-base">
-            Objectif du jour
+            {t("pages.dashboard.daily_goal")}
           </h2>
           <p className="text-xs md:text-sm text-slate-600 mt-1">
-            Configurez ou mettez à jour votre profil pour affiner vos objectifs
-            quotidiens.
+            {t("pages.dashboard.configure_goals")}
           </p>
         </div>
         <Link
           to="/onboarding"
           className="inline-flex justify-center rounded-full px-5 py-2 text-xs md:text-sm font-semibold text-white shadow-md bg-gradient-to-r from-fuchsia-600 via-indigo-600 to-sky-500 hover:brightness-110 transition"
         >
-          Configurer mes objectifs
+          {t("pages.dashboard.configure_btn")}
         </Link>
       </div>
 
@@ -107,23 +108,23 @@ export default function Dashboard() {
         <div className="rounded-2xl bg-white shadow-sm border border-slate-200 px-5 py-5 flex flex-col justify-between min-h-[200px]">
           <div>
             <h2 className="font-semibold text-slate-900 text-sm md:text-base">
-              Séances récentes
+              {t("pages.dashboard.recent_sessions")}
             </h2>
             <p className="text-xs md:text-sm text-slate-500">
-              Vos derniers entraînements et suggestions associées.
+              {t("pages.dashboard.recent_sessions_desc")}
             </p>
           </div>
 
           <div className="flex flex-col items-center justify-center flex-1 py-6">
             <span className="text-3xl mb-2 text-slate-300">📋</span>
             <p className="text-xs md:text-sm text-slate-500">
-              Aucune séance enregistrée pour le moment.
+              {t("pages.dashboard.no_sessions")}
             </p>
             <Link
               to="/reco"
               className="mt-2 inline-flex justify-center rounded-full px-5 py-2 text-xs md:text-sm font-semibold text-white shadow-md bg-gradient-to-r from-fuchsia-600 via-indigo-600 to-sky-500 hover:brightness-110 transition"
             >
-              Voir les recommandations
+              {t("pages.dashboard.view_reco")}
             </Link>
           </div>
         </div>
@@ -132,10 +133,10 @@ export default function Dashboard() {
         <div className="rounded-2xl bg-white shadow-sm border border-slate-200 px-5 py-5 flex flex-col justify-between min-h-[200px]">
           <div>
             <h2 className="font-semibold text-slate-900 text-sm md:text-base">
-              Recommandations IA
+              {t("pages.dashboard.ai_reco")}
             </h2>
             <p className="text-xs md:text-sm text-slate-500">
-              Exercices suggérés pour vous
+              {t("pages.dashboard.ai_reco_desc")}
             </p>
           </div>
 
@@ -144,14 +145,13 @@ export default function Dashboard() {
               <Brain className="inline h-7 w-7" />
             </span>
             <p className="text-xs md:text-sm text-slate-500 max-w-xs">
-              Obtenez des recommandations personnalisées en discutant avec
-              notre assistant IA.
+              {t("pages.dashboard.ai_reco_text")}
             </p>
             <Link
               to="/chat"
               className="mt-3 inline-flex justify-center rounded-full px-5 py-2 text-xs md:text-sm font-semibold text-white shadow-md bg-gradient-to-r from-fuchsia-600 via-indigo-600 to-sky-500 hover:brightness-110 transition"
             >
-              Parler au coach
+              {t("pages.dashboard.talk_coach")}
             </Link>
           </div>
         </div>
@@ -161,12 +161,12 @@ export default function Dashboard() {
       <div className="rounded-2xl border border-fuchsia-300 bg-gradient-to-r from-fuchsia-50 via-indigo-50 to-sky-50 px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="font-semibold text-slate-900 text-sm md:text-base">
-            {profile ? "Profil configuré" : "Complétez votre profil"}
+            {profile ? t("pages.dashboard.profile_configured") : t("pages.dashboard.complete_profile")}
           </h2>
           <p className="text-xs md:text-sm text-slate-700 mt-1">
             {profile
-              ? "Vous pouvez modifier vos objectifs à tout moment pour affiner vos recommandations."
-              : "Ajoutez votre âge, poids, taille et objectifs pour personnaliser encore plus vos séances."}
+              ? t("pages.dashboard.profile_desc")
+              : t("pages.dashboard.profile_desc_empty")}
           </p>
         </div>
 
@@ -174,7 +174,7 @@ export default function Dashboard() {
           to="/onboarding"
           className="inline-flex justify-center rounded-full border border-fuchsia-500 bg-white px-5 py-2 text-xs md:text-sm font-semibold text-fuchsia-700 hover:bg-gradient-to-r hover:from-fuchsia-600 hover:via-indigo-600 hover:to-sky-500 hover:text-white transition"
         >
-          {profile ? "Mettre à jour mon profil" : "Configurer mon profil"}
+          {profile ? t("pages.dashboard.update_profile") : t("pages.dashboard.configure_profile")}
         </Link>
       </div>
     </section>

@@ -11,11 +11,11 @@ export default function ProtectedRoute() {
   }
 
   // 2. Si está autenticado pero NO tiene perfil → onboarding obligatorio,
-  //    excepto cuando ya está en /onboarding
+  //    excepto cuando ya está en /onboarding o en rutas de admin
   const profile = getProfileLocal();
   const path = location.pathname.toLowerCase();
 
-  if (!profile && path !== "/onboarding") {
+  if (!profile && path !== "/onboarding" && !path.startsWith("/admin")) {
     return <Navigate to="/onboarding" replace />;
   }
 
