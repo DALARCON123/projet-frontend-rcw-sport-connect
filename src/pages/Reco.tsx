@@ -114,7 +114,7 @@ export default function RecoPage() {
         // ignore
       }
     }
-    return localStorage.getItem("user_email") || "";
+    return localStorage.getItem("technologyana@gmail.com") || "";
   };
 
   const userId = getUserId();
@@ -362,7 +362,7 @@ async function handleGenerate() {
     }
 
     const email =
-      profile?.email || localStorage.getItem("user_email") || "";
+      profile?.email || localStorage.getItem("tecnologyana@gmail.com") || "";
 
     if (!email) {
       setReportStatus("Aucun email trouvé pour cet utilisateur.");
