@@ -8,7 +8,7 @@ function Sports() {
   const { userProfile } = useAuthStore();
 
   const [videos, setVideos] = useState<SportActivity[]>([]);
-  const [categorie, setCategorie] = useState("");
+  const [categorie, setCategorie] = useState<string>("");
 
   // 🎥 VÍDEOS FIXOS POR TIPO DE ESPORTE
   const staticVideos = [
@@ -58,7 +58,133 @@ function Sports() {
       "https://cisss-outaouais.gouv.qc.ca/wp-content/uploads/2019/11/Carnet-de-la-marche-1.pdf",
   };
 
-  // Charger recommandations personnalisées
+  const pdfUrlForSelected = categorie ? pdfLinks[categorie] : undefined;
+
+  // 📝 DESCRIÇÃO / BENEFÍCIOS POR CATEGORIA
+  const sportInfos: Record<
+    string,
+    {
+      title: string;
+      items: string[];
+    }
+  > = {
+    Yoga: {
+      title: "Les 5 piliers du yoga",
+      items: [
+        "La voie du bien-être : harmoniser corps et esprit au quotidien.",
+        "Asanas : exercices physiques appropriés pour renforcer et assouplir le corps.",
+        "Pranayama : respiration correcte pour mieux gérer l’énergie et le stress.",
+        "Savasana : relaxation profonde pour récupérer et relâcher les tensions.",
+        "Vedanta & Dhyana : pensées positives et méditation pour apaiser le mental.",
+        "Alimentation saine : mieux manger pour mieux vivre et soutenir la pratique.",
+      ],
+    },
+    Cardio: {
+      title: "Les avantages de l’entraînement cardiovasculaire",
+      items: [
+        "Améliore la santé du cœur et réduit le risque de maladies cardiovasculaires.",
+        "Aide à maintenir un poids santé en brûlant beaucoup de calories.",
+        "Stimule les facultés cognitives (attention, mémoire, résolution de problèmes).",
+        "Réduit l’anxiété et la dépression et améliore l’humeur générale.",
+        "Améliore la qualité du sommeil et les niveaux d’énergie pendant la journée.",
+        "Soutient l’autonomie des personnes âgées en renforçant l’équilibre et l’endurance.",
+      ],
+    },
+    HIIT: {
+      title: "Les bienfaits du HIIT",
+      items: [
+        "Permet de s’entraîner en peu de temps avec des résultats comparables à un entraînement plus long.",
+        "Brûle beaucoup de calories pendant la séance et après grâce à l’effet « afterburn ». ",
+        "Peut se pratiquer presque partout, souvent sans équipement particulier.",
+        "Améliore fortement la VO₂ max et la capacité cardiovasculaire.",
+        "Aide à réguler la glycémie et à améliorer la sensibilité à l’insuline.",
+        "Peut réduire la tension artérielle et la fréquence cardiaque au repos.",
+      ],
+    },
+    Musculation: {
+      title: "Bienfaits de la musculation",
+      items: [
+        "Augmente la force et la masse musculaire pour les activités du quotidien.",
+        "Renforce les os et aide à prévenir l’ostéoporose.",
+        "Améliore la posture et protège les articulations.",
+        "Accélère le métabolisme au repos, facilitant le contrôle du poids.",
+        "Aide à réguler la glycémie et les lipides sanguins.",
+        "Renforce la confiance en soi et l’image corporelle.",
+      ],
+    },
+    "Étirements": {
+      title: "Pourquoi faire des étirements ?",
+      items: [
+        "Améliorent la souplesse et l’amplitude des mouvements.",
+        "Réduisent les tensions musculaires et certaines douleurs.",
+        "Préparent les muscles à l’effort et diminuent le risque de blessure.",
+        "Favorisent la récupération après l’entraînement.",
+        "Aident à la relaxation et à la gestion du stress.",
+      ],
+    },
+    Pilates: {
+      title: "Les avantages du Pilates",
+      items: [
+        "Renforce les muscles profonds, notamment la ceinture abdominale.",
+        "Améliore la posture et l’alignement du corps.",
+        "Développe la stabilité, l’équilibre et le contrôle des mouvements.",
+        "Peut réduire et prévenir les douleurs lombaires.",
+        "Travaille la respiration et la conscience du corps.",
+        "S’adapte à de nombreux niveaux de condition physique.",
+      ],
+    },
+    "Danse Fitness": {
+      title: "Pourquoi choisir la Danse Fitness ?",
+      items: [
+        "Propose un entraînement cardio ludique et rythmé.",
+        "Améliore la coordination, le sens du rythme et l’équilibre.",
+        "Permet de brûler des calories tout en s’amusant.",
+        "Stimule l’expression corporelle et la confiance en soi.",
+        "Réduit le stress et améliore l’humeur grâce à la musique.",
+      ],
+    },
+    "Marche Active": {
+      title: "Les bienfaits de la marche active",
+      items: [
+        "Activité douce et accessible à presque tout le monde.",
+        "Améliore la santé du cœur et la circulation sanguine.",
+        "Aide au contrôle du poids lorsqu’elle est pratiquée régulièrement.",
+        "Renforce les muscles des jambes, des hanches et du tronc.",
+        "Peut facilement s’intégrer dans la routine quotidienne (trajets, loisirs).",
+        "Soutient la santé mentale en réduisant le stress et en clarifiant l’esprit.",
+      ],
+    },
+  };
+
+  const infoForSelected = categorie ? sportInfos[categorie] : undefined;
+
+  // ========= CLIQUE NA CATEGORIA =========
+  const chargerVideosCategorie = (nomCategorie: string) => {
+    // usamos o nome do card como categoria selecionada
+    setCategorie(nomCategorie);
+
+    const params = new URLSearchParams({
+      name: nomCategorie,
+      age: String(userProfile?.age ?? 30),
+      objectif: String(userProfile?.mainGoal ?? "Bien-être"),
+    });
+
+    sportsClient
+      .get<{ categorie: string; videos: SportActivity[] }>(
+        `/category?${params}`
+      )
+      .then((res) => {
+        // usamos só os vídeos retornados pela API
+        // @ts-ignore
+        setVideos(res.videos);
+      })
+      .catch((err) => {
+        console.error("Erreur catégorie :", err);
+        setVideos([]);
+      });
+  };
+
+  // ========= RECOMENDAÇÃO AUTOMÁTICA AO CARREGAR =========
   useEffect(() => {
     if (!userProfile) return;
 
@@ -73,35 +199,23 @@ function Sports() {
         `/recommendations?${params}`
       )
       .then((res) => {
-        setCategorie(res.categorie_recommandee);
+        // tenta casar a categoria recomendada com um titre do array categoriesSport
+        // @ts-ignore
+        const catFromApi = res.categorie_recommandee;
+        const match =
+          categoriesSport.find(
+            (c) =>
+              c.titre.toLowerCase() === String(catFromApi).toLowerCase()
+          )?.titre ?? catFromApi;
+
+        setCategorie(match as string);
+        // @ts-ignore
         setVideos(res.videos);
       })
       .catch((err: unknown) => {
         console.error("Erreur recommandations :", err);
       });
   }, [userProfile]);
-
-  // Charger vidéos par catégorie cliquée
-  const chargerVideosCategorie = (nomCategorie: string) => {
-    const params = new URLSearchParams({
-      name: nomCategorie,
-      age: String(userProfile?.age ?? 30),
-      objectif: String(userProfile?.mainGoal ?? "Bien-être"),
-    });
-
-    sportsClient
-      .get<{ categorie: string; videos: SportActivity[] }>(
-        `/category?${params}`
-      )
-      .then((res) => {
-        setCategorie(res.categorie);
-        setVideos(res.videos);
-      })
-      .catch((err) => {
-        console.error("Erreur catégorie :", err);
-        setVideos([]);
-      });
-  };
 
   return (
     <div className="w-full flex justify-center px-4">
@@ -128,14 +242,7 @@ function Sports() {
               <div
                 key={cat.id}
                 onClick={() => {
-                  // mantém o comportamento de carregar vídeos
                   chargerVideosCategorie(cat.titre);
-
-                  // abre o PDF correspondente em nova aba, se existir
-                  const pdfUrl = pdfLinks[cat.titre];
-                  if (pdfUrl) {
-                    window.open(pdfUrl, "_blank", "noopener,noreferrer");
-                  }
                 }}
                 className="relative h-40 rounded-xl overflow-hidden shadow-lg cursor-pointer
                 group transition transform hover:-translate-y-1 hover:shadow-2xl"
@@ -173,9 +280,62 @@ function Sports() {
             </h2>
           </div>
 
-          <p className="text-purple-800 text-lg font-medium mt-1">
-            👉 <strong>{categorie}</strong>
-          </p>
+          {categorie ? (
+            <>
+              <p className="text-purple-800 text-lg font-medium mt-1">
+                👉 <strong>{categorie}</strong>
+              </p>
+
+              {/* INFOS / BÉNÉFICES DO ESPORTE */}
+              {infoForSelected && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold text-purple-800">
+                    {infoForSelected.title}
+                  </h3>
+                  <ul className="mt-2 list-disc list-inside text-slate-700 space-y-1">
+                    {infoForSelected.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* PDF dentro da categoria selecionada */}
+              {pdfUrlForSelected && (
+                <div className="mt-5">
+                  <div className="border rounded-xl overflow-hidden shadow-inner">
+                    <iframe
+                      src={pdfUrlForSelected}
+                      className="w-full h-[500px]"
+                      title={`Document ${categorie}`}
+                    />
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2">
+                    Si le document ne s&apos;affiche pas correctement,{" "}
+                    <a
+                      href={pdfUrlForSelected}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-purple-700 underline"
+                    >
+                      clique ici pour l&apos;ouvrir dans un nouvel onglet.
+                    </a>
+                  </p>
+                </div>
+              )}
+
+              {!pdfUrlForSelected && (
+                <p className="text-sm text-slate-500 mt-3">
+                  Aucun PDF configuré pour cette catégorie.
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="text-slate-500 mt-1">
+              Choisis une catégorie pour voir les informations et le PDF
+              associé.
+            </p>
+          )}
         </div>
 
         {/* ========================== VIDÉOS ========================== */}
