@@ -1,3 +1,4 @@
+import sportImg from "../assets/sport.png"; // ajusta o caminho conforme a pasta
 import { Link } from "react-router-dom";
 import {
   MessageCircle,
@@ -64,25 +65,14 @@ export default function Home() {
               <div className="absolute -bottom-10 -left-16 h-40 w-40 rounded-full bg-sky-400/20 blur-3xl" />
 
               <div className="relative flex flex-col items-center gap-4">
-                <div className="h-28 w-28 rounded-full bg-gradient-to-tr from-fuchsia-500 via-indigo-500 to-sky-500 flex items-center justify-center shadow-xl">
-                  <svg
-                    viewBox="0 0 64 64"
-                    className="h-16 w-16 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="42" cy="14" r="4" />
-                    <path d="M30 54l7-16-8-8-9 6" />
-                    <path d="M32 24l6-6 8 4" />
-                    <path d="M18 40l-6 4" />
-                    <path d="M34 38l10 6" />
-                    <path d="M10 26h-4" />
-                    <path d="M10 32h-6" />
-                    <path d="M10 38H4" />
-                  </svg>
+                <div className="h-36 w-36 rounded-full bg-gradient-to-tr from-fuchsia-500 via-indigo-500 to-sky-500 flex items-center justify-center shadow-xl">
+                  {/* Imagem no lugar do SVG */}
+                  <img
+                    src={sportImg}
+                    alt="Catégories sportives"
+                    className="h-36 w-36 object-contain rounded-full"
+
+                  />
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-2 text-[11px]">
