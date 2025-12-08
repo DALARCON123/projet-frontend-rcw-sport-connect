@@ -1,9 +1,11 @@
+//Navbar.tsx
 import { Link, NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LangSwitcher from "./LangSwitcher";
 import { ShieldCheck } from "lucide-react";
 import { isAdminFromToken } from "../services/authService";
 import logo from "../assets/logo.png";
+
 
 const link =
   "px-4 py-2 rounded-xl text-sm font-medium transition-all hover:bg-white/80 hover:shadow-sm";

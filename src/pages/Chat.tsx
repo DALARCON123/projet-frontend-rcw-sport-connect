@@ -93,7 +93,9 @@ export default function Chat() {
     }
 
     try {
-      const res: ChatResp = await askBot(q, i18n.language);
+    const historyForApi = [...msgs, userMsg];
+
+    const res: ChatResp = await askBot(q, i18n.language, historyForApi);
 
       const botMsg: Msg = {
         id: crypto.randomUUID(),

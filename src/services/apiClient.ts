@@ -39,12 +39,17 @@ async function request<T>(base: string, path: string, init: RequestInit = {}): P
 
   if (!res.ok) {
     // Intenta parsear JSON; si no, texto plano.
+  
+    const raw = await res.text();
+
+    let parsed: any;
     try {
-      const errJson = await res.json();
-      throw errJson;
+      parsed = raw ? JSON.parse(raw) : null;
     } catch {
-      throw await res.text();
+      parsed = raw; 
     }
+
+    throw parsed;
   }
 
   // 204 No Content
