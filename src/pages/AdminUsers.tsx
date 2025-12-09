@@ -69,18 +69,47 @@ export default function AdminUsers() {
   }
 
   /**
-   * Charge les utilisateurs depuis le microservice d’authentification.
+   * Charge les utilisateurs depuis le microservice d'authentification.
    */
   async function chargerUtilisateurs() {
     try {
       setChargement(true);
       setErreur(null);
 
+      // Debug: verificar se o token existe
+      const token = localStorage.getItem("token");
+      console.log("Token presente no localStorage:", !!token);
+      console.log(
+        "🔑 Primeiros 20 caracteres do token:",
+        token?.substring(0, 20)
+      );
+
       const data = await authClient.get<UtilisateurDto[]>("/admin/users");
+      console.log("Usuarios carregados:", data.length);
       setUtilisateurs(data);
       recalculerStats(data);
     } catch (e: any) {
-      setErreur(messageErreur(e, t("pages.admin.errors.load")));
+      console.error("Erro ao carregar usuarios:", e);
+
+      // Se for erro 401, pode ser token inválido/expirado
+      if (
+        e?.status === 401 ||
+        String(e).includes("401") ||
+        String(e).includes("Unauthorized")
+      ) {
+        setErreur(
+          t("pages.admin.errors.unauthorized") ||
+            "Não autorizado. Token pode estar expirado."
+        );
+
+        // Opcional: redirecionar para login após 2 segundos
+        setTimeout(() => {
+          localStorage.removeItem("token");
+          window.location.href = "/login";
+        }, 2000);
+      } else {
+        setErreur(messageErreur(e, t("pages.admin.errors.load")));
+      }
     } finally {
       setChargement(false);
     }
