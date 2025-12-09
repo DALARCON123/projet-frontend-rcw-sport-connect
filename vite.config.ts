@@ -18,7 +18,7 @@ export default defineConfig({
 
       // 🏋️ SERVICE SPORTS
       '/sports': {
-        target: 'http://localhost:8004',
+        target: 'http://localhost:8002',
         changeOrigin: true,
       },
 

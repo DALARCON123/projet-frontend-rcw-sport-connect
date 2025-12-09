@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { authClient } from "../services/apiClient";
-import { Users, Plus, RefreshCw } from "lucide-react";
+import { Users, Plus, RefreshCw, Eye, EyeOff, Key } from "lucide-react";
 import { getUserSnapshot } from "../services/authService";
 import { useTranslation } from "react-i18next";
 
@@ -45,6 +45,11 @@ export default function AdminUsers() {
   const [nouveauEstActif, setNouveauEstActif] = useState(true);
   const [creationEnCours, setCreationEnCours] = useState(false);
 
+  // Estados para cambiar contraseña
+  const [editandoPasswordId, setEditandoPasswordId] = useState<number | null>(null);
+  const [nuevaPassword, setNuevaPassword] = useState("");
+  const [mostrarPassword, setMostrarPassword] = useState(false);
+
   const { name: adminName } = getUserSnapshot();
 
   /**
@@ -76,11 +81,15 @@ export default function AdminUsers() {
       setChargement(true);
       setErreur(null);
 
+      console.log("🔄 Chargement des utilisateurs depuis /auth/admin/users...");
       const data = await authClient.get<UtilisateurDto[]>("/admin/users");
+      console.log("✅ Utilisateurs chargés:", data.length);
       setUtilisateurs(data);
       recalculerStats(data);
     } catch (e: any) {
-      setErreur(messageErreur(e, t("pages.admin.errors.load")));
+      console.error("❌ Erreur chargement utilisateurs:", e);
+      const errorMsg = e?.detail || e?.message || JSON.stringify(e);
+      setErreur(`${t("pages.admin.errors.load")} - ${errorMsg}`);
     } finally {
       setChargement(false);
     }
@@ -156,6 +165,31 @@ export default function AdminUsers() {
   }
 
   /**
+   * Cambiar contraseña de un usuario
+   */
+  async function cambiarPassword(id: number) {
+    if (!nuevaPassword.trim() || nuevaPassword.length < 6) {
+      alert("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
+    try {
+      setErreur(null);
+      
+      await authClient.patch(`/admin/users/${id}`, {
+        password: nuevaPassword
+      });
+
+      alert("Contraseña actualizada correctamente");
+      setEditandoPasswordId(null);
+      setNuevaPassword("");
+      setMostrarPassword(false);
+    } catch (e: any) {
+      setErreur(messageErreur(e, "Error al cambiar la contraseña"));
+    }
+  }
+
+  /**
    * Crée un nouveau compte utilisateur.
    */
   async function creerNouvelUtilisateur(e: React.FormEvent) {
@@ -221,6 +255,32 @@ export default function AdminUsers() {
           {u.name || t("pages.admin.no_name")}
         </td>
         <td className="px-5 py-2.5 text-slate-700">{u.email}</td>
+        <td className="px-5 py-2.5">
+          {editandoPasswordId === u.id ? (
+            <div className="flex items-center gap-1">
+              <input
+                type={mostrarPassword ? "text" : "password"}
+                value={nuevaPassword}
+                onChange={(e) => setNuevaPassword(e.target.value)}
+                placeholder="Nueva contraseña"
+                className="w-36 px-2 py-1 text-xs border border-slate-300 rounded focus:outline-none focus:border-sky-500"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setMostrarPassword(!mostrarPassword);
+                }}
+                className="p-1.5 text-slate-500 hover:text-slate-700 flex-shrink-0"
+              >
+                {mostrarPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              </button>
+            </div>
+          ) : (
+            <span className="text-xs text-slate-400">••••••••</span>
+          )}
+        </td>
         <td className="px-5 py-2.5 text-center">
           <input
             type="checkbox"
@@ -239,32 +299,71 @@ export default function AdminUsers() {
             }
           />
         </td>
-        <td className="px-5 py-2.5 text-right space-x-2">
-          <button
-            type="button"
-            className="rounded-lg bg-sky-500 px-3 py-1 text-xs font-medium text-white hover:bg-sky-600"
-            onClick={() =>
-              mettreAJourUtilisateur(u.id, { is_active: !u.is_active })
-            }
-          >
-            {u.is_active
-              ? t("pages.admin.deactivate")
-              : t("pages.admin.activate")}
-          </button>
-          <button
-            type="button"
-            className="rounded-lg bg-rose-500 px-3 py-1 text-xs font-medium text-white hover:bg-rose-600"
-            onClick={() => supprimerUtilisateur(u.id)}
-          >
-            {t("pages.admin.delete")}
-          </button>
+        <td className="px-5 py-2.5">
+          <div className="flex items-center justify-end gap-2 flex-wrap">
+            {editandoPasswordId === u.id ? (
+              <>
+                <button
+                  type="button"
+                  className="rounded-lg bg-green-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-600 transition-colors whitespace-nowrap"
+                  onClick={() => cambiarPassword(u.id)}
+                >
+                  {t("pages.admin.save")}
+                </button>
+                <button
+                  type="button"
+                  className="rounded-lg bg-slate-400 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-500 transition-colors whitespace-nowrap"
+                  onClick={() => {
+                    setEditandoPasswordId(null);
+                    setNuevaPassword("");
+                    setMostrarPassword(false);
+                  }}
+                >
+                  {t("pages.admin.cancel")}
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="rounded-lg bg-amber-500 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-amber-600 transition-colors flex items-center gap-1 whitespace-nowrap"
+                  onClick={() => {
+                    setEditandoPasswordId(u.id);
+                    setNuevaPassword("");
+                    setMostrarPassword(false);
+                  }}
+                >
+                  <Key className="h-3 w-3" />
+                  <span>{t("pages.admin.change_password")}</span>
+                </button>
+                <button
+                  type="button"
+                  className="rounded-lg bg-sky-500 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-sky-600 transition-colors whitespace-nowrap"
+                  onClick={() =>
+                    mettreAJourUtilisateur(u.id, { is_active: !u.is_active })
+                  }
+                >
+                  {u.is_active
+                    ? t("pages.admin.deactivate")
+                    : t("pages.admin.activate")}
+                </button>
+                <button
+                  type="button"
+                  className="rounded-lg bg-rose-500 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-rose-600 transition-colors whitespace-nowrap"
+                  onClick={() => supprimerUtilisateur(u.id)}
+                >
+                  {t("pages.admin.delete")}
+                </button>
+              </>
+            )}
+          </div>
         </td>
       </tr>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 lg:py-10">
+    <div className="w-full min-h-screen px-6 py-8 lg:px-8 lg:py-10">
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Barre latérale gauche, uniquement section Utilisateurs */}
         <aside className="lg:w-64 flex-shrink-0 rounded-3xl bg-white/90 border border-slate-200 shadow-sm overflow-hidden">
@@ -486,6 +585,7 @@ export default function AdminUsers() {
                     <th className="px-5 py-3">
                       {t("pages.admin.table_email")}
                     </th>
+                    <th className="px-5 py-3">{t("pages.admin.table_password")}</th>
                     <th className="px-5 py-3 text-center">
                       {t("pages.admin.table_active")}
                     </th>
@@ -504,7 +604,7 @@ export default function AdminUsers() {
                   {admins.length === 0 && (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={7}
                         className="px-5 py-4 text-center text-xs text-slate-500"
                       >
                         {t("pages.admin.no_admins")}
@@ -536,6 +636,7 @@ export default function AdminUsers() {
                     <th className="px-5 py-3">
                       {t("pages.admin.table_email")}
                     </th>
+                    <th className="px-5 py-3">{t("pages.admin.table_password")}</th>
                     <th className="px-5 py-3 text-center">
                       {t("pages.admin.table_active")}
                     </th>
@@ -554,7 +655,7 @@ export default function AdminUsers() {
                   {simplesUtilisateurs.length === 0 && (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={7}
                         className="px-5 py-4 text-center text-xs text-slate-500"
                       >
                         {t("pages.admin.no_users")}

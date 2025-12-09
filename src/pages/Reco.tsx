@@ -8,8 +8,6 @@ import {
   History,
   Loader2,
   Sparkles,
-  Mail,
-  TrendingDown,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -29,6 +27,7 @@ type Profile = {
   heightCm?: number;
   mainGoal?: string;
   lang?: string;
+  // por si un día guardas el email del usuario en Firestore
   email?: string;
 };
 
@@ -53,12 +52,15 @@ type Measurement = {
   notes?: string | null;
 };
 
+// 🔗 URL del microservicio de recomendaciones & tracking
+// En desarrollo usa el proxy de Vite, en producción usa la variable de entorno
 const isDev = import.meta.env.DEV;
-// em dev usamos o proxy do Vite (API_URL = ""), em prod usamos variável de env
-const API_URL = isDev
-  ? ""
-  : import.meta.env.VITE_RECO_URL ?? "http://localhost:8003";
+const API_URL = isDev ? "" : (import.meta.env.VITE_RECO_URL ?? "http://localhost:8003");
 
+/**
+ * Parsea el texto plano generado por la IA (con **títulos** y *viñetas)
+ * en un arreglo de secciones estructuradas para poder mostrar tarjetas.
+ */
 function parseRecoToSections(text: string): ParsedSection[] {
   if (!text) return [];
 
@@ -71,11 +73,18 @@ function parseRecoToSections(text: string): ParsedSection[] {
   let current: ParsedSection | null = null;
 
   for (const line of lines) {
+    // Línea tipo **Titre:**
     if (line.startsWith("**") && line.includes("**", 2)) {
-      const cleanTitle = line.replace(/\*\*/g, "").replace(/:+$/, "").trim();
+      const cleanTitle = line
+        .replace(/\*\*/g, "")
+        .replace(/:+$/, "")
+        .trim();
+
       if (current) sections.push(current);
       current = { title: cleanTitle || "Plan", bullets: [] };
-    } else if (line.startsWith("*")) {
+    }
+    // Línea tipo * viñeta
+    else if (line.startsWith("*")) {
       const bullet = line
         .replace(/^\*+/, "")
         .trim()
@@ -84,6 +93,7 @@ function parseRecoToSections(text: string): ParsedSection[] {
       if (!current) current = { title: "Plan", bullets: [] };
       if (bullet) current.bullets.push(bullet);
     } else {
+      // Texto suelto → bullet adicional
       if (!current) current = { title: "Plan", bullets: [] };
       current.bullets.push(line);
     }
@@ -96,7 +106,9 @@ function parseRecoToSections(text: string): ParsedSection[] {
 export default function RecoPage() {
   const { t, i18n } = useTranslation();
 
+  // Obtener el user_id del token JWT (sub) o del email guardado
   const getUserId = (): string => {
+    // Intentar obtener del token JWT
     const token = localStorage.getItem("token");
     if (token) {
       try {
@@ -109,12 +121,16 @@ export default function RecoPage() {
             .join("")
         );
         const payload = JSON.parse(jsonPayload);
+        
+        // Preferir sub (subject) del JWT, sino email
         return payload.sub || payload.email || payload.user_id || "";
       } catch {
-        // ignore
+        // Si falla el parse, continuar con email
       }
     }
-    return localStorage.getItem("technologyana@gmail.com") || "";
+    
+    // Fallback: usar email guardado
+    return localStorage.getItem("user_email") || "";
   };
 
   const userId = getUserId();
@@ -126,14 +142,11 @@ export default function RecoPage() {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // ---- Tracking & gráficos ----
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [loadingMeasurements, setLoadingMeasurements] = useState(false);
   const [savingMeasurement, setSavingMeasurement] = useState(false);
   const [trackingError, setTrackingError] = useState<string | null>(null);
-
-  const [sendingReport, setSendingReport] = useState(false);
-  const [reportStatus, setReportStatus] = useState<string | null>(null);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
   const [measureDate, setMeasureDate] = useState(today);
@@ -143,12 +156,15 @@ export default function RecoPage() {
   const [measureChest, setMeasureChest] = useState("");
   const [measureNotes, setMeasureNotes] = useState("");
 
+  // key que usamos para el tracking en SQLite (puede ser email o uid)
   const trackingKey = (profile?.email || userId).toLowerCase();
+
+  // -------- Helpers --------
 
   function formatDate(v?: any) {
     if (!v) return "";
-    if (typeof v === "object" && (v as any).seconds != null) {
-      const d = new Date((v as any).seconds * 1000);
+    if (typeof v === "object" && v.seconds != null) {
+      const d = new Date(v.seconds * 1000);
       return d.toLocaleString();
     }
     return String(v);
@@ -166,6 +182,7 @@ export default function RecoPage() {
     );
     return sorted.map((m) => ({
       ...m,
+      // etiqueta más corta en el eje X
       label: m.date,
     }));
   }, [measurements]);
@@ -180,6 +197,7 @@ export default function RecoPage() {
       ? latestMeasure.weight_kg - prevMeasure.weight_kg
       : null;
 
+  // -------- Cargar perfil desde localStorage al inicio --------
   useEffect(() => {
     const storedProfile = localStorage.getItem("profile_v1");
     if (storedProfile) {
@@ -200,12 +218,14 @@ export default function RecoPage() {
     }
   }, [i18n.language]);
 
+  // -------- Cargar historial al entrar --------
   useEffect(() => {
     if (!userId) return;
     loadHistory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
+  // Cargar medidas cuando tengamos trackingKey
   useEffect(() => {
     if (!trackingKey) return;
     loadMeasurements(trackingKey);
@@ -227,32 +247,18 @@ export default function RecoPage() {
 
       const mapped: RecoItem[] = data.map((d: any) => ({
         id: d.id,
-        answer: d.answer ?? d.content ?? "",
-        createdAt: d.createdAt ?? d.created_at,
+        answer: d.answer,
+        createdAt: d.createdAt,
       }));
 
-      setHistory(mapped.slice(0, 8));
-
+      setHistory(mapped);
       if (mapped.length > 0) {
         setLatestReco(mapped[0].answer || "");
-
-        const meta = (data[0].metadata || {}) as any;
-        setProfile((prev) => ({
-          ...(prev || {}),
-          age: meta.age ?? prev?.age,
-          weightKg: meta.weight_kg ?? prev?.weightKg,
-          heightCm: meta.height_cm ?? prev?.heightCm,
-          mainGoal: meta.main_goal ?? prev?.mainGoal,
-          lang: meta.lang ?? prev?.lang,
-          email: data[0].email ?? prev?.email,
-        }));
+        setProfile((p) => ({ ...(p || {}), ...(data[0].profile || {}) }));
       }
     } catch (e: any) {
       console.error("Erreur loadHistory:", e);
-      setError(
-        t("pages.reco.errors.history") ||
-          "Impossible de charger l'historique des recommandations."
-      );
+      setError("Impossible de charger l'historique des recommandations.");
     } finally {
       setLoadingHistory(false);
     }
@@ -264,7 +270,9 @@ export default function RecoPage() {
       setTrackingError(null);
 
       const resp = await fetch(
-        `${API_URL}/tracking/measurements?email=${encodeURIComponent(email)}`
+        `${API_URL}/tracking/measurements?email=${encodeURIComponent(
+          email
+        )}`
       );
       if (!resp.ok) {
         const text = await resp.text();
@@ -275,166 +283,89 @@ export default function RecoPage() {
     } catch (e: any) {
       console.error("Erreur loadMeasurements:", e);
       setTrackingError(
-        t("pages.reco.errors.trackingLoad") ||
-          "Impossible de charger les mesures de suivi. Réessaie plus tard."
+        "Impossible de charger les mesures de suivi. Réessaie plus tard."
       );
     } finally {
       setLoadingMeasurements(false);
     }
   }
 
-async function handleGenerate() {
-  if (!userId) {
-    setError(
-      t("pages.reco.errors.noUser") ||
-        "Utilisateur introuvable (uid manquant)."
-    );
-    return;
-  }
-
-  // Tenta carregar o profile_v1, mas não bloqueia se não existir
-  const localProfile = localStorage.getItem("profile_v1");
-  let profileData: any = {};
-
-  if (localProfile) {
-    try {
-      profileData = JSON.parse(localProfile);
-    } catch (e) {
-      console.error("Erreur JSON profile_v1:", e);
-      profileData = {};
-    }
-  }
-
-  try {
-    setLoadingReco(true);
-    setError(null);
-
-    const requestBody = {
-      user_id: userId,
-      lang: i18n.language,
-      age: profileData.age || 30,
-      weight_kg: profileData.weightKg || 70,
-      height_cm: profileData.heightCm || 170,
-      main_goal: profileData.goal || "Perte de poids",
-      days_per_week: profileData.daysPerWeek || 3,
-      minutes_per_session: profileData.minutesPerSession || 45,
-      level: profileData.level || "debutant",
-    };
-
-    const resp = await fetch(`${API_URL}/reco/generate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!resp.ok) {
-      const text = await resp.text();
-      throw new Error(text || "Error HTTP " + resp.status);
-    }
-
-    const data = await resp.json();
-    const answer: string = data.answer || data.content || "";
-    setLatestReco(answer);
-
-    setProfile({
-      name: localStorage.getItem("user_name") || undefined,
-      email: localStorage.getItem("user_email") || undefined,
-      age: requestBody.age,
-      weightKg: requestBody.weight_kg,
-      heightCm: requestBody.height_cm,
-      mainGoal: requestBody.main_goal,
-      lang: i18n.language,
-    });
-
-    await loadHistory();
-  } catch (e: any) {
-    console.error("Erreur handleGenerate:", e);
-    setError(
-      t("pages.reco.errors.generate", { message: e.message }) ||
-        "Une erreur est survenue lors de la génération des recommandations. Détails: " +
-          e.message
-    );
-  } finally {
-    setLoadingReco(false);
-  }
-}
-
-  async function handleSendReport() {
-    setReportStatus(null);
-
+  // -------- Generar nueva recomendación --------
+  async function handleGenerate() {
     if (!userId) {
-      setReportStatus(
-        t("pages.reco.report.noUser") ||
-          "Utilisateur introuvable (uid manquant)."
-      );
+      setError("Utilisateur introuvable (uid manquant).");
       return;
     }
 
-    const email =
-      profile?.email || localStorage.getItem("tecnologyana@gmail.com") || "";
-
-    if (!email) {
-      setReportStatus(
-        t("pages.reco.report.noEmail") ||
-          "Aucun email trouvé pour cet utilisateur."
-      );
+    // Verificar que tenemos perfil completo
+    const localProfile = localStorage.getItem("profile_v1");
+    if (!localProfile) {
+      setError("Tu perfil no está completo. Ve a 'Perfil' pour le compléter.");
       return;
     }
 
     try {
-      setSendingReport(true);
+      setLoadingReco(true);
+      setError(null);
 
-      const name =
-        profile?.name || localStorage.getItem("user_name") || "";
+      const profileData = JSON.parse(localProfile);
+      
+      // Construir el objeto de perfil para enviar al backend
+      const requestBody = {
+        user_id: userId,
+        lang: i18n.language,
+        age: profileData.age || 30,
+        weight_kg: profileData.weightKg || 70,
+        height_cm: profileData.heightCm || 170,
+        main_goal: profileData.goal || "Perte de poids",
+        days_per_week: profileData.daysPerWeek || 3,
+        minutes_per_session: profileData.minutesPerSession || 45,
+        level: profileData.level || "debutant",
+      };
 
-      const resp = await fetch(`${API_URL}/reco/send-report`, {
+      console.log("🔍 Generando recomendación con:", requestBody);
+
+      const resp = await fetch(`${API_URL}/reco/generate`, {
         method: "POST",
-        headers: {
+        headers: { 
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          user_id: userId,
-          email,
-          name,
-          lang: i18n.language,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!resp.ok) {
         const text = await resp.text();
-        throw new Error(text || "Erreur HTTP " + resp.status);
+        console.error("❌ Error del servidor:", text);
+        throw new Error(text || "Error HTTP " + resp.status);
       }
 
       const data = await resp.json();
-      console.log("✅ Rapport envoyé:", data);
-      setReportStatus(
-        t("pages.reco.report.success") ||
-          "Rapport envoyé avec succès à ton adresse e-mail."
-      );
+      console.log("✅ Respuesta recibida:", data);
+
+      const answer: string = data.answer || "";
+      setLatestReco(answer);
+      setProfile(data.profile || null);
+
+      await loadHistory();
     } catch (e: any) {
-      console.error("Erreur handleSendReport:", e);
-      setReportStatus(
-        t("pages.reco.report.error", { message: e.message }) ||
-          "Une erreur est survenue lors de l'envoi du rapport : " + e.message
+      console.error("Erreur handleGenerate:", e);
+      setError(
+        "Une erreur est survenue lors de la génération des recommandations. Détails: " + e.message
       );
     } finally {
-      setSendingReport(false);
+      setLoadingReco(false);
     }
   }
 
+  // -------- Guardar una nueva medida --------
   async function handleSaveMeasurement(e: React.FormEvent) {
     e.preventDefault();
     if (!trackingKey) {
-      setTrackingError(
-        t("pages.reco.errors.missingTrackingUser") ||
-          "Utilisateur introuvable pour le suivi."
-      );
+      setTrackingError("Utilisateur introuvable pour le suivi.");
       return;
     }
     if (!measureDate) {
-      setTrackingError(t("pages.reco.errors.missingDate") || "La date est obligatoire.");
+      setTrackingError("La date est obligatoire.");
       return;
     }
 
@@ -467,6 +398,7 @@ async function handleGenerate() {
         throw new Error(text || "Error HTTP " + resp.status);
       }
 
+      // limpiar campos (menos fecha)
       setMeasureWeight("");
       setMeasureWaist("");
       setMeasureHips("");
@@ -477,14 +409,14 @@ async function handleGenerate() {
     } catch (e: any) {
       console.error("Erreur handleSaveMeasurement:", e);
       setTrackingError(
-        t("pages.reco.errors.trackingSave") ||
-          "Erreur lors de l’enregistrement de la mesure. Vérifie les valeurs."
+        "Erreur lors de l’enregistrement de la mesure. Vérifie les valeurs."
       );
     } finally {
       setSavingMeasurement(false);
     }
   }
 
+  // -------- UI --------
   const displayProfile: Profile = profile || {
     name: "SportConnectIA",
     age: 39,
@@ -501,355 +433,392 @@ async function handleGenerate() {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-white via-slate-50 to-sky-50 px-4 sm:px-8 py-8">
-      <header className="max-w-5xl mx-auto mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 flex items-center gap-2">
-            <Sparkles className="text-fuchsia-600 h-7 w-7" />
-            {t("pages.reco.title") || "Recommandations personnalisées"}
-          </h1>
-          <p className="text-sm text-slate-600 mt-1">
-            {t("pages.reco.subtitle") ||
-              "SportConnectIA analyse ton profil pour te proposer un plan d'entraînement, d'alimentation et de récupération sain."}
-          </p>
-          {reportStatus && (
-            <p className="text-xs mt-2 text-slate-500">{reportStatus}</p>
-          )}
-          {error && (
-            <p className="text-xs mt-1 text-red-500">
-              {error}
-            </p>
-          )}
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 px-6 lg:px-8 py-10">
+      {/* Header espectacular con fondo degradado */}
+      <header className="max-w-[1600px] mx-auto mb-8">
+        <div className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 rounded-3xl p-8 shadow-2xl border-2 border-white/30">
+          {/* Patrón de fondo */}
+          <div 
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '60px 60px'
+            }}
+          ></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div className="flex items-center gap-5">
+              <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center shadow-2xl border-2 border-white/30">
+                <Sparkles className="text-white h-8 w-8 animate-pulse" />
+              </div>
+              <div>
+                <h1 className="text-5xl font-black text-white drop-shadow-2xl">
+                  {t("pages.reco.title") || "Recommandations IA"}
+                </h1>
+                <p className="text-lg text-white/95 drop-shadow-lg mt-2 max-w-2xl">
+                  {t("pages.reco.subtitle") ||
+                    "Coach intelligent • Plan personnalisé • Résultats garantis"}
+                </p>
+              </div>
+            </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2">
-          <button
-            onClick={handleGenerate}
-            disabled={loadingReco}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-fuchsia-600 to-sky-600 px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-95 disabled:opacity-60 transition"
-          >
-            {loadingReco ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Brain className="h-4 w-4" />
-            )}
-            {t("pages.reco.generate") || "Générer mes recommandations IA"}
-          </button>
-
-          <button
-            onClick={handleSendReport}
-            disabled={sendingReport}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-95 disabled:opacity-60 transition"
-          >
-            {sendingReport ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Mail className="h-4 w-4" />
-            )}
-            {t("pages.reco.sendReport") || "Envoyer un résumé"}
-          </button>
+            <button
+              onClick={handleGenerate}
+              disabled={loadingReco}
+              className="group inline-flex items-center gap-3 rounded-2xl bg-white hover:bg-white/95 px-8 py-4 text-base font-bold text-purple-600 shadow-2xl hover:shadow-white/50 hover:scale-105 disabled:opacity-60 disabled:hover:scale-100 transition-all"
+            >
+              {loadingReco ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <Brain className="h-6 w-6 group-hover:rotate-12 transition-transform" />
+              )}
+              {t("pages.reco.generate") || "Générer mon plan IA"}
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* 1) Résumé du profil + recommandation actuelle */}
-      <main className="max-w-5xl mx-auto space-y-8">
-        {/* Cards de profil */}
-        <section>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <div className="rounded-2xl bg-white/80 border border-slate-100 shadow-sm px-4 py-3">
-              <p className="text-xs text-slate-500 uppercase tracking-wide">
-                {t("pages.reco.age")}
-              </p>
-              <p className="mt-1 text-lg font-semibold text-slate-900 flex items-center gap-1">
-                <Activity className="h-4 w-4 text-fuchsia-500" />
-                {t("pages.reco.profileCard.ageUnit", {
-                  value: displayProfile.age ?? "—",
-                }) ||
-                  `${displayProfile.age ?? "—"} ans`}
-              </p>
-            </div>
-            <div className="rounded-2xl bg-white/80 border border-slate-100 shadow-sm px-4 py-3">
-              <p className="text-xs text-slate-500 uppercase tracking-wide">
-                {t("pages.reco.weight")}
-              </p>
-              <p className="mt-1 text-lg font-semibold text-slate-900 flex items-center gap-1">
-                <Apple className="h-4 w-4 text-emerald-500" />
-                {t("pages.reco.profileCard.weightUnit", {
-                  value: displayProfile.weightKg ?? "—",
-                }) ||
-                  `${displayProfile.weightKg ?? "—"} kg`}
-              </p>
-            </div>
-            <div className="rounded-2xl bg-white/80 border border-slate-100 shadow-sm px-4 py-3">
-              <p className="text-xs text-slate-500 uppercase tracking-wide">
-                {t("pages.reco.height")}
-              </p>
-              <p className="mt-1 text-lg font-semibold text-slate-900">
-                {t("pages.reco.profileCard.heightUnit", {
-                  value: displayProfile.heightCm ?? "—",
-                }) ||
-                  `${displayProfile.heightCm ?? "—"} cm`}
-              </p>
-            </div>
-            <div className="rounded-2xl bg-white/80 border border-slate-100 shadow-sm px-4 py-3">
-              <p className="text-xs text-slate-500 uppercase tracking-wide">
-                {t("pages.reco.mainGoal")}
-              </p>
-              <p className="mt-1 text-lg font-semibold text-slate-900">
-                {displayProfile.mainGoal ?? "—"}
-              </p>
-            </div>
-          </div>
+      <main className="max-w-[1600px] mx-auto space-y-8">
+        {/* Perfil + métricas */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <ProfileCard
+            title={t("pages.reco.age") || "Âge"}
+            icon={<Activity className="h-5 w-5" />}
+            value={
+              displayProfile.age != null ? `${displayProfile.age} ans` : "—"
+            }
+          />
+          <ProfileCard
+            title={t("pages.reco.weight") || "Poids"}
+            icon={<Activity className="h-5 w-5" />}
+            value={
+              displayProfile.weightKg != null
+                ? `${displayProfile.weightKg} kg`
+                : "—"
+            }
+          />
+          <ProfileCard
+            title={t("pages.reco.height") || "Taille"}
+            icon={<Activity className="h-5 w-5" />}
+            value={
+              displayProfile.heightCm != null
+                ? `${displayProfile.heightCm} cm`
+                : "—"
+            }
+          />
+          <ProfileCard
+            title={t("pages.reco.mainGoal") || "Objectif principal"}
+            icon={<Apple className="h-5 w-5" />}
+            value={displayProfile.mainGoal || "—"}
+          />
         </section>
 
-        {/* Recommandation IA actuelle */}
-        <section className="rounded-3xl bg-white/80 border border-slate-100 shadow-sm px-5 py-5">
-          <div className="flex items-center justify-between gap-2 mb-4">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-fuchsia-500" />
-              <h2 className="text-sm font-semibold text-slate-900">
-                {t("pages.reco.latest") || "Recommandation IA actuelle"}
+        {/* Recomendación actual en tarjetas */}
+        <section className="rounded-3xl border-2 border-purple-200 bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 shadow-2xl p-8 space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
+              <Brain className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+                {t("pages.reco.latest") || "Ton Plan Personnalisé"}
               </h2>
+              <p className="text-sm text-slate-600 mt-1">Généré par l'intelligence artificielle</p>
             </div>
           </div>
 
-          {loadingHistory && !latestReco && (
-            <p className="text-sm text-slate-500">
-              {t("pages.reco.current.loading") ||
-                "Chargement de tes recommandations…"}
+          {!latestReco ? (
+            loadingReco ? (
+              <p className="text-sm text-slate-500">
+                {t("pages.reco.loading") ||
+                  "Génération des recommandations..."}
+              </p>
+            ) : (
+              <p className="text-sm text-slate-500">
+                {t("pages.reco.empty") ||
+                  "Clique sur le bouton ci-dessus pour générer tes premières recommandations."}
+              </p>
+            )
+          ) : sections.length === 0 ? (
+            <p className="text-sm text-slate-700 whitespace-pre-wrap">
+              {latestReco}
             </p>
-          )}
+          ) : (
+            <>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+                {sections.map((sec, idx) => {
+                  const gradient =
+                    sectionGradients[idx % sectionGradients.length];
+                  const isLast = idx === sections.length - 1;
 
-          {!loadingHistory && sections.length === 0 && (
-            <p className="text-sm text-slate-500">
-              {t("pages.reco.current.empty", {
-                action: t("pages.reco.generate"),
-              }) ||
-                'Aucune recommandation pour le moment. Clique sur “Générer mes recommandations IA” pour commencer.'}
-            </p>
-          )}
+                  const cardColors = [
+                    { accent: 'from-purple-500 to-pink-500', icon: 'bg-purple-100 text-purple-600', border: 'border-purple-200' },
+                    { accent: 'from-blue-500 to-cyan-500', icon: 'bg-blue-100 text-blue-600', border: 'border-blue-200' },
+                    { accent: 'from-emerald-500 to-teal-500', icon: 'bg-emerald-100 text-emerald-600', border: 'border-emerald-200' },
+                    { accent: 'from-amber-500 to-orange-500', icon: 'bg-amber-100 text-amber-600', border: 'border-amber-200' },
+                  ];
+                  
+                  const cardColor = cardColors[idx % cardColors.length];
+                  
+                  return (
+                    <div
+                      key={`${sec.title}-${idx}`}
+                      className={`group relative h-full overflow-hidden rounded-3xl border-2 ${cardColor.border} bg-gradient-to-br ${gradient} px-7 py-6 text-sm text-slate-800 shadow-xl hover:shadow-2xl backdrop-blur-sm flex flex-col transition-all duration-300 hover:-translate-y-2 ${
+                        isLast ? "lg:col-span-3" : ""
+                      }`}
+                    >
+                      <span className={`absolute left-0 top-8 h-16 w-1.5 rounded-r-full bg-gradient-to-b ${cardColor.accent} shadow-lg`} />
 
-          {sections.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-              {sections.map((sec, idx) => (
-                  <article
-                    key={idx}
-                    className={`rounded-2xl bg-gradient-to-br ${
-                      sectionGradients[idx % sectionGradients.length]
-                    } border border-white/60 shadow-sm p-4
-                    transform transition-transform duration-200 hover:scale-[1.01] md:hover:scale-[1.02] hover:shadow-md`}
-                  >
-                  <h3 className="text-sm font-semibold text-slate-900 mb-2 flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-fuchsia-500" />
-                    {sec.title}
-                  </h3>
-                  <ul className="space-y-1 text-sm text-slate-700">
-                    {sec.bullets.map((b, i) => (
-                      <li key={i} className="flex gap-2">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-fuchsia-400" />
-                        <span>{b}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-          )}
+                      <div className="pl-4">
+                        <h3 className="text-xl font-black text-slate-900 mb-4 flex items-center gap-3">
+                          <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${cardColor.icon} shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-transform`}>
+                            <Sparkles className="h-5 w-5" />
+                          </span>
+                          {sec.title || "Plan"}
+                        </h3>
 
-          <p className="mt-4 text-[11px] text-slate-400">
-            {t("pages.reco.disclaimer") ||
-              "Ces recommandations sont indicatives et ne remplacent pas l'avis d'un professionnel de santé. Adapte toujours l'intensité à ton niveau et à ton ressenti."}
-          </p>
+                        <ul className="mt-3 space-y-2.5 text-sm leading-relaxed flex-1">
+                          {sec.bullets.map((b, i) => (
+                            <li key={i} className="flex gap-3">
+                              <span className="mt-[6px] h-2 w-2 rounded-full bg-purple-500/70 shrink-0 shadow-sm" />
+                              <span className="text-slate-700">{b}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        <div className="mt-4 pt-3 border-t border-purple-200/50 text-xs text-slate-500 flex items-center gap-1.5">
+                          <Sparkles className="h-3.5 w-3.5 text-purple-400" />
+                          <span className="font-medium">Coach IA • SportConnectIA</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <p className="text-[10px] text-slate-400 mt-1">
+                ⚠ Ces recommandations sont indicatives et ne remplacent
+                pas l’avis d’un professionnel de la santé. Adapte toujours
+                l’intensité à ton niveau et à ton ressenti.
+              </p>
+            </>
+          )}
         </section>
 
-        {/* 2) Suivi de ton évolution + graphique */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Formulaire de mesures */}
-          <div className="rounded-3xl bg-white/80 border border-slate-100 shadow-sm p-5">
-            <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-1">
-              <Activity className="h-4 w-4 text-sky-500" />
-              {t("pages.reco.tracking.title") || "Suivi de ton évolution"}
-            </h2>
+        {/* Seguimiento & gráficos */}
+        <section className="grid md:grid-cols-2 gap-6 items-start">
+          {/* Formulario de seguimiento */}
+          <div className="rounded-3xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-white to-cyan-50 shadow-2xl p-7">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-xl">
+                <Activity className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-slate-900">
+                  Suivi de ton Évolution
+                </h2>
+                <p className="text-sm text-slate-600">Enregistre tes progrès</p>
+              </div>
+            </div>
+
             {trackingError && (
               <p className="text-xs text-red-500 mb-2">{trackingError}</p>
-            )}
-            {loadingMeasurements && (
-              <p className="text-xs text-slate-500 mb-2">
-                {t("pages.reco.tracking.loading") || "Chargement de tes mesures…"}
-              </p>
             )}
 
             <form
               onSubmit={handleSaveMeasurement}
-              className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700"
+              className="space-y-4 text-sm text-slate-700"
             >
-              <div className="flex flex-col gap-1">
-                <label className="font-medium">
-                  {t("pages.reco.tracking.form.date") || "Date"}
-                </label>
-                <input
-                  type="date"
-                  value={measureDate}
-                  onChange={(e) => setMeasureDate(e.target.value)}
-                  className="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700 flex items-center gap-2">
+                    <span className="h-5 w-5 rounded-lg bg-purple-100 grid place-items-center text-purple-600 text-xs">????</span>
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    value={measureDate}
+                    onChange={(e) => setMeasureDate(e.target.value)}
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-semibold"
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700">
+                    Poids (kg)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={measureWeight}
+                    onChange={(e) => setMeasureWeight(e.target.value)}
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all"
+                    placeholder="Ex: 64.5"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700">
+                    Tour de taille (cm)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={measureWaist}
+                    onChange={(e) => setMeasureWaist(e.target.value)}
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all"
+                    placeholder="Ex: 80"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700">
+                    Tour de hanches (cm)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={measureHips}
+                    onChange={(e) => setMeasureHips(e.target.value)}
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all"
+                    placeholder="Ex: 95"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700">
+                    Tour de poitrine (cm)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={measureChest}
+                    onChange={(e) => setMeasureChest(e.target.value)}
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all"
+                    placeholder="Ex: 90"
+                  />
+                </div>
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="font-medium">
-                  {t("pages.reco.tracking.form.weight") || "Poids (kg)"}
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={measureWeight}
-                  onChange={(e) => setMeasureWeight(e.target.value)}
-                  className="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-                  placeholder={
-                    t("pages.reco.tracking.form.weightPlaceholder") || "Ex: 65.4"
-                  }
-                />
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="font-medium">
-                  {t("pages.reco.tracking.form.waist") || "Tour de taille (cm)"}
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={measureWaist}
-                  onChange={(e) => setMeasureWaist(e.target.value)}
-                  className="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-                  placeholder={
-                    t("pages.reco.tracking.form.waistPlaceholder") || "Ex: 72"
-                  }
-                />
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="font-medium">
-                  {t("pages.reco.tracking.form.hips") || "Tour de hanches (cm)"}
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={measureHips}
-                  onChange={(e) => setMeasureHips(e.target.value)}
-                  className="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-                  placeholder={
-                    t("pages.reco.tracking.form.hipsPlaceholder") || "Ex: 95"
-                  }
-                />
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="font-medium">
-                  {t("pages.reco.tracking.form.chest") ||
-                    "Tour de poitrine (cm)"}
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  value={measureChest}
-                  onChange={(e) => setMeasureChest(e.target.value)}
-                  className="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-                  placeholder={
-                    t("pages.reco.tracking.form.chestPlaceholder") || "Ex: 88"
-                  }
-                />
-              </div>
-
-              <div className="sm:col-span-2 flex flex-col gap-1">
-                <label className="font-medium">
-                  {t("pages.reco.tracking.form.notes") || "Notes"}
+              <div className="flex flex-col gap-2">
+                <label className="font-bold text-sm text-slate-700">
+                  Notes (comment tu te sens, séance, etc.)
                 </label>
                 <textarea
                   value={measureNotes}
                   onChange={(e) => setMeasureNotes(e.target.value)}
-                  rows={2}
-                  className="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-                  placeholder={
-                    t("pages.reco.tracking.form.notesPlaceholder") ||
-                    "Ex: Exercices difficiles, peu d'énergie"
-                  }
+                  className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all min-h-[80px]"
+                  placeholder="Ex: Séance facile, bonne énergie…"
                 />
               </div>
 
-              <div className="sm:col-span-2 flex justify-end mt-1">
-                <button
-                  type="submit"
-                  disabled={savingMeasurement}
-                  className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow hover:bg-sky-700 disabled:opacity-60"
-                >
-                  {savingMeasurement && (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  )}
-                  {t("pages.reco.tracking.form.submit") || "Enregistrer la mesure"}
-                </button>
-              </div>
-            </form>
-
-            {latestMeasure && (
-              <div className="mt-4 rounded-2xl bg-slate-50 border border-slate-100 px-3 py-2 text-xs text-slate-600 flex items-center justify-between gap-2">
-                <div>
-                  <p className="font-semibold text-slate-800">
-                    {t("pages.reco.tracking.lastMeasure", {
-                      date: latestMeasure.date,
-                    }) || `Dernière mesure : ${latestMeasure.date}`}
-                  </p>
-                  <p>
-                    {t("pages.reco.tracking.weightLabel") || "Poids :"}{" "}
-                    <span className="font-semibold">
-                      {t("pages.reco.profileCard.weightUnit", {
-                        value: latestMeasure.weight_kg ?? "—",
-                      }) ||
-                        `${latestMeasure.weight_kg ?? "—"} kg`}
-                    </span>
-                  </p>
-                </div>
-                {deltaWeight != null && (
-                  <div className="flex items-center gap-1 text-emerald-600 font-semibold">
-                    <TrendingDown className="h-4 w-4" />
-                    {t("pages.reco.tracking.delta", {
-                      value: deltaWeight.toFixed(1),
-                    }) || `${deltaWeight.toFixed(1)} kg`}
-                  </div>
+              <button
+                type="submit"
+                disabled={savingMeasurement}
+                className="group mt-6 w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 hover:from-blue-600 hover:via-cyan-600 hover:to-teal-600 px-8 py-4 text-base font-bold text-white shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100 transition-all"
+              >
+                {savingMeasurement ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Sparkles className="h-5 w-5 group-hover:rotate-12 transition-transform" />
                 )}
-              </div>
-            )}
+                Enregistrer la mesure
+              </button>
+
+              {loadingMeasurements && (
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Chargement des mesures…
+                </p>
+              )}
+            </form>
           </div>
 
-          {/* Graphique */}
-          <div className="rounded-3xl bg-white/80 border border-slate-100 shadow-sm p-5">
-            <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-1">
-              <Activity className="h-4 w-4 text-emerald-500" />
-              {t("pages.reco.tracking.chartTitle") || "Graphique d'évolution"}
-            </h2>
-            <p className="text-[11px] text-slate-500 mb-2">
-              {t("pages.reco.tracking.description") ||
-                "Visualise ton poids et tes mesures dans le temps. Ajoute une première mesure depuis le formulaire à gauche."}
-            </p>
+          {/* Gráficos */}
+          <div className="rounded-3xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-teal-50 shadow-2xl p-7">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-xl">
+                  <History className="h-7 w-7 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900">
+                    Graphique d'Évolution
+                  </h2>
+                  <p className="text-sm text-slate-600">Visualise tes progrès</p>
+                </div>
+              </div>
+              {latestMeasure && (
+                <div className="text-[10px] text-slate-500 text-right">
+                  <p>
+                    Dernier poids:{" "}
+                    <span className="font-semibold">
+                      {latestMeasure.weight_kg ?? "—"} kg
+                    </span>{" "}
+                    le {latestMeasure.date}
+                  </p>
+                  {deltaWeight != null && (
+                    <p>
+                      Différence vs mesure précédente:{" "}
+                      <span
+                        className={
+                          deltaWeight < 0
+                            ? "text-emerald-600 font-semibold"
+                            : deltaWeight > 0
+                            ? "text-rose-600 font-semibold"
+                            : "font-semibold"
+                        }
+                      >
+                        {deltaWeight > 0 ? "+" : ""}
+                        {deltaWeight.toFixed(1)} kg
+                      </span>
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
 
             {chartData.length === 0 ? (
-              <div className="h-56 flex items-center justify-center text-xs text-slate-400">
-                {t("pages.reco.tracking.empty") ||
-                  "Aucune mesure enregistrée pour le moment."}
-              </div>
+              <p className="text-xs text-slate-500">
+                Aucune mesure enregistrée pour le moment. Ajoute une
+                première mesure dans le formulaire à gauche.
+              </p>
             ) : (
-              <div className="h-64">
+              <div className="h-56">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="label" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
+                    <XAxis dataKey="label" fontSize={10} />
+                    <YAxis fontSize={10} />
+                    <Tooltip
+                      contentStyle={{ fontSize: "11px" }}
+                      labelStyle={{ fontWeight: 600 }}
+                    />
+                    <Legend
+                      verticalAlign="top"
+                      height={24}
+                      wrapperStyle={{ fontSize: "10px" }}
+                    />
                     <Line
                       type="monotone"
                       dataKey="weight_kg"
-                      name={t("pages.reco.tracking.chartWeight") || "Poids (kg)"}
+                      name="Poids (kg)"
+                      dot={{ r: 3 }}
+                      strokeWidth={2}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="waist_cm"
+                      name="Taille (cm)"
                       dot={false}
+                      strokeWidth={1.5}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="hips_cm"
+                      name="Hanches (cm)"
+                      dot={false}
+                      strokeWidth={1.5}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -858,65 +827,88 @@ async function handleGenerate() {
           </div>
         </section>
 
-        {/* 3) Historique des recommandations */}
-        <section className="rounded-3xl bg-white/80 border border-slate-100 shadow-sm p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <History className="h-4 w-4 text-slate-600" />
-            <h2 className="text-sm font-semibold text-slate-900">
-              {t("pages.reco.historyTitle") || "Historique de tes recommandations"}
-            </h2>
+        {/* Historial de recomendaciones IA */}
+        <section className="rounded-3xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-purple-50 shadow-2xl p-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-xl">
+                <History className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  {t("pages.reco.historyTitle") ||
+                    "Historique de tes Recommandations"}
+                </h2>
+                <p className="text-sm text-slate-600 mt-1">Toutes tes générations précédentes</p>
+              </div>
+            </div>
+            {loadingHistory && (
+              <span className="text-xs text-slate-400 flex items-center gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                {t("pages.reco.loadingHistory") || "Mise à jour..."}
+              </span>
+            )}
           </div>
 
-          {loadingHistory && history.length === 0 && (
-            <p className="text-xs text-slate-500">
-              {t("pages.reco.loadingHistory") || "Chargement de l'historique…"}
-            </p>
+          {error && (
+            <p className="text-xs text-red-500 mb-3">{error}</p>
           )}
 
-          {!loadingHistory && history.length === 0 && (
-            <p className="text-xs text-slate-500">
+          {history.length === 0 ? (
+            <p className="text-sm text-slate-500">
               {t("pages.reco.historyEmpty") ||
                 "Aucune recommandation enregistrée pour le moment."}
             </p>
+          ) : (
+            <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+              {history.map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2 text-xs text-slate-700"
+                >
+                  <p className="font-semibold text-[11px] text-slate-500 mb-1">
+                    {formatDate(item.createdAt)}
+                  </p>
+                  <p className="whitespace-pre-wrap leading-relaxed">
+                    {item.answer}
+                  </p>
+                </div>
+              ))}
+            </div>
           )}
-
-          {history.length > 0 && (
-            <ul className="space-y-3 text-xs text-slate-700">
-              {history.map((item) => {
-                const isExpanded = expandedId === item.id;
-
-                return (
-                  <li
-                    key={item.id}
-                    onClick={() =>
-                      setExpandedId(isExpanded ? null : item.id)
-                    }
-                    className="rounded-2xl border border-slate-100 bg-slate-50/70 px-3 py-2 cursor-pointer hover:border-sky-200 transition"
-                  >
-                    <p className="text-[11px] text-slate-500 mb-1">
-                      {formatDate(item.createdAt)}
-                    </p>
-
-                    <p className={isExpanded ? "" : "line-clamp-3"}>
-                      {item.answer ||
-                        t("pages.reco.history.emptyItem") ||
-                        "(contenu vide)"}
-                    </p>
-
-                    <p className="mt-1 text-[11px] text-sky-600 font-medium">
-                      {isExpanded
-                        ? t("pages.reco.history.showLess") || "Voir moins"
-                        : t("pages.reco.history.showMore") || "Voir plus"}
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-
-
         </section>
       </main>
+    </div>
+  );
+}
+
+type ProfileCardProps = {
+  title: string;
+  icon: React.ReactNode;
+  value: string;
+};
+
+function ProfileCard({ title, icon, value }: ProfileCardProps) {
+  const colorSchemes = [
+    { bg: 'from-purple-500 to-pink-500', text: 'from-purple-600 to-pink-600', border: 'border-purple-200 hover:border-purple-400' },
+    { bg: 'from-blue-500 to-cyan-500', text: 'from-blue-600 to-cyan-600', border: 'border-blue-200 hover:border-blue-400' },
+    { bg: 'from-emerald-500 to-teal-500', text: 'from-emerald-600 to-teal-600', border: 'border-emerald-200 hover:border-emerald-400' },
+    { bg: 'from-amber-500 to-orange-500', text: 'from-amber-600 to-orange-600', border: 'border-amber-200 hover:border-amber-400' },
+  ];
+  
+  const scheme = colorSchemes[Math.floor(Math.random() * colorSchemes.length)];
+  
+  return (
+    <div className={`group rounded-2xl border-2 ${scheme.border} bg-white shadow-xl hover:shadow-2xl p-6 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-1`}>
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-bold uppercase tracking-wider text-slate-600">
+          {title}
+        </p>
+        <span className={`h-12 w-12 rounded-xl bg-gradient-to-br ${scheme.bg} grid place-items-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-transform`}>
+          {icon}
+        </span>
+      </div>
+      <p className={`text-3xl font-black bg-gradient-to-r ${scheme.text} bg-clip-text text-transparent mt-1`}>{value}</p>
     </div>
   );
 }

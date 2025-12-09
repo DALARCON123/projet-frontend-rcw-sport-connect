@@ -80,6 +80,7 @@ export default function Navbar() {
           {/* Liens privés (authentifié) */}
           {isAuth && (
             <>
+              {/* Dashboard - visible para todos los usuarios autenticados */}
               <NavLink
                 to="/dashboard"
                 className={({ isActive }) =>
@@ -89,6 +90,7 @@ export default function Navbar() {
                 {t("nav.dashboard")}
               </NavLink>
 
+              {/* Reco - visible para todos los usuarios autenticados */}
               <NavLink
                 to="/reco"
                 className={({ isActive }) =>
@@ -98,15 +100,7 @@ export default function Navbar() {
                 {t("nav.reco")}
               </NavLink>
 
-              <NavLink
-                to="/sports"
-                className={({ isActive }) =>
-                  `${link} ${isActive ? active : ""}`
-                }
-              >
-                {t("nav.sports")}
-              </NavLink>
-
+              {/* Chat - visible para todos los usuarios autenticados */}
               <NavLink
                 to="/chat"
                 className={({ isActive }) =>
@@ -116,7 +110,17 @@ export default function Navbar() {
                 {t("nav.chat")}
               </NavLink>
 
-              {/* Botão Admin - apenas para administradores */}
+              {/* Sports - visible para todos los usuarios autenticados */}
+              <NavLink
+                to="/sports"
+                className={({ isActive }) =>
+                  `${link} ${isActive ? active : ""}`
+                }
+              >
+                {t("nav.sports")}
+              </NavLink>
+
+              {/* Admin Panel - solo visible para administradores */}
               {isAdmin && (
                 <NavLink
                   to="/admin/users"

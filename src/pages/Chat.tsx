@@ -3,7 +3,16 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { askBot } from "../services/chatService";
 import type { ChatResp } from "../services/chatService";
-import { Bot, User as UserIcon, Send, MessageSquare } from "lucide-react";
+import {
+  Bot,
+  User as UserIcon,
+  Send,
+  MessageSquare,
+  Sparkles,
+  Plus,
+  Trash2,
+  Clock,
+} from "lucide-react";
 
 type Msg = {
   id: string;
@@ -170,32 +179,58 @@ export default function Chat() {
   const faqKeys = ["chat.faq_1", "chat.faq_2", "chat.faq_3", "chat.faq_4"];
 
   return (
-    <div className="w-full h-[calc(100vh-4rem)] flex overflow-hidden bg-gradient-to-br from-white via-slate-50 to-indigo-50">
+    <div className="w-full h-[calc(100vh-4rem)] flex overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative">
+      {/* Efectos de fondo decorativos */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-purple-300/30 rounded-full blur-3xl animate-pulse"></div>
+        <div
+          className="absolute -bottom-40 -left-40 w-96 h-96 bg-pink-300/30 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "2s" }}
+        ></div>
+      </div>
+
       {/* -------------------------------------------------
          PANEL IZQUIERDO – HISTORIAL
       --------------------------------------------------- */}
-      <aside className="w-96 border-r bg-white/90 backdrop-blur-xl p-4 overflow-y-auto">
-        <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
-          <MessageSquare className="text-fuchsia-600" />
-          Assistant Coach IA
-        </h2>
+      <aside className="relative z-10 w-96 border-r border-white/60 bg-white/80 backdrop-blur-xl p-6 overflow-y-auto shadow-xl">
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center shadow-lg animate-pulse">
+              <MessageSquare className="text-white h-6 w-6" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black bg-gradient-to-r from-purple-700 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+                Coach IA
+              </h2>
+              <p className="text-xs text-slate-600">Assistant intelligent</p>
+            </div>
+          </div>
+        </div>
 
         <button
           onClick={startNewChat}
-          className="w-full mb-4 bg-gradient-to-r from-fuchsia-600 to-sky-600 text-white py-2 rounded-xl font-semibold shadow hover:opacity-90 transition"
+          className="w-full mb-6 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 text-white py-3 px-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 flex items-center justify-center gap-2"
         >
+          <Plus className="h-5 w-5" />
           {t("chat.new_chat") as string}
         </button>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           {history.length === 0 && (
-            <p className="text-xs text-slate-500">
-              {t("chat.no_conversations") as string}
-            </p>
+            <div className="text-center py-8">
+              <div className="text-5xl mb-3">💬</div>
+              <p className="text-sm text-slate-500">
+                {t("chat.no_conversations") as string}
+              </p>
+            </div>
           )}
 
           {history.map((h) => (
-            <div key={h} className="flex items-center gap-2">
+            <div key={h} className="group flex items-center gap-2">
               <button
                 onClick={() => {
                   setActiveChatId(h);
@@ -214,20 +249,31 @@ export default function Chat() {
                         ]
                   );
                 }}
-                className={`flex-1 text-left px-3 py-2 rounded-lg border text-sm transition ${
+                className={`flex-1 text-left px-4 py-3 rounded-xl border-2 text-sm transition-all font-medium ${
                   h === activeChatId
-                    ? "border-fuchsia-600 bg-fuchsia-50 text-fuchsia-700"
-                    : "border-slate-200 hover:bg-slate-50"
+                    ? "border-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 shadow-lg"
+                    : "border-slate-200 hover:border-purple-300 bg-white hover:bg-slate-50 text-slate-700 shadow-sm hover:shadow-md"
                 }`}
               >
-                💬 {t("chat.history_title") as string}
+                <div className="flex items-center gap-2">
+                  <MessageSquare
+                    className={`h-4 w-4 ${
+                      h === activeChatId ? "text-purple-500" : "text-slate-400"
+                    }`}
+                  />
+                  <span>{t("chat.history_title") as string}</span>
+                </div>
+                <div className="flex items-center gap-1 mt-1 text-xs text-slate-500">
+                  <Clock className="h-3 w-3" />
+                  <span>Il y a quelques instants</span>
+                </div>
               </button>
               <button
                 onClick={() => deleteChat(h)}
-                className="px-2 py-2 rounded-lg border border-red-200 bg-white hover:bg-red-50 text-red-600 text-sm transition"
-                title="Eliminar"
+                className="p-2.5 rounded-xl border-2 border-red-200 bg-white hover:bg-red-50 hover:border-red-400 text-red-600 transition-all opacity-0 group-hover:opacity-100 hover:scale-110 shadow-sm"
+                title="Supprimer"
               >
-                🗑️
+                <Trash2 className="h-4 w-4" />
               </button>
             </div>
           ))}
@@ -237,39 +283,79 @@ export default function Chat() {
       {/* -------------------------------------------------
          PANEL DERECHO – CHAT + INPUT + FAQ
       --------------------------------------------------- */}
-      <main className="flex-1 flex flex-col overflow-hidden min-h-0">
-        {/* Header */}
-        <div className="px-8 py-4 border-b bg-white/80 backdrop-blur-xl shrink-0">
-          <h1 className="text-2xl font-bold flex items-center gap-2 text-slate-900">
-            <Bot className="text-fuchsia-600" />
-            Assistant Coach IA
-          </h1>
-          <p className="text-slate-600 text-sm">
-            {t("chat.subtitle") as string}
-          </p>
+      <main className="relative z-10 flex-1 flex flex-col overflow-hidden min-h-0">
+        {/* HEADER ESPECTACULAR */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-cyan-600 via-blue-600 to-purple-600 px-8 py-6 shrink-0 shadow-2xl border-b-2 border-white/30">
+          {/* Patrón de fondo */}
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: "60px 60px",
+            }}
+          ></div>
+
+          <div className="relative z-10 flex items-center gap-5">
+            <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center shadow-2xl border-2 border-white/30">
+              <Bot className="h-8 w-8 text-white animate-pulse" />
+            </div>
+            <div>
+              <h1 className="text-5xl font-black text-white drop-shadow-2xl flex items-center gap-3">
+                Assistant Coach IA
+                <Sparkles className="h-7 w-7 text-yellow-300 animate-pulse" />
+              </h1>
+              <p className="text-lg text-white/95 drop-shadow-lg mt-2">
+                {(t("chat.subtitle") as string) ||
+                  "Conseils personnalisés • Disponible 24/7 • Intelligence artificielle"}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Contenido principal */}
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col min-h-0 bg-gradient-to-b from-transparent to-slate-50/30">
           {/* Mensajes */}
           <div
             ref={listRef}
-            className="flex-1 overflow-y-auto px-10 py-6 space-y-4 w-full"
+            className="flex-1 overflow-y-auto px-10 py-8 space-y-6 w-full"
           >
             {msgs.map((m) => (
               <Bubble key={m.id} role={m.role} text={m.text} />
             ))}
 
             {loading && (
-              <p className="text-slate-500 text-sm">
-                ⏳ {t("chat.typing") as string}
-              </p>
+              <div className="flex items-start gap-3 animate-pulse">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                  <Bot className="h-5 w-5 text-white" />
+                </div>
+                <div className="bg-white border-2 border-purple-200 rounded-2xl rounded-bl-sm px-5 py-4 shadow-md">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1">
+                      <span
+                        className="h-2 w-2 bg-purple-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "0s" }}
+                      ></span>
+                      <span
+                        className="h-2 w-2 bg-purple-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></span>
+                      <span
+                        className="h-2 w-2 bg-purple-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.4s" }}
+                      ></span>
+                    </div>
+                    <span className="text-sm text-slate-600">
+                      {t("chat.typing") as string}
+                    </span>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
           {/* Input */}
-          <div className="px-10 py-3 border-t bg-white/80 backdrop-blur-xl shrink-0">
-            <div className="flex gap-2">
+          <div className="px-10 py-5 border-t border-white/60 bg-white/90 backdrop-blur-xl shrink-0 shadow-lg">
+            <div className="flex gap-3">
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -283,34 +369,41 @@ export default function Chat() {
                     sendMessage();
                   }
                 }}
-                className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-sky-400"
+                className="flex-1 rounded-2xl border-2 border-slate-200 focus:border-purple-400 bg-white px-5 py-4 text-sm outline-none focus:ring-4 focus:ring-purple-100 transition-all shadow-sm"
               />
               <button
                 onClick={() => sendMessage()}
                 disabled={loading || !input.trim()}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-fuchsia-600 to-sky-600 shadow hover:opacity-95 disabled:opacity-50 transition"
+                className="inline-flex items-center gap-2 px-6 py-4 rounded-2xl text-sm font-semibold text-white bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all"
               >
-                <Send className="h-4 w-4" />
-                {t("chat.send") as string}
+                <Send className="h-5 w-5" />
+                <span className="hidden sm:inline">
+                  {t("chat.send") as string}
+                </span>
               </button>
             </div>
           </div>
 
           {/* Preguntas frecuentes */}
-          <div className="px-10 py-4 border-t bg-white/80 shrink-0">
-            <p className="text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wide">
-              {t("chat.faq_title") as string}
-            </p>
-            <div className="grid gap-2 md:grid-cols-2">
+          <div className="px-10 py-5 border-t border-white/60 bg-gradient-to-b from-white/90 to-purple-50/30 backdrop-blur-xl shrink-0">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="h-4 w-4 text-purple-500" />
+              <p className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+                {t("chat.faq_title") as string}
+              </p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
               {faqKeys.map((key) => (
                 <button
                   key={key}
                   type="button"
                   onClick={() => handleFaqClick(key)}
-                  className="flex items-center gap-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-left text-[13px] text-slate-700 hover:bg-slate-100 hover:border-sky-300 transition"
+                  className="group flex items-start gap-3 w-full rounded-2xl border-2 border-slate-200 hover:border-purple-400 bg-white hover:bg-gradient-to-br hover:from-purple-50 hover:to-pink-50 px-4 py-3 text-left text-sm text-slate-700 hover:text-purple-700 transition-all shadow-sm hover:shadow-lg hover:-translate-y-0.5"
                 >
-                  <span className="text-fuchsia-500 text-sm">💡</span>
-                  <span>{t(key) as string}</span>
+                  <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-purple-100 to-pink-100 group-hover:from-purple-500 group-hover:to-pink-500 flex items-center justify-center shrink-0 transition-all group-hover:scale-110">
+                    <Sparkles className="h-4 w-4 text-purple-500 group-hover:text-white" />
+                  </div>
+                  <span className="font-medium pt-0.5">{t(key) as string}</span>
                 </button>
               ))}
             </div>
@@ -328,26 +421,33 @@ function Bubble({ role, text }: { role: "user" | "assistant"; text: string }) {
   const isUser = role === "user";
 
   return (
-    <div className={`flex mb-2 ${isUser ? "justify-end" : "justify-start"}`}>
+    <div
+      className={`flex items-start gap-3 ${
+        isUser ? "justify-end" : "justify-start"
+      } animate-fadeIn`}
+    >
       {!isUser && (
-        <div className="h-8 w-8 rounded-full bg-slate-900 text-white grid place-items-center mr-2">
-          <Bot className="h-4 w-4" />
+        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shrink-0">
+          <Bot className="h-5 w-5 text-white" />
         </div>
       )}
 
       <div
-        className={`max-w-2xl px-4 py-3 rounded-2xl shadow-sm text-sm whitespace-pre-wrap leading-relaxed ${
+        className={`group relative max-w-2xl px-5 py-4 rounded-2xl shadow-lg text-sm whitespace-pre-wrap leading-relaxed transition-all hover:shadow-xl ${
           isUser
-            ? "bg-sky-600 text-white rounded-br-sm"
-            : "bg-white text-slate-900 border border-slate-200 rounded-bl-sm"
+            ? "bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 text-white rounded-br-sm"
+            : "bg-white text-slate-800 border-2 border-purple-100 rounded-bl-sm hover:border-purple-200"
         }`}
       >
+        {!isUser && (
+          <div className="absolute -top-1 -left-1 h-3 w-3 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+        )}
         {text}
       </div>
 
       {isUser && (
-        <div className="h-8 w-8 rounded-full bg-white border border-slate-200 grid place-items-center ml-2">
-          <UserIcon className="h-4 w-4 text-slate-700" />
+        <div className="h-10 w-10 rounded-full bg-white border-2 border-purple-200 flex items-center justify-center shadow-lg shrink-0">
+          <UserIcon className="h-5 w-5 text-purple-600" />
         </div>
       )}
     </div>

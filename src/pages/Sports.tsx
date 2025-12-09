@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { sportsClient } from "../services/apiClient";
@@ -6,237 +5,181 @@ import useAuthStore from "../stores/useAuthStore";
 import type { SportActivity } from "../types/SportActivity";
 import { categoriesSport } from "../data/categories";
 
-type SectionCardProps = {
-  icon: ReactNode;
-  title: string;
-  children: ReactNode;
-  headerClassName?: string;
-};
-
-function SectionCard({
-  icon,
-  title,
-  children,
-  headerClassName = "mb-4",
-}: SectionCardProps) {
-  return (
-    <div className="bg-white shadow-md rounded-2xl p-6 mb-10 border-l-4 border-purple-400">
-      <div className={`flex items-center gap-2 ${headerClassName}`}>
-        <div className="text-purple-600 text-2xl" aria-hidden>
-          {icon}
-        </div>
-        <h2 className="text-xl font-semibold text-purple-700">{title}</h2>
-      </div>
-      {children}
-    </div>
-  );
-}
-
 function Sports() {
   const { t } = useTranslation();
   const { userProfile } = useAuthStore();
 
   const [videos, setVideos] = useState<SportActivity[]>([]);
-  const [categorie, setCategorie] = useState<string>("");
+  const [categorie, setCategorie] = useState("");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [selectedCategoryImages, setSelectedCategoryImages] = useState<
+    string[]
+  >([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // ?? VIDEOS FIXOS POR TIPO DE ESPORTE (usamos i18n para t¡tulo/esporte)
-  const staticVideos = [
-    {
-      titleKey: "pages.sports.staticVideos.pilates.title",
-      sportKey: "pages.sports.staticVideos.pilates.sport",
-      fallbackTitle: "Pilates - s‚ance guid‚e",
-      fallbackSport: "Pilates",
-      link: "https://www.youtube.com/watch?v=SPxP0w2o6wQ",
-      image: "https://img.youtube.com/vi/SPxP0w2o6wQ/hqdefault.jpg",
-    },
-    {
-      titleKey: "pages.sports.staticVideos.yoga.title",
-      sportKey: "pages.sports.staticVideos.yoga.sport",
-      fallbackTitle: "Yoga - d‚butant",
-      fallbackSport: "Yoga",
-      link: "https://www.youtube.com/watch?v=3_rUl32CPbA",
-      image: "https://img.youtube.com/vi/3_rUl32CPbA/hqdefault.jpg",
-    },
-    {
-      titleKey: "pages.sports.staticVideos.cycling.title",
-      sportKey: "pages.sports.staticVideos.cycling.sport",
-      fallbackTitle: "Sportive … v‚lo - entraŒnement",
-      fallbackSport: "Sportive … v‚lo",
-      link: "https://www.youtube.com/watch?v=AiDD_aqdnK0",
-      image: "https://img.youtube.com/vi/AiDD_aqdnK0/hqdefault.jpg",
-    },
-    {
-      titleKey: "pages.sports.staticVideos.cardio.title",
-      sportKey: "pages.sports.staticVideos.cardio.sport",
-      fallbackTitle: "Cardio HIIT - haute intensit‚",
-      fallbackSport: "Cardio HIIT",
-      link: "https://www.youtube.com/watch?v=JqSIh5IiVAs",
-      image: "https://img.youtube.com/vi/JqSIh5IiVAs/hqdefault.jpg",
-    },
-  ];
-
-  // ?? LINKS PDF POR CATEGORIA
-  const pdfLinks: Record<string, string> = {
-    Yoga: "https://www.pedagogie.ac-aix-marseille.fr/upload/docs/application/pdf/2020-09/livret_de_yoga_collegien.pdf",
-    Cardio:
-      "https://www.itteville.fr/wp-content/uploads/2020/03/cardio-%C3%A0-la-maison.pdf",
-    HIIT: "https://lyc-montesquieu-plessis.ac-versailles.fr/IMG/pdf/defit_hiit_-_du_1er_au_14_mars.pdf",
-    Musculation:
-      "https://www.santepubliqueottawa.ca/fr/public-health-topics/resources/Documents/strength-balance-exercises-fr.pdf",
-    "tirements":
-      "https://vitalitenb.ca/formations/fr/ressources_educatives/Techniques%20de%20d%C3%A9placement/Documents%20PDF/Exercices%20Echauffement%20et%20Etirement.pdf",
-    Pilates:
-      "https://www.chu-montpellier.fr/fileadmin/medias/Publications/Guide-pratique-Exercices-Pilates-adapte.pdf",
-    "Danse Fitness":
-      "https://www.cnd.fr/fr/file/file/2285/inline/CN%20D_Guide%20danse%20et%20sante%CC%81_2023.pdf",
-    "Marche Active":
-      "https://cisss-outaouais.gouv.qc.ca/wp-content/uploads/2019/11/Carnet-de-la-marche-1.pdf",
-  };
-
-  const pdfUrlForSelected = categorie ? pdfLinks[categorie] : undefined;
-
-  // Translation keys for sport infos
-
-  const sportInfoKeys: Record<
-    string,
-    {
-      title: string;
-      items: string;
-    }
-  > = {
-    Yoga: {
-      title: "pages.sports.infos.Yoga.title",
-      items: "pages.sports.infos.Yoga.items",
-    },
-    Cardio: {
-      title: "pages.sports.infos.Cardio.title",
-      items: "pages.sports.infos.Cardio.items",
-    },
-    HIIT: {
-      title: "pages.sports.infos.HIIT.title",
-      items: "pages.sports.infos.HIIT.items",
-    },
-    Musculation: {
-      title: "pages.sports.infos.Musculation.title",
-      items: "pages.sports.infos.Musculation.items",
-    },
-    Étirements: {
-      title: "pages.sports.infos.Étirements.title",
-      items: "pages.sports.infos.Étirements.items",
-    },
-    Pilates: {
-      title: "pages.sports.infos.Pilates.title",
-      items: "pages.sports.infos.Pilates.items",
-    },
-    "Danse Fitness": {
-      title: "pages.sports.infos.Danse Fitness.title",
-      items: "pages.sports.infos.Danse Fitness.items",
-    },
-    "Marche Active": {
-      title: "pages.sports.infos.Marche Active.title",
-      items: "pages.sports.infos.Marche Active.items",
-    },
-  };
-
-  const infoKeys = categorie ? sportInfoKeys[categorie] : undefined;
-  const localizedInfoTitle = infoKeys?.title ? t(infoKeys.title) : undefined;
-  const localizedInfoItems = infoKeys?.items
-    ? (t(infoKeys.items, { returnObjects: true }) as string[])
-    : undefined;
-
-  // ========= CLIQUE NA CATEGORIA =========
-  const chargerVideosCategorie = (nomCategorie: string) => {
-    setCategorie(nomCategorie);
-
-    const params = new URLSearchParams({
-      name: nomCategorie,
-      age: String(userProfile?.age ?? 30),
-      objectif: String(userProfile?.mainGoal ?? "Bien-ˆtre"),
-    });
-
-    sportsClient
-      .get<{ categorie: string; videos: SportActivity[] }>(
-        `/category?${params}`
-      )
-      .then((res) => {
-        // @ts-ignore
-        setVideos(res.videos);
-      })
-      .catch((err) => {
-        console.error("Erreur cat‚gorie :", err);
-        setVideos([]);
-      });
-  };
-
-  // ========= RECOMENDA€AO AUTOMATICA AO CARREGAR =========
+  // Recommandations personnalisées
   useEffect(() => {
-    if (!userProfile) return;
+    if (!userProfile) {
+      console.log("⚠️ No hay userProfile, esperando...");
+      return;
+    }
 
     const params = new URLSearchParams({
       age: String(userProfile.age ?? 30),
       poids: String(userProfile.weight ?? 60),
-      objectif: String(userProfile.mainGoal ?? "Bien-ˆtre"),
+      objectif: String(userProfile.mainGoal ?? "Bien-être"),
     });
+
+    console.log("🎬 Cargando recomendaciones iniciales con params:", {
+      age: userProfile.age ?? 30,
+      poids: userProfile.weight ?? 60,
+      objectif: userProfile.mainGoal ?? "Bien-être",
+    });
+
+    setLoading(true);
+    setError(null);
 
     sportsClient
       .get<{ categorie_recommandee: string; videos: SportActivity[] }>(
         `/recommendations?${params}`
       )
       .then((res) => {
-        // @ts-ignore
-        const catFromApi = res.categorie_recommandee;
-        const match =
-          categoriesSport.find(
-            (c) => c.titre.toLowerCase() === String(catFromApi).toLowerCase()
-          )?.titre ?? catFromApi;
-
-        setCategorie(match as string);
-        // @ts-ignore
+        console.log(
+          "✅ Recomendación recibida:",
+          res.categorie_recommandee,
+          "con",
+          res.videos.length,
+          "videos"
+        );
+        console.log("📹 Primeros videos:", res.videos.slice(0, 2));
+        setCategorie(res.categorie_recommandee);
         setVideos(res.videos);
+
+        // Encontrar la categoría y configurar sus imágenes
+        const cat = categoriesSport.find(
+          (c) => c.titre === res.categorie_recommandee
+        );
+        if (cat && cat.images) {
+          setSelectedCategoryImages(cat.images);
+        }
+        setLoading(false);
       })
       .catch((err: unknown) => {
-        console.error("Erreur recommandations :", err);
+        console.error("❌ Erreur recommandations :", err);
+        setError("Erreur de chargement des recommandations");
+        setLoading(false);
       });
   }, [userProfile]);
 
-  const videosTitle =
-    categorie && categorie.length > 0
-      ? t("pages.sports.videos_for", { category: categorie }) ||
-        `Vid‚os : ${categorie}`
-      : t("pages.sports.videos") || "Vid‚os";
+  // Carrusel automático de imágenes (cambia cada 3 segundos)
+  useEffect(() => {
+    if (selectedCategoryImages.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex(
+        (prev) => (prev + 1) % selectedCategoryImages.length
+      );
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [selectedCategoryImages]);
+
+  // Charger vidéos par catégorie cliquée
+  const chargerVideosCategorie = (nomCategorie: string) => {
+    // Incluir edad y objetivo del usuario para personalizar los videos
+    const params = new URLSearchParams({
+      name: nomCategorie,
+      age: String(userProfile?.age ?? 30),
+      objectif: String(userProfile?.mainGoal ?? "Bien-être"),
+    });
+
+    console.log("🎬 Cargando videos para:", nomCategorie, "con params:", {
+      age: userProfile?.age ?? 30,
+      objectif: userProfile?.mainGoal ?? "Bien-être",
+    });
+
+    setLoading(true);
+    setError(null);
+
+    sportsClient
+      .get<{ categorie: string; videos: SportActivity[] }>(
+        `/category?${params}`
+      )
+      .then((res) => {
+        console.log("✅ Videos recibidos:", res.videos.length, "videos");
+        console.log("📹 Videos completos:", res.videos);
+        setCategorie(res.categorie);
+        setVideos(res.videos);
+
+        // Encontrar la categoría y configurar sus imágenes
+        const cat = categoriesSport.find((c) => c.titre === nomCategorie);
+        if (cat && cat.images) {
+          setSelectedCategoryImages(cat.images);
+          setCurrentImageIndex(0); // Reiniciar al primer índice
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("❌ Erreur catégorie :", err);
+        setError(`Erreur de chargement des vidéos pour ${nomCategorie}`);
+        setVideos([]);
+        setLoading(false);
+      });
+  };
 
   return (
-    <div className="w-full flex justify-center px-4">
-      <div className="max-w-7xl w-full">
-        {/* TITRE PRINCIPAL */}
-        <div className="flex items-center gap-3 mt-6 mb-6">
-          <div className="text-purple-600 text-3xl" aria-hidden>
-            💪
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-8 py-8">
+        {/* HEADER ESPECTACULAR */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-600 rounded-3xl p-8 shadow-2xl border-2 border-white/30 mb-10">
+          {/* Patrón de fondo */}
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: "60px 60px",
+            }}
+          ></div>
+
+          <div className="relative z-10 flex items-center gap-5">
+            <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center text-4xl shadow-2xl border-2 border-white/30">
+              🏋️‍♀️
+            </div>
+            <div>
+              <h1 className="text-5xl font-black text-white drop-shadow-2xl">
+                {t("pages.sports.title")}
+              </h1>
+              <p className="text-lg text-white/95 drop-shadow-lg mt-2">
+                Vidéos adaptées • Entraînements personnalisés • Résultats
+                garantis
+              </p>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-purple-700">
-            {t("pages.sports.title") ||
-              "Recommandations sportives personnalisées"}
-          </h1>
         </div>
 
         {/* ========================== CATÉGORIES ========================== */}
-        <SectionCard
-          icon="🏷️"
-          title={t("pages.sports.categories") || "Catégories sportives"}
-        >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-4">
+        <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl p-8 mb-12 border border-white/60">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xl shadow-md">
+              📦
+            </div>
+            <h2 className="text-2xl font-bold text-slate-800">
+              {t("pages.sports.categories")}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6 mt-6">
             {categoriesSport.map((cat) => (
               <div
                 key={cat.id}
-                onClick={() => {
-                  chargerVideosCategorie(cat.titre);
-                }}
-                className="relative h-40 rounded-xl overflow-hidden shadow-lg cursor-pointer
-                group transition transform hover:-translate-y-1 hover:shadow-2xl"
+                onClick={() => chargerVideosCategorie(cat.titre)}
+                className="relative h-48 rounded-2xl overflow-hidden shadow-lg cursor-pointer
+                group transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
               >
                 <img
                   src={cat.image}
-                  className="h-full w-full object-cover group-hover:scale-110 transition duration-500"
+                  className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700"
                   alt={cat.titre}
                   onError={(e) => {
                     e.currentTarget.src = `https://via.placeholder.com/400x300/9333EA/FFFFFF?text=${encodeURIComponent(
@@ -245,169 +188,202 @@ function Sports() {
                   }}
                 />
 
-                <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/60"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/20 to-purple-900/80 group-hover:to-purple-900/90 transition-all"></div>
 
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                  <span className="text-3xl drop-shadow-lg">{cat.icone}</span>
-                  <span className="text-lg font-semibold drop-shadow-lg mt-1">
-                    {t(`pages.sports.categoryNames.${cat.titre}`, {
-                      defaultValue: cat.titre,
-                    })}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-4">
+                  <div className="h-14 w-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-lg">
+                    <span className="text-3xl">{cat.icone}</span>
+                  </div>
+                  <span className="text-lg font-bold drop-shadow-lg text-center">
+                    {cat.titre}
                   </span>
                 </div>
               </div>
             ))}
           </div>
-        </SectionCard>
+        </div>
 
-        {/* ================== CATGORIE SLECTIONNE ================== */}
-        <SectionCard
-          icon="📂"
-          title={
-            t("pages.sports.selected_category") || "Cat‚gorie s‚lectionn‚e"
-          }
-          headerClassName="mb-3"
-        >
-          {categorie ? (
-            <>
-              <p className="text-purple-800 text-lg font-medium mt-1">
-                {t("pages.sports.selected_prefix", { category: categorie }) ||
-                  categorie}
-              </p>
+        {/* ================== CATÉGORIE SÉLECTIONNÉE ================== */}
+        {categorie && (
+          <div className="bg-gradient-to-br from-purple-500 via-purple-600 to-pink-500 shadow-2xl rounded-3xl p-8 mb-12 text-white">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl shadow-md">
+                🎯
+              </div>
+              <h2 className="text-2xl font-bold">
+                {t("pages.sports.selected_category")}
+              </h2>
+            </div>
 
-              {/* INFOS / BNFICES DO ESPORTE */}
-              {localizedInfoTitle && localizedInfoItems && (
-                <div className="mt-4">
-                  <h3 className="text-lg font-semibold text-purple-800">
-                    {localizedInfoTitle}
-                  </h3>
-                  <ul className="mt-2 list-disc list-inside text-slate-700 space-y-1">
-                    {localizedInfoItems.map((item) => (
-                      <li key={item}>{item}</li>
+            <div className="flex flex-col lg:flex-row items-center gap-8">
+              {/* Imagen dinámica */}
+              {selectedCategoryImages.length > 0 && (
+                <div className="relative w-full lg:w-80 h-52 rounded-2xl overflow-hidden shadow-2xl border-4 border-white/30">
+                  <img
+                    src={selectedCategoryImages[currentImageIndex]}
+                    alt={categorie}
+                    className="w-full h-full object-cover transition-opacity duration-700"
+                    onError={(e) => {
+                      e.currentTarget.src = `https://via.placeholder.com/400x300/9333EA/FFFFFF?text=${encodeURIComponent(
+                        categorie
+                      )}`;
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-purple-900/40 to-transparent"></div>
+                  <div className="absolute bottom-3 left-3 right-3 flex justify-center gap-1.5">
+                    {selectedCategoryImages.map((_, idx) => (
+                      <div
+                        key={idx}
+                        className={`h-2 rounded-full transition-all duration-300 shadow-lg ${
+                          idx === currentImageIndex
+                            ? "w-8 bg-white"
+                            : "w-2 bg-white/60 hover:bg-white/80"
+                        }`}
+                      />
                     ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* PDF dentro da categoria selecionada */}
-              {pdfUrlForSelected && (
-                <div className="mt-5">
-                  <div className="border rounded-xl overflow-hidden shadow-inner">
-                    <iframe
-                      src={pdfUrlForSelected}
-                      className="w-full h-[500px]"
-                      title={`Document ${categorie}`}
-                    />
                   </div>
-                  <p className="text-xs text-slate-500 mt-2">
-                    {t("pages.sports.pdf_notice") ||
-                      "Si le document ne s'affiche pas correctement,"}{" "}
-                    <a
-                      href={pdfUrlForSelected}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-purple-700 underline"
-                    >
-                      {t("pages.sports.pdf_link") ||
-                        "clique ici pour l'ouvrir dans un nouvel onglet."}
-                    </a>
-                  </p>
                 </div>
               )}
 
-              {!pdfUrlForSelected && (
-                <p className="text-sm text-slate-500 mt-3">
-                  {t("pages.sports.no_pdf") ||
-                    "Aucun PDF configur‚ pour cette cat‚gorie."}
-                </p>
-              )}
-            </>
-          ) : (
-            <p className="text-slate-500 mt-1">
-              {t("pages.sports.choose_category") ||
-                "Choisis une cat‚gorie pour voir les informations et le PDF associ‚."}
-            </p>
-          )}
-        </SectionCard>
-
-        {/* ========================== VIDOS ========================== */}
-        <SectionCard icon="🎬" title={videosTitle}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-            {videos.map((v, index) => (
-              <div
-                key={index}
-                className="shadow-md rounded-xl overflow-hidden bg-white hover:shadow-xl transition"
-              >
-                <img
-                  src={v.image}
-                  alt={v.title}
-                  className="h-48 w-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src =
-                      "https://via.placeholder.com/400x300/9333EA/FFFFFF?text=" +
-                      encodeURIComponent(categorie);
-                  }}
-                />
-                <div className="p-4">
-                  <h3 className="font-semibold">{v.title}</h3>
-
-                  <a
-                    href={v.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block mt-3 bg-purple-600 hover:bg-purple-700 
-                    text-white text-center py-2 rounded-lg transition"
-                  >
-                    {t("pages.sports.watch_video") || "Voir la vid‚o"}
-                  </a>
+              {/* Información de la categoría */}
+              <div className="flex-1">
+                <div className="flex items-start gap-4">
+                  <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-xl">
+                    <span className="text-5xl">
+                      {categoriesSport.find((c) => c.titre === categorie)
+                        ?.icone || "🏋️"}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-bold text-white drop-shadow-lg">
+                      {categorie}
+                    </h3>
+                    <p className="text-white/90 text-base mt-2 font-medium">
+                      {videos.length} vidéo{videos.length > 1 ? "s" : ""}{" "}
+                      personnalisée{videos.length > 1 ? "s" : ""}
+                    </p>
+                    <div className="flex items-center gap-2 mt-3">
+                      <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse"></div>
+                      <span className="text-white/80 text-sm">
+                        Recommandations actives
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
+          </div>
+        )}
+
+        {/* ========================== VIDÉOS ========================== */}
+        <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl p-8 mb-12 border border-white/60">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xl shadow-md">
+              🎥
+            </div>
+            <h2 className="text-2xl font-bold text-slate-800">
+              {t("pages.sports.videos_recommended")}{" "}
+              {categorie && (
+                <span className="text-purple-600">· {categorie}</span>
+              )}
+            </h2>
           </div>
 
-          {/* ?? BLOC FIXO - VIDEOS POR TIPO DE ESPORTE */}
-          <div className="mt-10 border-t border-purple-100 pt-6">
-            <h3 className="text-lg font-semibold text-purple-800 mb-3">
-              {t("pages.sports.static_title") || "Vid‚os par type de sport"}
-            </h3>
-            <p className="text-sm text-slate-600 mb-4">
-              {t("pages.sports.static_subtitle") ||
-                "Voici quelques suggestions rapides pour t'entraŒner en Pilates, Yoga, v‚lo ou Cardio HIIT."}
-            </p>
+          {error && (
+            <div className="text-center py-8 bg-red-50 rounded-xl border border-red-200">
+              <div className="text-5xl mb-3">⚠️</div>
+              <p className="text-red-600 font-medium">{error}</p>
+              <p className="text-gray-600 text-sm mt-2">
+                Vérifie que le service SPORTS est en cours d'exécution sur le
+                port 8002
+              </p>
+            </div>
+          )}
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {staticVideos.map((sv) => (
+          {loading ? (
+            <div className="text-center py-12 bg-purple-50 rounded-xl">
+              <div className="text-6xl mb-4 animate-pulse">⏳</div>
+              <p className="text-gray-600 text-lg font-medium">
+                {t("pages.sports.loading_videos")}
+              </p>
+            </div>
+          ) : videos.length === 0 && !error ? (
+            <div className="text-center py-12 bg-purple-50 rounded-xl">
+              <div className="text-6xl mb-4">🎬</div>
+              <p className="text-gray-600 text-lg font-medium">
+                {t("pages.sports.select_category_prompt")}
+              </p>
+              <p className="text-gray-500 text-sm mt-2">
+                {t("pages.sports.ai_recommendation_info")}
+              </p>
+            </div>
+          ) : videos.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
+              {videos.map((v, index) => (
                 <div
-                  key={sv.link}
-                  className="shadow-md rounded-xl overflow-hidden bg-white hover:shadow-xl transition"
+                  key={index}
+                  className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-slate-100"
                 >
-                  <img
-                    src={sv.image}
-                    alt={sv.fallbackTitle}
-                    className="h-32 w-full object-cover"
-                  />
-                  <div className="p-3">
-                    <p className="text-xs text-purple-600 font-semibold uppercase">
-                      {t(sv.sportKey, { defaultValue: sv.fallbackSport })}
-                    </p>
-                    <h4 className="text-sm font-semibold mt-1">
-                      {t(sv.titleKey, { defaultValue: sv.fallbackTitle })}
-                    </h4>
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={v.image}
+                      alt={v.title}
+                      className="h-56 w-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "https://via.placeholder.com/400x300/9333EA/FFFFFF?text=" +
+                          encodeURIComponent(categorie);
+                      }}
+                    />
+                    {/* Overlay con icono de play */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                      <div className="bg-white rounded-full p-5 transform scale-75 group-hover:scale-100 transition-transform duration-300 shadow-2xl">
+                        <svg
+                          className="w-10 h-10 text-purple-600"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-bold text-slate-800 text-lg line-clamp-2 min-h-[3.5rem] group-hover:text-purple-600 transition-colors">
+                      {v.title}
+                    </h3>
+
+                    {v.category && (
+                      <div className="flex items-center gap-2 mt-3">
+                        <span className="h-1.5 w-1.5 rounded-full bg-purple-500"></span>
+                        <p className="text-xs text-slate-600 font-medium uppercase tracking-wide">
+                          {v.category}
+                        </p>
+                      </div>
+                    )}
+
                     <a
-                      href={sv.link}
+                      href={v.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block mt-3 bg-purple-600 hover:bg-purple-700 
-                      text-white text-center py-1.5 rounded-lg text-xs transition"
+                      className="flex items-center justify-center gap-2 mt-4 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 
+                      text-white text-center py-3 px-5 rounded-xl transition-all font-semibold shadow-lg hover:shadow-xl group-hover:scale-105"
                     >
-                      {t("pages.sports.watch_video") || "Regarder"}
+                      <svg
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                      </svg>
+                      <span>{t("pages.sports.watch_youtube")}</span>
                     </a>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        </SectionCard>
+          ) : null}
+        </div>
       </div>
     </div>
   );
