@@ -148,9 +148,133 @@
     "sports": {
       "title": "Personalized sports recommendations",
       "categories": "Sports categories",
+      "categoryNames": {
+        "Yoga": "Yoga",
+        "Cardio": "Cardio",
+        "HIIT": "HIIT",
+        "Musculation": "Strength Training",
+        "Étirements": "Stretching",
+        "Pilates": "Pilates",
+        "Danse Fitness": "Dance Fitness",
+        "Marche Active": "Power Walking"
+      },
       "selected_category": "Selected category",
+      "selected_prefix": "You selected {{category}}",
+      "choose_category": "Choose a category to view the information and PDF.",
+      "no_pdf": "No PDF configured for this category.",
+      "pdf_notice": "If the document does not display correctly,",
+      "pdf_link": "click here to open it in a new tab.",
       "videos": "Videos",
-      "watch_video": "Watch video"
+      "videos_for": "Videos: {{category}}",
+      "static_title": "Videos by sport type",
+      "static_subtitle": "Here are a few quick suggestions to train in Pilates, Yoga, cycling or Cardio HIIT.",
+      "watch_video": "Watch video",
+      "infos": {
+        "Yoga": {
+          "title": "The 5 pillars of yoga",
+          "items": [
+            "The path to well-being: harmonize body and mind every day.",
+            "Asanas: suitable physical exercises to strengthen and loosen the body.",
+            "Pranayama: proper breathing to better manage energy and stress.",
+            "Savasana: deep relaxation to recover and release tension.",
+            "Vedanta & Dhyana: positive thoughts and meditation to calm the mind.",
+            "Healthy eating: eat better to live better and support your practice."
+          ]
+        },
+        "Cardio": {
+          "title": "Benefits of cardiovascular training",
+          "items": [
+            "Improves heart health and reduces the risk of cardiovascular disease.",
+            "Helps maintain a healthy weight by burning many calories.",
+            "Boosts cognitive skills (attention, memory, problem solving).",
+            "Reduces anxiety and depression and improves overall mood.",
+            "Improves sleep quality and daytime energy levels.",
+            "Supports seniors' autonomy by strengthening balance and endurance."
+          ]
+        },
+        "HIIT": {
+          "title": "Benefits of HIIT",
+          "items": [
+            "Lets you train in little time with results comparable to longer sessions.",
+            "Burns many calories during the session and afterward thanks to the afterburn effect.",
+            "Can be done almost anywhere, often without specific equipment.",
+            "Greatly improves VO2 max and cardiovascular capacity.",
+            "Helps regulate blood sugar and improve insulin sensitivity.",
+            "Can reduce blood pressure and resting heart rate."
+          ]
+        },
+        "Musculation": {
+          "title": "Strength training benefits",
+          "items": [
+            "Increases strength and muscle mass for daily activities.",
+            "Strengthens bones and helps prevent osteoporosis.",
+            "Improves posture and protects the joints.",
+            "Speeds up resting metabolism, making weight control easier.",
+            "Helps regulate blood sugar and blood lipids.",
+            "Boosts self-confidence and body image."
+          ]
+        },
+        "Étirements": {
+          "title": "Why stretch?",
+          "items": [
+            "Improve flexibility and range of motion.",
+            "Reduce muscle tension and certain pains.",
+            "Prepare muscles for effort and lower the risk of injury.",
+            "Promote recovery after training.",
+            "Aid relaxation and stress management."
+          ]
+        },
+        "Pilates": {
+          "title": "Benefits of Pilates",
+          "items": [
+            "Strengthens deep muscles, especially the core.",
+            "Improves posture and body alignment.",
+            "Develops stability, balance and control of movements.",
+            "Can reduce and prevent lower back pain.",
+            "Works on breathing and body awareness.",
+            "Adapts to many fitness levels."
+          ]
+        },
+        "Danse Fitness": {
+          "title": "Why choose Dance Fitness?",
+          "items": [
+            "Offers a playful, rhythmic cardio workout.",
+            "Improves coordination, sense of rhythm and balance.",
+            "Helps burn calories while having fun.",
+            "Stimulates self-expression and confidence.",
+            "Reduces stress and improves mood thanks to music."
+          ]
+        },
+        "Marche Active": {
+          "title": "Benefits of power walking",
+          "items": [
+            "Gentle activity accessible to almost everyone.",
+            "Improves heart health and blood circulation.",
+            "Helps control weight when practiced regularly.",
+            "Strengthens muscles of the legs, hips and core.",
+            "Easily fits into the daily routine (commutes, leisure).",
+            "Supports mental health by reducing stress and clearing the mind."
+          ]
+        }
+      },
+      "staticVideos": {
+        "pilates": {
+          "sport": "Pilates",
+          "title": "Pilates - guided session"
+        },
+        "yoga": {
+          "sport": "Yoga",
+          "title": "Yoga - beginner"
+        },
+        "cycling": {
+          "sport": "Cycling",
+          "title": "Cycling - training ride"
+        },
+        "cardio": {
+          "sport": "Cardio HIIT",
+          "title": "Cardio HIIT - high intensity"
+        }
+      }
     },
     "reco": {
       "title": "Personalized recommendations",

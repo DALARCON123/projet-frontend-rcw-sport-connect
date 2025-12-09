@@ -1,6 +1,5 @@
 {
   "appTitle": "SportConnectIA",
-
   "nav": {
     "home": "Início",
     "sports": "Esportes",
@@ -12,11 +11,9 @@
     "admin": "Administração",
     "logout": "Sair"
   },
-
   "footer": {
     "text": "© 2025 FIAI – Sistema de Recomendação de Atividades Físicas. Desenvolvido por Diana Alarcon, Ana Claudia e Lucas Bellinazzi."
   },
-
   "home": {
     "hero": {
       "title_1": "Seu treinador fitness",
@@ -53,7 +50,6 @@
       "button": "Começar grátis"
     }
   },
-
   "pages": {
     "notfound": {
       "title": "Página não encontrada"
@@ -148,9 +144,133 @@
     "sports": {
       "title": "Recomendações esportivas personalizadas",
       "categories": "Categorias esportivas",
+      "categoryNames": {
+        "Yoga": "Yoga",
+        "Cardio": "Cardio",
+        "HIIT": "HIIT",
+        "Musculation": "Musculação",
+        "Étirements": "Alongamentos",
+        "Pilates": "Pilates",
+        "Danse Fitness": "Dança Fitness",
+        "Marche Active": "Caminhada Ativa"
+      },
       "selected_category": "Categoria selecionada",
+      "selected_prefix": "Você selecionou {{category}}",
+      "choose_category": "Escolha uma categoria para ver as informações e o PDF.",
+      "no_pdf": "Nenhum PDF configurado para esta categoria.",
+      "pdf_notice": "Se o documento nao aparecer corretamente,",
+      "pdf_link": "clique aqui para abrir em uma nova guia.",
       "videos": "Vídeos",
-      "watch_video": "Assistir vídeo"
+      "videos_for": "Vídeos: {{category}}",
+      "static_title": "Vídeos por tipo de esporte",
+      "static_subtitle": "Aqui vão algumas sugestões rápidas para treinar Pilates, Yoga, ciclismo ou Cardio HIIT.",
+      "watch_video": "Assistir vídeo",
+      "infos": {
+        "Yoga": {
+          "title": "Os 5 pilares do yoga",
+          "items": [
+            "O caminho do bem-estar: harmonizar corpo e mente no dia a dia.",
+            "Asanas: exercícios físicos adequados para fortalecer e alongar o corpo.",
+            "Pranayama: respiração correta para gerir melhor a energia e o estresse.",
+            "Savasana: relaxamento profundo para recuperar e soltar tensoes.",
+            "Vedanta & Dhyana: pensamentos positivos e meditação para acalmar a mente.",
+            "Alimentação saudável: comer melhor para viver melhor e apoiar a prática."
+          ]
+        },
+        "Cardio": {
+          "title": "Vantagens do treinamento cardiovascular",
+          "items": [
+            "Melhora a saúde do coração e reduz o risco de doenças cardiovasculares.",
+            "Ajuda a manter um peso saudável queimando muitas calorias.",
+            "Estimula as habilidades cognitivas (atenção, memória, resolução de problemas).",
+            "Reduz a ansiedade e a depressao e melhora o humor geral.",
+            "Melhora a qualidade do sono e os níveis de energia durante o dia.",
+            "Sustenta a autonomia de idosos ao fortalecer equilíbrio e resistência."
+          ]
+        },
+        "HIIT": {
+          "title": "Benefícios do HIIT",
+          "items": [
+            "Permite treinar em pouco tempo com resultados comparáveis aos de uma sessao mais longa.",
+            "Queima muitas calorias durante e depois da sessao graças ao efeito afterburn.",
+            "Pode ser praticado quase em qualquer lugar, muitas vezes sem equipamento específico.",
+            "Melhora bastante o VO2 máx e a capacidade cardiovascular.",
+            "Ajuda a regular a glicemia e a melhorar a sensibilidade … insulina.",
+            "Pode reduzir a pressao arterial e a frequência cardíaca de repouso."
+          ]
+        },
+        "Musculation": {
+          "title": "Benefícios da musculação",
+          "items": [
+            "Aumenta a força e a massa muscular para as atividades do dia a dia.",
+            "Fortalece os ossos e ajuda a prevenir osteoporose.",
+            "Melhora a postura e protege as articulações.",
+            "Acelera o metabolismo em repouso, facilitando o controle de peso.",
+            "Ajuda a regular a glicemia e os lipídeos sanguíneos.",
+            "Reforça a autoconfiança e a imagem corporal."
+          ]
+        },
+        "Étirements": {
+          "title": "Por que alongar?",
+          "items": [
+            "Melhoram a flexibilidade e a amplitude de movimento.",
+            "Reduzem a tensao muscular e algumas dores.",
+            "Preparam os músculos para o esforço e diminuem o risco de lesao.",
+            "Favorecem a recuperação após o treino.",
+            "Ajudam no relaxamento e no gerenciamento do estresse."
+          ]
+        },
+        "Pilates": {
+          "title": "Vantagens do Pilates",
+          "items": [
+            "Fortalece os músculos profundos, principalmente o core.",
+            "Melhora a postura e o alinhamento corporal.",
+            "Desenvolve estabilidade, equilíbrio e controle dos movimentos.",
+            "Pode reduzir e prevenir dores lombares.",
+            "Trabalha a respiração e a consciência corporal.",
+            "Adapta-se a muitos níveis de condicionamento físico."
+          ]
+        },
+        "Danse Fitness": {
+          "title": "Por que escolher Dança Fitness?",
+          "items": [
+            "Oferece um treino cardio divertido e ritmado.",
+            "Melhora coordenação, senso de ritmo e equilíbrio.",
+            "Ajuda a queimar calorias enquanto se diverte.",
+            "Estimula a expressao corporal e a confiança.",
+            "Reduz o estresse e melhora o humor graças … música."
+          ]
+        },
+        "Marche Active": {
+          "title": "Benefícios da caminhada ativa",
+          "items": [
+            "Atividade leve e acessível a quase todos.",
+            "Melhora a saúde do coração e a circulação sanguínea.",
+            "Ajuda no controle de peso quando praticada regularmente.",
+            "Fortalece os músculos das pernas, quadris e tronco.",
+            "Encaixa-se facilmente na rotina diária (trajetos, lazer).",
+            "Apoia a saúde mental ao reduzir o estresse e clarear a mente."
+          ]
+        }
+      },
+      "staticVideos": {
+        "pilates": {
+          "sport": "Pilates",
+          "title": "Pilates - sessao guiada"
+        },
+        "yoga": {
+          "sport": "Yoga",
+          "title": "Yoga - iniciante"
+        },
+        "cycling": {
+          "sport": "Ciclismo",
+          "title": "Ciclismo - treino"
+        },
+        "cardio": {
+          "sport": "Cardio HIIT",
+          "title": "Cardio HIIT - alta intensidade"
+        }
+      }
     },
     "reco": {
       "title": "Recomendações personalizadas",
@@ -272,14 +392,12 @@
       }
     }
   },
-
   "auth": {
     "hero": {
       "title": "Treine com IA, no seu ritmo",
       "subtitle": "Programas, desafios e monitoramento inteligente"
     }
   },
-
   "chat": {
     "title": "Assistente Coach IA",
     "subtitle": "Converse com seu coach pessoal alimentado por inteligência artificial.",
@@ -300,7 +418,6 @@
     "faq_3": "Quais alimentos priorizar para ganhar músculo?",
     "faq_4": "Como otimizar minha recuperação após o treino?"
   },
-
   "welcome": "Olá, {{name}}!",
   "welcome_generic": "Olá!",
   "logout": "Sair"

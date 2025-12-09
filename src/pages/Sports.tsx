@@ -1,54 +1,89 @@
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sportsClient } from "../services/apiClient";
 import useAuthStore from "../stores/useAuthStore";
 import type { SportActivity } from "../types/SportActivity";
 import { categoriesSport } from "../data/categories";
 
+type SectionCardProps = {
+  icon: ReactNode;
+  title: string;
+  children: ReactNode;
+  headerClassName?: string;
+};
+
+function SectionCard({
+  icon,
+  title,
+  children,
+  headerClassName = "mb-4",
+}: SectionCardProps) {
+  return (
+    <div className="bg-white shadow-md rounded-2xl p-6 mb-10 border-l-4 border-purple-400">
+      <div className={`flex items-center gap-2 ${headerClassName}`}>
+        <div className="text-purple-600 text-2xl" aria-hidden>
+          {icon}
+        </div>
+        <h2 className="text-xl font-semibold text-purple-700">{title}</h2>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 function Sports() {
+  const { t } = useTranslation();
   const { userProfile } = useAuthStore();
 
   const [videos, setVideos] = useState<SportActivity[]>([]);
   const [categorie, setCategorie] = useState<string>("");
 
-  // 🎥 VÍDEOS FIXOS POR TIPO DE ESPORTE
+  // ?? VIDEOS FIXOS POR TIPO DE ESPORTE (usamos i18n para t¡tulo/esporte)
   const staticVideos = [
     {
-      title: "Pilates – séance guidée",
-      sport: "Pilates",
+      titleKey: "pages.sports.staticVideos.pilates.title",
+      sportKey: "pages.sports.staticVideos.pilates.sport",
+      fallbackTitle: "Pilates - s‚ance guid‚e",
+      fallbackSport: "Pilates",
       link: "https://www.youtube.com/watch?v=SPxP0w2o6wQ",
       image: "https://img.youtube.com/vi/SPxP0w2o6wQ/hqdefault.jpg",
     },
     {
-      title: "Yoga – débutant",
-      sport: "Yoga",
+      titleKey: "pages.sports.staticVideos.yoga.title",
+      sportKey: "pages.sports.staticVideos.yoga.sport",
+      fallbackTitle: "Yoga - d‚butant",
+      fallbackSport: "Yoga",
       link: "https://www.youtube.com/watch?v=3_rUl32CPbA",
       image: "https://img.youtube.com/vi/3_rUl32CPbA/hqdefault.jpg",
     },
     {
-      title: "Sportive à vélo – entraînement",
-      sport: "Sportive à vélo",
+      titleKey: "pages.sports.staticVideos.cycling.title",
+      sportKey: "pages.sports.staticVideos.cycling.sport",
+      fallbackTitle: "Sportive … v‚lo - entraŒnement",
+      fallbackSport: "Sportive … v‚lo",
       link: "https://www.youtube.com/watch?v=AiDD_aqdnK0",
       image: "https://img.youtube.com/vi/AiDD_aqdnK0/hqdefault.jpg",
     },
     {
-      title: "Cardio HIIT – haute intensité",
-      sport: "Cardio HIIT",
+      titleKey: "pages.sports.staticVideos.cardio.title",
+      sportKey: "pages.sports.staticVideos.cardio.sport",
+      fallbackTitle: "Cardio HIIT - haute intensit‚",
+      fallbackSport: "Cardio HIIT",
       link: "https://www.youtube.com/watch?v=JqSIh5IiVAs",
       image: "https://img.youtube.com/vi/JqSIh5IiVAs/hqdefault.jpg",
     },
   ];
 
-  // 📄 LINKS PDF POR CATEGORIA
+  // ?? LINKS PDF POR CATEGORIA
   const pdfLinks: Record<string, string> = {
-    Yoga:
-      "https://www.pedagogie.ac-aix-marseille.fr/upload/docs/application/pdf/2020-09/livret_de_yoga_collegien.pdf",
+    Yoga: "https://www.pedagogie.ac-aix-marseille.fr/upload/docs/application/pdf/2020-09/livret_de_yoga_collegien.pdf",
     Cardio:
       "https://www.itteville.fr/wp-content/uploads/2020/03/cardio-%C3%A0-la-maison.pdf",
-    HIIT:
-      "https://lyc-montesquieu-plessis.ac-versailles.fr/IMG/pdf/defit_hiit_-_du_1er_au_14_mars.pdf",
+    HIIT: "https://lyc-montesquieu-plessis.ac-versailles.fr/IMG/pdf/defit_hiit_-_du_1er_au_14_mars.pdf",
     Musculation:
       "https://www.santepubliqueottawa.ca/fr/public-health-topics/resources/Documents/strength-balance-exercises-fr.pdf",
-    "Étirements":
+    "tirements":
       "https://vitalitenb.ca/formations/fr/ressources_educatives/Techniques%20de%20d%C3%A9placement/Documents%20PDF/Exercices%20Echauffement%20et%20Etirement.pdf",
     Pilates:
       "https://www.chu-montpellier.fr/fileadmin/medias/Publications/Guide-pratique-Exercices-Pilates-adapte.pdf",
@@ -60,113 +95,63 @@ function Sports() {
 
   const pdfUrlForSelected = categorie ? pdfLinks[categorie] : undefined;
 
-  // 📝 DESCRIÇÃO / BENEFÍCIOS POR CATEGORIA
-  const sportInfos: Record<
+  // Translation keys for sport infos
+
+  const sportInfoKeys: Record<
     string,
     {
       title: string;
-      items: string[];
+      items: string;
     }
   > = {
     Yoga: {
-      title: "Les 5 piliers du yoga",
-      items: [
-        "La voie du bien-être : harmoniser corps et esprit au quotidien.",
-        "Asanas : exercices physiques appropriés pour renforcer et assouplir le corps.",
-        "Pranayama : respiration correcte pour mieux gérer l’énergie et le stress.",
-        "Savasana : relaxation profonde pour récupérer et relâcher les tensions.",
-        "Vedanta & Dhyana : pensées positives et méditation pour apaiser le mental.",
-        "Alimentation saine : mieux manger pour mieux vivre et soutenir la pratique.",
-      ],
+      title: "pages.sports.infos.Yoga.title",
+      items: "pages.sports.infos.Yoga.items",
     },
     Cardio: {
-      title: "Les avantages de l’entraînement cardiovasculaire",
-      items: [
-        "Améliore la santé du cœur et réduit le risque de maladies cardiovasculaires.",
-        "Aide à maintenir un poids santé en brûlant beaucoup de calories.",
-        "Stimule les facultés cognitives (attention, mémoire, résolution de problèmes).",
-        "Réduit l’anxiété et la dépression et améliore l’humeur générale.",
-        "Améliore la qualité du sommeil et les niveaux d’énergie pendant la journée.",
-        "Soutient l’autonomie des personnes âgées en renforçant l’équilibre et l’endurance.",
-      ],
+      title: "pages.sports.infos.Cardio.title",
+      items: "pages.sports.infos.Cardio.items",
     },
     HIIT: {
-      title: "Les bienfaits du HIIT",
-      items: [
-        "Permet de s’entraîner en peu de temps avec des résultats comparables à un entraînement plus long.",
-        "Brûle beaucoup de calories pendant la séance et après grâce à l’effet « afterburn ». ",
-        "Peut se pratiquer presque partout, souvent sans équipement particulier.",
-        "Améliore fortement la VO₂ max et la capacité cardiovasculaire.",
-        "Aide à réguler la glycémie et à améliorer la sensibilité à l’insuline.",
-        "Peut réduire la tension artérielle et la fréquence cardiaque au repos.",
-      ],
+      title: "pages.sports.infos.HIIT.title",
+      items: "pages.sports.infos.HIIT.items",
     },
     Musculation: {
-      title: "Bienfaits de la musculation",
-      items: [
-        "Augmente la force et la masse musculaire pour les activités du quotidien.",
-        "Renforce les os et aide à prévenir l’ostéoporose.",
-        "Améliore la posture et protège les articulations.",
-        "Accélère le métabolisme au repos, facilitant le contrôle du poids.",
-        "Aide à réguler la glycémie et les lipides sanguins.",
-        "Renforce la confiance en soi et l’image corporelle.",
-      ],
+      title: "pages.sports.infos.Musculation.title",
+      items: "pages.sports.infos.Musculation.items",
     },
-    "Étirements": {
-      title: "Pourquoi faire des étirements ?",
-      items: [
-        "Améliorent la souplesse et l’amplitude des mouvements.",
-        "Réduisent les tensions musculaires et certaines douleurs.",
-        "Préparent les muscles à l’effort et diminuent le risque de blessure.",
-        "Favorisent la récupération après l’entraînement.",
-        "Aident à la relaxation et à la gestion du stress.",
-      ],
+    Étirements: {
+      title: "pages.sports.infos.Étirements.title",
+      items: "pages.sports.infos.Étirements.items",
     },
     Pilates: {
-      title: "Les avantages du Pilates",
-      items: [
-        "Renforce les muscles profonds, notamment la ceinture abdominale.",
-        "Améliore la posture et l’alignement du corps.",
-        "Développe la stabilité, l’équilibre et le contrôle des mouvements.",
-        "Peut réduire et prévenir les douleurs lombaires.",
-        "Travaille la respiration et la conscience du corps.",
-        "S’adapte à de nombreux niveaux de condition physique.",
-      ],
+      title: "pages.sports.infos.Pilates.title",
+      items: "pages.sports.infos.Pilates.items",
     },
     "Danse Fitness": {
-      title: "Pourquoi choisir la Danse Fitness ?",
-      items: [
-        "Propose un entraînement cardio ludique et rythmé.",
-        "Améliore la coordination, le sens du rythme et l’équilibre.",
-        "Permet de brûler des calories tout en s’amusant.",
-        "Stimule l’expression corporelle et la confiance en soi.",
-        "Réduit le stress et améliore l’humeur grâce à la musique.",
-      ],
+      title: "pages.sports.infos.Danse Fitness.title",
+      items: "pages.sports.infos.Danse Fitness.items",
     },
     "Marche Active": {
-      title: "Les bienfaits de la marche active",
-      items: [
-        "Activité douce et accessible à presque tout le monde.",
-        "Améliore la santé du cœur et la circulation sanguine.",
-        "Aide au contrôle du poids lorsqu’elle est pratiquée régulièrement.",
-        "Renforce les muscles des jambes, des hanches et du tronc.",
-        "Peut facilement s’intégrer dans la routine quotidienne (trajets, loisirs).",
-        "Soutient la santé mentale en réduisant le stress et en clarifiant l’esprit.",
-      ],
+      title: "pages.sports.infos.Marche Active.title",
+      items: "pages.sports.infos.Marche Active.items",
     },
   };
 
-  const infoForSelected = categorie ? sportInfos[categorie] : undefined;
+  const infoKeys = categorie ? sportInfoKeys[categorie] : undefined;
+  const localizedInfoTitle = infoKeys?.title ? t(infoKeys.title) : undefined;
+  const localizedInfoItems = infoKeys?.items
+    ? (t(infoKeys.items, { returnObjects: true }) as string[])
+    : undefined;
 
   // ========= CLIQUE NA CATEGORIA =========
   const chargerVideosCategorie = (nomCategorie: string) => {
-    // usamos o nome do card como categoria selecionada
     setCategorie(nomCategorie);
 
     const params = new URLSearchParams({
       name: nomCategorie,
       age: String(userProfile?.age ?? 30),
-      objectif: String(userProfile?.mainGoal ?? "Bien-être"),
+      objectif: String(userProfile?.mainGoal ?? "Bien-ˆtre"),
     });
 
     sportsClient
@@ -174,24 +159,23 @@ function Sports() {
         `/category?${params}`
       )
       .then((res) => {
-        // usamos só os vídeos retornados pela API
         // @ts-ignore
         setVideos(res.videos);
       })
       .catch((err) => {
-        console.error("Erreur catégorie :", err);
+        console.error("Erreur cat‚gorie :", err);
         setVideos([]);
       });
   };
 
-  // ========= RECOMENDAÇÃO AUTOMÁTICA AO CARREGAR =========
+  // ========= RECOMENDA€AO AUTOMATICA AO CARREGAR =========
   useEffect(() => {
     if (!userProfile) return;
 
     const params = new URLSearchParams({
       age: String(userProfile.age ?? 30),
       poids: String(userProfile.weight ?? 60),
-      objectif: String(userProfile.mainGoal ?? "Bien-être"),
+      objectif: String(userProfile.mainGoal ?? "Bien-ˆtre"),
     });
 
     sportsClient
@@ -199,13 +183,11 @@ function Sports() {
         `/recommendations?${params}`
       )
       .then((res) => {
-        // tenta casar a categoria recomendada com um titre do array categoriesSport
         // @ts-ignore
         const catFromApi = res.categorie_recommandee;
         const match =
           categoriesSport.find(
-            (c) =>
-              c.titre.toLowerCase() === String(catFromApi).toLowerCase()
+            (c) => c.titre.toLowerCase() === String(catFromApi).toLowerCase()
           )?.titre ?? catFromApi;
 
         setCategorie(match as string);
@@ -217,26 +199,31 @@ function Sports() {
       });
   }, [userProfile]);
 
+  const videosTitle =
+    categorie && categorie.length > 0
+      ? t("pages.sports.videos_for", { category: categorie }) ||
+        `Vid‚os : ${categorie}`
+      : t("pages.sports.videos") || "Vid‚os";
+
   return (
     <div className="w-full flex justify-center px-4">
       <div className="max-w-7xl w-full">
         {/* TITRE PRINCIPAL */}
         <div className="flex items-center gap-3 mt-6 mb-6">
-          <div className="text-purple-600 text-3xl">🏋️‍♀️</div>
+          <div className="text-purple-600 text-3xl" aria-hidden>
+            💪
+          </div>
           <h1 className="text-3xl font-bold text-purple-700">
-            Recommandations sportives personnalisées
+            {t("pages.sports.title") ||
+              "Recommandations sportives personnalisées"}
           </h1>
         </div>
 
         {/* ========================== CATÉGORIES ========================== */}
-        <div className="bg-white shadow-md rounded-2xl p-6 mb-10 border-l-4 border-purple-400">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="text-purple-600 text-2xl">📦</div>
-            <h2 className="text-xl font-semibold text-purple-700">
-              Catégories sportives
-            </h2>
-          </div>
-
+        <SectionCard
+          icon="🏷️"
+          title={t("pages.sports.categories") || "Catégories sportives"}
+        >
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-4">
             {categoriesSport.map((cat) => (
               <div
@@ -263,37 +250,39 @@ function Sports() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
                   <span className="text-3xl drop-shadow-lg">{cat.icone}</span>
                   <span className="text-lg font-semibold drop-shadow-lg mt-1">
-                    {cat.titre}
+                    {t(`pages.sports.categoryNames.${cat.titre}`, {
+                      defaultValue: cat.titre,
+                    })}
                   </span>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </SectionCard>
 
-        {/* ================== CATÉGORIE SÉLECTIONNÉE ================== */}
-        <div className="bg-white shadow-md rounded-2xl p-6 mb-10 border-l-4 border-purple-400">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="text-purple-600 text-2xl">🎯</div>
-            <h2 className="text-xl font-semibold text-purple-700">
-              Catégorie sélectionnée
-            </h2>
-          </div>
-
+        {/* ================== CATGORIE SLECTIONNE ================== */}
+        <SectionCard
+          icon="📂"
+          title={
+            t("pages.sports.selected_category") || "Cat‚gorie s‚lectionn‚e"
+          }
+          headerClassName="mb-3"
+        >
           {categorie ? (
             <>
               <p className="text-purple-800 text-lg font-medium mt-1">
-                👉 <strong>{categorie}</strong>
+                {t("pages.sports.selected_prefix", { category: categorie }) ||
+                  categorie}
               </p>
 
-              {/* INFOS / BÉNÉFICES DO ESPORTE */}
-              {infoForSelected && (
+              {/* INFOS / BNFICES DO ESPORTE */}
+              {localizedInfoTitle && localizedInfoItems && (
                 <div className="mt-4">
                   <h3 className="text-lg font-semibold text-purple-800">
-                    {infoForSelected.title}
+                    {localizedInfoTitle}
                   </h3>
                   <ul className="mt-2 list-disc list-inside text-slate-700 space-y-1">
-                    {infoForSelected.items.map((item) => (
+                    {localizedInfoItems.map((item) => (
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
@@ -311,14 +300,16 @@ function Sports() {
                     />
                   </div>
                   <p className="text-xs text-slate-500 mt-2">
-                    Si le document ne s&apos;affiche pas correctement,{" "}
+                    {t("pages.sports.pdf_notice") ||
+                      "Si le document ne s'affiche pas correctement,"}{" "}
                     <a
                       href={pdfUrlForSelected}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-purple-700 underline"
                     >
-                      clique ici pour l&apos;ouvrir dans un nouvel onglet.
+                      {t("pages.sports.pdf_link") ||
+                        "clique ici pour l'ouvrir dans un nouvel onglet."}
                     </a>
                   </p>
                 </div>
@@ -326,27 +317,21 @@ function Sports() {
 
               {!pdfUrlForSelected && (
                 <p className="text-sm text-slate-500 mt-3">
-                  Aucun PDF configuré pour cette catégorie.
+                  {t("pages.sports.no_pdf") ||
+                    "Aucun PDF configur‚ pour cette cat‚gorie."}
                 </p>
               )}
             </>
           ) : (
             <p className="text-slate-500 mt-1">
-              Choisis une catégorie pour voir les informations et le PDF
-              associé.
+              {t("pages.sports.choose_category") ||
+                "Choisis une cat‚gorie pour voir les informations et le PDF associ‚."}
             </p>
           )}
-        </div>
+        </SectionCard>
 
-        {/* ========================== VIDÉOS ========================== */}
-        <div className="bg-white shadow-md rounded-2xl p-6 mb-12 border-l-4 border-purple-400">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="text-purple-600 text-2xl">🎥</div>
-            <h2 className="text-xl font-semibold text-purple-700">
-              Vidéos : <span className="text-purple-900">{categorie}</span>
-            </h2>
-          </div>
-
+        {/* ========================== VIDOS ========================== */}
+        <SectionCard icon="🎬" title={videosTitle}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
             {videos.map((v, index) => (
               <div
@@ -373,21 +358,21 @@ function Sports() {
                     className="block mt-3 bg-purple-600 hover:bg-purple-700 
                     text-white text-center py-2 rounded-lg transition"
                   >
-                    ▶ Voir la vidéo
+                    {t("pages.sports.watch_video") || "Voir la vid‚o"}
                   </a>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* 🌟 BLOC FIXO – VÍDEOS POR TIPO DE ESPORTE */}
+          {/* ?? BLOC FIXO - VIDEOS POR TIPO DE ESPORTE */}
           <div className="mt-10 border-t border-purple-100 pt-6">
             <h3 className="text-lg font-semibold text-purple-800 mb-3">
-              Vidéos par type de sport
+              {t("pages.sports.static_title") || "Vid‚os par type de sport"}
             </h3>
             <p className="text-sm text-slate-600 mb-4">
-              Voici quelques suggestions rapides pour t&apos;entraîner en Pilates,
-              Yoga, vélo ou Cardio HIIT.
+              {t("pages.sports.static_subtitle") ||
+                "Voici quelques suggestions rapides pour t'entraŒner en Pilates, Yoga, v‚lo ou Cardio HIIT."}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -398,15 +383,15 @@ function Sports() {
                 >
                   <img
                     src={sv.image}
-                    alt={sv.title}
+                    alt={sv.fallbackTitle}
                     className="h-32 w-full object-cover"
                   />
                   <div className="p-3">
                     <p className="text-xs text-purple-600 font-semibold uppercase">
-                      {sv.sport}
+                      {t(sv.sportKey, { defaultValue: sv.fallbackSport })}
                     </p>
                     <h4 className="text-sm font-semibold mt-1">
-                      {sv.title}
+                      {t(sv.titleKey, { defaultValue: sv.fallbackTitle })}
                     </h4>
                     <a
                       href={sv.link}
@@ -415,15 +400,14 @@ function Sports() {
                       className="block mt-3 bg-purple-600 hover:bg-purple-700 
                       text-white text-center py-1.5 rounded-lg text-xs transition"
                     >
-                      ▶ Regarder
+                      {t("pages.sports.watch_video") || "Regarder"}
                     </a>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-
+        </SectionCard>
       </div>
     </div>
   );
