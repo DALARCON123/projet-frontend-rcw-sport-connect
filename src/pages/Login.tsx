@@ -126,23 +126,30 @@ export default function Login() {
           onChange={(v) => setForm({ ...form, password: v })}
         />
 
-        {err && <p className="text-sm text-red-600">{err}</p>}
+        {err && (
+          <div className="rounded-xl bg-red-50 border-2 border-red-200 px-4 py-3 flex items-start gap-3">
+            <span className="text-red-600 text-xl">⚠️</span>
+            <p className="text-sm text-red-700 font-medium">{err}</p>
+          </div>
+        )}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold text-white bg-slate-900 hover:bg-slate-800 transition shadow-lg disabled:opacity-60"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-4 font-bold text-white bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
         >
-          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+          {loading && <Loader2 className="h-5 w-5 animate-spin" />}
           {t("pages.login.cta") as string}
         </button>
 
-        <p className="text-sm text-slate-600">
-          {t("nav.register") as string}{" "}
-          <Link to="/register" className="underline">
-            {t("pages.register.title") as string}
-          </Link>
-        </p>
+        <div className="pt-2 text-center">
+          <p className="text-sm text-slate-600">
+            {t("nav.register") as string}{" "}
+            <Link to="/register" className="font-bold text-purple-600 hover:text-pink-600 transition-colors underline decoration-2 underline-offset-2">
+              {t("pages.register.title") as string}
+            </Link>
+          </p>
+        </div>
       </form>
     </AuthLayout>
   );
@@ -165,12 +172,12 @@ function Field({
   onChange: (v: string) => void;
 }) {
   return (
-    <label className="relative block">
-      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+    <label className="relative block group">
+      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-purple-600 transition-colors">
         {icon}
       </span>
       <input
-        className="w-full rounded-xl border border-slate-200 bg-white/80 pl-10 pr-3 py-3 outline-none focus:ring-2 focus:ring-sky-400"
+        className="w-full rounded-xl border-2 border-slate-200 bg-white pl-12 pr-4 py-3.5 outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-400 transition-all text-slate-900 placeholder:text-slate-400"
         type={type}
         placeholder={placeholder}
         value={value}
