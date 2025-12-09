@@ -93,9 +93,9 @@ export default function Chat() {
     }
 
     try {
-    const historyForApi = [...msgs, userMsg];
+      const historyForApi = [...msgs, userMsg];
 
-    const res: ChatResp = await askBot(q, i18n.language, historyForApi);
+      const res: ChatResp = await askBot(q, i18n.language, historyForApi);
 
       const botMsg: Msg = {
         id: crypto.randomUUID(),
@@ -146,7 +146,11 @@ export default function Chat() {
   }
 
   function deleteChat(chatId: string) {
-    if (!window.confirm(t("chat.confirm_delete") as string || "¿Eliminar esta conversación?")) {
+    if (
+      !window.confirm(
+        (t("chat.confirm_delete") as string) || "¿Eliminar esta conversación?"
+      )
+    ) {
       return;
     }
 
@@ -180,7 +184,7 @@ export default function Chat() {
           onClick={startNewChat}
           className="w-full mb-4 bg-gradient-to-r from-fuchsia-600 to-sky-600 text-white py-2 rounded-xl font-semibold shadow hover:opacity-90 transition"
         >
-          + Nouveau chat
+          {t("chat.new_chat") as string}
         </button>
 
         <div className="space-y-2">

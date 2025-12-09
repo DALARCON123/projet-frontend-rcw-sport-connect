@@ -410,6 +410,7 @@
     "error": "Ocurrió un error. Inténtalo de nuevo en unos momentos.",
     "history_title": "Conversaciones",
     "new": "Nuevo",
+    "new_chat": "+ Nuevo chat",
     "no_conversations": "No hay conversaciones guardadas todavía.",
     "confirm_delete": "¿Realmente quieres eliminar esta conversación?",
     "faq_title": "Preguntas frecuentes",

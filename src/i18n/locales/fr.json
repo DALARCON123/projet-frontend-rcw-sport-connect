@@ -410,6 +410,7 @@
     "error": "Une erreur est survenue. Réessayez dans quelques instants.",
     "history_title": "Conversations",
     "new": "Nouveau",
+    "new_chat": "+ Nouveau chat",
     "no_conversations": "Aucune conversation enregistrée pour l'instant.",
     "confirm_delete": "Voulez-vous vraiment supprimer cette conversation ?",
     "faq_title": "Questions fréquentes",

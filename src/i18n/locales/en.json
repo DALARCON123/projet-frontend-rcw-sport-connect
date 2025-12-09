@@ -416,6 +416,7 @@
     "error": "An error occurred. Try again in a few moments.",
     "history_title": "Conversations",
     "new": "New",
+    "new_chat": "+ New chat",
     "no_conversations": "No conversations saved yet.",
     "confirm_delete": "Do you really want to delete this conversation?",
     "faq_title": "Frequently asked questions",
