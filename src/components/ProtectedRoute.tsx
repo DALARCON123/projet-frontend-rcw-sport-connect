@@ -1,3 +1,4 @@
+//ProtectedRoute.tsx
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { getProfileLocal } from "../services/profileService";
 

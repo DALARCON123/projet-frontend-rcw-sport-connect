@@ -28,9 +28,15 @@ export default defineConfig({
         changeOrigin: true,
       },
 
+      // 📈 SERVICE TRACKING (medidas corporais)
+      '/tracking': {
+        target: 'http://localhost:8003',
+        changeOrigin: true,
+      },
+
       // 💬 SERVICE CHATBOT
       '/chat': {
-        target: 'http://localhost:8010',
+        target: 'http://localhost:8004',
         changeOrigin: true,
       },
     },

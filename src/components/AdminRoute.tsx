@@ -1,3 +1,4 @@
+//AdminRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
 import { isAdminFromToken } from "../services/authService";
 

@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 
 /**
  * Décode un token JWT et renvoie true si l'utilisateur est administrateur.
- * On vérifie les champs is_admin ou role === "admin" dans la charge utile.
  */
 function isAdminFromToken(token: string | null): boolean {
   if (!token) return false;
@@ -41,9 +40,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  /**
-   * Soumission du formulaire de connexion.
-   */
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
@@ -56,13 +52,11 @@ export default function Login() {
     try {
       setLoading(true);
 
-      // Appel au microservice d'authentification
       const res = await loginUser({
         email: form.email,
         password: form.password,
       });
 
-      // Récupération du token (retourné par l'API ou déjà stocké par loginUser)
       const token =
         (res as any)?.access_token ??
         (res as any)?.token ??
@@ -72,26 +66,25 @@ export default function Login() {
         throw new Error("Le jeton JWT n'a pas été reçu.");
       }
 
-      // Sauvegarde du token au cas où loginUser ne l'aurait pas déjà fait
+      // token
       localStorage.setItem("token", token);
 
-      // Sauvegarde du nom et de l'email pour le navbar
+      // 👇 IMPORTANTE: guardar e-mail (e opcionalmente nome) para o Reco.tsx
+      localStorage.setItem("user_email", form.email.trim());
+
+      // se o saveUserSnapshotFromToken já salva user_name, mantemos:
       saveUserSnapshotFromToken();
 
-      // Détection admin à partir du token
       const estAdminDepuisToken = isAdminFromToken(token);
 
-      // Fallback simple : email spécifique de l'admin
       const emailLower = form.email.trim().toLowerCase();
       const estAdminParEmail = emailLower === "dianaalarcon@teccart.com";
 
       const estAdmin = estAdminDepuisToken || estAdminParEmail;
 
       if (estAdmin) {
-        // Redirection vers l'espace administrateur
         nav("/admin/users");
       } else {
-        // Logique classique pour les utilisateurs normaux
         const hasProfile = !!localStorage.getItem("profile_v1");
         nav(hasProfile ? "/dashboard" : "/onboarding");
       }
@@ -155,9 +148,6 @@ export default function Login() {
   );
 }
 
-/**
- * Champ de formulaire avec icône à gauche.
- */
 function Field({
   icon,
   type,
