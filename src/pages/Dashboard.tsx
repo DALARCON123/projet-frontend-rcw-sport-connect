@@ -1,10 +1,8 @@
 // src/pages/Dashboard.tsx
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getProfileLocal } from "../services/profileService";
 import { User2, Activity, Ruler, Target, Brain } from "lucide-react";
-
 
 type StatCardProps = {
   label: string;
@@ -17,9 +15,7 @@ const StatCard = ({ label, value, subtitle, icon }: StatCardProps) => (
   <div className="rounded-2xl bg-white shadow-sm border border-slate-200 px-5 py-4 flex flex-col justify-between">
     <div className="flex items-start justify-between">
       <div>
-        <p className="text-xs text-slate-500 font-medium uppercase">
-          {label}
-        </p>
+        <p className="text-xs text-slate-500 font-medium uppercase">{label}</p>
         <p className="mt-2 text-xl md:text-2xl font-bold text-slate-900">
           {value}
         </p>
@@ -28,9 +24,7 @@ const StatCard = ({ label, value, subtitle, icon }: StatCardProps) => (
         {icon}
       </div>
     </div>
-    {subtitle && (
-      <p className="mt-2 text-[11px] text-slate-500">{subtitle}</p>
-    )}
+    {subtitle && <p className="mt-2 text-[11px] text-slate-500">{subtitle}</p>}
   </div>
 );
 
@@ -50,39 +44,45 @@ export default function Dashboard() {
       {/* TÍTULO + BIENVENIDA */}
       <header>
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-          Tableau de bord
+          {t("pages.dashboard.title")}
         </h1>
         <p className="mt-1 text-sm text-slate-600">
           {name
-            ? `Bienvenue, ${name}. Voici ton espace d’entraînement personnalisé.`
-            : "Bienvenue sur votre espace d’entraînement personnalisé."}
+            ? t("pages.dashboard.welcome", { name })
+            : t("pages.dashboard.welcome_generic")}
         </p>
       </header>
 
       {/* INFORMACIÓN DE PERFIL EN LA PARTE SUPERIOR */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          label="Âge"
-          value={age != null ? `${age} ans` : "Non renseigné"}
-          subtitle="Âge actuel utilisé pour adapter les recommandations."
+          label={t("pages.dashboard.age")}
+          value={
+            age != null
+              ? `${age} ${t("pages.dashboard.age_years")}`
+              : t("pages.dashboard.not_set")
+          }
+          subtitle={t("pages.dashboard.age_subtitle")}
           icon={<User2 className="h-5 w-5" />}
         />
         <StatCard
-          label="Poids"
-          value={weight != null ? `${weight} kg` : "Non renseigné"}
-          subtitle="Permet d’estimer l’intensité et les calories brûlées."
+          label={t("pages.dashboard.weight")}
+          value={weight != null ? `${weight} kg` : t("pages.dashboard.not_set")}
+          subtitle={t("pages.dashboard.weight_subtitle")}
           icon={<Activity className="h-5 w-5" />}
         />
         <StatCard
-          label="Taille"
-          value={height != null ? `${height} cm` : "Non renseigné"}
-          subtitle="Aide à calculer vos indicateurs corporels."
+          label={t("pages.dashboard.height")}
+          value={height != null ? `${height} cm` : t("pages.dashboard.not_set")}
+          subtitle={t("pages.dashboard.height_subtitle")}
           icon={<Ruler className="h-5 w-5" />}
         />
         <StatCard
-          label="Objectif principal"
-          value={goal && goal.trim() !== "" ? goal : "Non renseigné"}
-          subtitle="Perte de poids, remise en forme, performance..."
+          label={t("pages.dashboard.goal")}
+          value={
+            goal && goal.trim() !== "" ? goal : t("pages.dashboard.not_set")
+          }
+          subtitle={t("pages.dashboard.goal_subtitle")}
           icon={<Target className="h-5 w-5" />}
         />
       </div>
@@ -164,7 +164,9 @@ export default function Dashboard() {
       <div className="rounded-2xl border border-fuchsia-300 bg-gradient-to-r from-fuchsia-50 via-indigo-50 to-sky-50 px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="font-semibold text-slate-900 text-sm md:text-base">
-            {profile ? t("pages.dashboard.profile_configured") : t("pages.dashboard.complete_profile")}
+            {profile
+              ? t("pages.dashboard.profile_configured")
+              : t("pages.dashboard.complete_profile")}
           </h2>
           <p className="text-xs md:text-sm text-slate-700 mt-1">
             {profile
@@ -177,17 +179,19 @@ export default function Dashboard() {
           to="/onboarding"
           className="inline-flex justify-center rounded-full border border-fuchsia-500 bg-white px-5 py-2 text-xs md:text-sm font-semibold text-fuchsia-700 hover:bg-gradient-to-r hover:from-fuchsia-600 hover:via-indigo-600 hover:to-sky-500 hover:text-white transition"
         >
-          {profile ? t("pages.dashboard.update_profile") : t("pages.dashboard.configure_profile")}
+          {profile
+            ? t("pages.dashboard.update_profile")
+            : t("pages.dashboard.configure_profile")}
         </Link>
       </div>
 
       {/* FONCTIONNALITÉS INTELLIGENTES */}
       <section className="pt-4">
         <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
-          Fonctionnalités intelligentes
+          {t("home.features.title")}
         </h2>
         <p className="text-sm text-slate-600 mb-6">
-          Découvrez comment SportConnectIA révolutionne votre entraînement avec des technologies d&apos;IA avancées.
+          {t("home.features.subtitle")}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -199,11 +203,11 @@ export default function Dashboard() {
                   <Brain className="h-5 w-5" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900">
-                  Chatbot IA Expert
+                  {t("home.features.f1_title")}
                 </h3>
               </div>
               <p className="text-sm text-slate-600">
-                Discutez avec notre assistant intelligent disponible 24/7 pour répondre à vos questions sur la nutrition, l&apos;entraînement et la récupération.
+                {t("home.features.f1_text")}
               </p>
             </div>
           </Link>
@@ -216,11 +220,11 @@ export default function Dashboard() {
                   <Activity className="h-5 w-5" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900">
-                  Recommandations personnalisées
+                  {t("home.features.f2_title")}
                 </h3>
               </div>
               <p className="text-sm text-slate-600">
-                Des programmes adaptés à votre niveau, vos objectifs et vos préférences.
+                {t("home.features.f2_text")}
               </p>
             </div>
           </Link>
@@ -233,11 +237,11 @@ export default function Dashboard() {
                   <Target className="h-5 w-5" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900">
-                  Suivi de progression
+                  {t("home.features.f3_title")}
                 </h3>
               </div>
               <p className="text-sm text-slate-600">
-                Visualisez vos progrès avec des graphiques détaillés et des statistiques en temps réel.
+                {t("home.features.f3_text")}
               </p>
             </div>
           </Link>
@@ -250,11 +254,11 @@ export default function Dashboard() {
                   <span className="text-2xl">⭐</span>
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900">
-                  Gamification
+                  {t("home.features.f4_title")}
                 </h3>
               </div>
               <p className="text-sm text-slate-600">
-                Gagnez des badges, relevez des défis quotidiens et restez motivé·e.
+                {t("home.features.f4_text")}
               </p>
             </div>
           </Link>
@@ -267,11 +271,11 @@ export default function Dashboard() {
                   <Activity className="h-5 w-5" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900">
-                  Ajustements dynamiques
+                  {t("home.features.f5_title")}
                 </h3>
               </div>
               <p className="text-sm text-slate-600">
-                L&apos;IA adapte automatiquement vos objectifs du jour selon vos performances.
+                {t("home.features.f5_text")}
               </p>
             </div>
           </Link>
@@ -284,11 +288,11 @@ export default function Dashboard() {
                   <Brain className="h-5 w-5" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900">
-                  Conseils en temps réel
+                  {t("home.features.f6_title")}
                 </h3>
               </div>
               <p className="text-sm text-slate-600">
-                Recevez des recommandations instantanées pendant vos séances.
+                {t("home.features.f6_text")}
               </p>
             </div>
           </Link>
