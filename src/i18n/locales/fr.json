@@ -1,6 +1,5 @@
 {
   "appTitle": "SportConnectIA",
-
   "nav": {
     "home": "Accueil",
     "sports": "Sports",
@@ -12,7 +11,9 @@
     "admin": "Administration",
     "logout": "Déconnexion"
   },
-
+  "footer": {
+    "text": "© 2025 FIAI – Système de Recommandation d'Activités Physiques. Développé par Diana Alarcon, Ana Claudia et Lucas Bellinazzi."
+  },
   "home": {
     "hero": {
       "title_1": "Votre coach fitness",
@@ -49,7 +50,6 @@
       "button": "Commencer gratuitement"
     }
   },
-
   "pages": {
     "notfound": {
       "title": "Page non trouvée"
@@ -96,9 +96,14 @@
       "welcome": "Bienvenue, {{name}}. Voici ton espace d'entraînement personnalisé.",
       "welcome_generic": "Bienvenue sur votre espace d'entraînement personnalisé.",
       "age": "Âge",
+      "age_years": "ans",
+      "age_subtitle": "Âge actuel utilisé pour adapter les recommandations.",
       "weight": "Poids",
+      "weight_subtitle": "Permet d'estimer l'intensité et les calories brûlées.",
       "height": "Taille",
+      "height_subtitle": "Aide à calculer vos indicateurs corporels.",
       "goal": "Objectif principal",
+      "goal_subtitle": "Perte de poids, remise en forme, performance...",
       "not_set": "Non renseigné",
       "daily_goal": "Objectif du jour",
       "configure_goals": "Configurez ou mettez à jour votre profil pour affiner vos objectifs quotidiens.",
@@ -144,9 +149,133 @@
     "sports": {
       "title": "Recommandations sportives personnalisées",
       "categories": "Catégories sportives",
+      "categoryNames": {
+        "Yoga": "Yoga",
+        "Cardio": "Cardio",
+        "HIIT": "HIIT",
+        "Musculation": "Musculation",
+        "Étirements": "Étirements",
+        "Pilates": "Pilates",
+        "Danse Fitness": "Danse Fitness",
+        "Marche Active": "Marche Active"
+      },
       "selected_category": "Catégorie sélectionnée",
+      "selected_prefix": "Tu as sélectionné {{category}}",
+      "choose_category": "Choisis une catégorie pour voir les informations et le PDF.",
+      "no_pdf": "Aucun PDF configuré pour cette catégorie.",
+      "pdf_notice": "Si le document ne s'affiche pas correctement,",
+      "pdf_link": "clique ici pour l'ouvrir dans un nouvel onglet.",
       "videos": "Vidéos",
-      "watch_video": "Voir la vidéo"
+      "videos_for": "Vidéos : {{category}}",
+      "static_title": "Vidéos par type de sport",
+      "static_subtitle": "Voici quelques suggestions rapides pour t'entraîner en Pilates, Yoga, vélo ou Cardio HIIT.",
+      "watch_video": "Voir la vidéo",
+      "infos": {
+        "Yoga": {
+          "title": "Les 5 piliers du yoga",
+          "items": [
+            "La voie du bien-être : harmoniser corps et esprit au quotidien.",
+            "Asanas : exercices physiques appropriés pour renforcer et assouplir le corps.",
+            "Pranayama : respiration correcte pour mieux gérer l'énergie et le stress.",
+            "Savasana : relaxation profonde pour récupérer et relâcher les tensions.",
+            "Vedanta & Dhyana : pensées positives et méditation pour apaiser le mental.",
+            "Alimentation saine : mieux manger pour mieux vivre et soutenir la pratique."
+          ]
+        },
+        "Cardio": {
+          "title": "Les avantages de l'entraînement cardiovasculaire",
+          "items": [
+            "Améliore la santé du cœur et réduit le risque de maladies cardiovasculaires.",
+            "Aide à maintenir un poids santé en brûlant beaucoup de calories.",
+            "Stimule les facultés cognitives (attention, mémoire, résolution de problèmes).",
+            "Réduit l'anxiété et la dépression et améliore l'humeur générale.",
+            "Améliore la qualité du sommeil et les niveaux d'énergie pendant la journée.",
+            "Soutient l'autonomie des personnes âgées en renforçant l'équilibre et l'endurance."
+          ]
+        },
+        "HIIT": {
+          "title": "Les bienfaits du HIIT",
+          "items": [
+            "Permet de s'entraîner en peu de temps avec des résultats comparables à un entraînement plus long.",
+            "Brûle beaucoup de calories pendant la séance et après grâce à l'effet afterburn.",
+            "Peut se pratiquer presque partout, souvent sans équipement particulier.",
+            "Améliore fortement la VO2 max et la capacité cardiovasculaire.",
+            "Aide à réguler la glycémie et à améliorer la sensibilité à l'insuline.",
+            "Peut réduire la tension artérielle et la fréquence cardiaque au repos."
+          ]
+        },
+        "Musculation": {
+          "title": "Bienfaits de la musculation",
+          "items": [
+            "Augmente la force et la masse musculaire pour les activités du quotidien.",
+            "Renforce les os et aide à prévenir l'ostéoporose.",
+            "Améliore la posture et protège les articulations.",
+            "Accélère le métabolisme au repos, facilitant le contrôle du poids.",
+            "Aide à réguler la glycémie et les lipides sanguins.",
+            "Renforce la confiance en soi et l'image corporelle."
+          ]
+        },
+        "Étirements": {
+          "title": "Pourquoi faire des étirements ?",
+          "items": [
+            "Améliorent la souplesse et l'amplitude des mouvements.",
+            "Réduisent les tensions musculaires et certaines douleurs.",
+            "Préparent les muscles à l'effort et diminuent le risque de blessure.",
+            "Favorisent la récupération après l'entraînement.",
+            "Aident à la relaxation et à la gestion du stress."
+          ]
+        },
+        "Pilates": {
+          "title": "Les avantages du Pilates",
+          "items": [
+            "Renforce les muscles profonds, notamment la ceinture abdominale.",
+            "Améliore la posture et l'alignement du corps.",
+            "Développe la stabilité, l'équilibre et le contrôle des mouvements.",
+            "Peut réduire et prévenir les douleurs lombaires.",
+            "Travaille la respiration et la conscience du corps.",
+            "S'adapte à de nombreux niveaux de condition physique."
+          ]
+        },
+        "Danse Fitness": {
+          "title": "Pourquoi choisir la Danse Fitness ?",
+          "items": [
+            "Propose un entraînement cardio ludique et rythmé.",
+            "Améliore la coordination, le sens du rythme et l'équilibre.",
+            "Permet de brûler des calories tout en s'amusant.",
+            "Stimule l'expression corporelle et la confiance en soi.",
+            "Réduit le stress et améliore l'humeur grâce à la musique."
+          ]
+        },
+        "Marche Active": {
+          "title": "Les bienfaits de la marche active",
+          "items": [
+            "Activité douce et accessible à presque tout le monde.",
+            "Améliore la santé du cœur et la circulation sanguine.",
+            "Aide au contrôle du poids lorsqu'elle est pratiquée régulièrement.",
+            "Renforce les muscles des jambes, des hanches et du tronc.",
+            "Peut facilement s'intégrer dans la routine quotidienne (trajets, loisirs).",
+            "Soutient la santé mentale en réduisant le stress et en clarifiant l'esprit."
+          ]
+        }
+      },
+      "staticVideos": {
+        "pilates": {
+          "sport": "Pilates",
+          "title": "Pilates - séance guidée"
+        },
+        "yoga": {
+          "sport": "Yoga",
+          "title": "Yoga - débutant"
+        },
+        "cycling": {
+          "sport": "Vélo",
+          "title": "Vélo - entraînement"
+        },
+        "cardio": {
+          "sport": "Cardio HIIT",
+          "title": "Cardio HIIT - haute intensité"
+        }
+      }
     },
     "reco": {
       "title": "Recommandations personnalisées",
@@ -161,7 +290,63 @@
       "empty": "Clique sur le bouton ci-dessus pour générer tes premières recommandations.",
       "historyTitle": "Historique de tes recommandations",
       "loadingHistory": "Mise à jour...",
-      "historyEmpty": "Aucune recommandation enregistrée pour le moment."
+      "historyEmpty": "Aucune recommandation enregistrée pour le moment.",
+      "sendReport": "Envoyer un résumé",
+      "report": {
+        "noUser": "Utilisateur introuvable (uid manquant).",
+        "noEmail": "Aucun email trouvé pour cet utilisateur.",
+        "success": "Rapport envoyé avec succès à ton adresse e-mail.",
+        "error": "Erreur lors de l'envoi du rapport : {{message}}"
+      },
+      "errors": {
+        "noUser": "Utilisateur introuvable (uid manquant).",
+        "history": "Impossible de charger l'historique des recommandations.",
+        "generate": "Une erreur est survenue lors de la génération des recommandations. Détails : {{message}}",
+        "trackingLoad": "Impossible de charger les mesures de suivi. Réessaie plus tard.",
+        "trackingSave": "Erreur lors de l'enregistrement de la mesure. Vérifie les valeurs.",
+        "missingDate": "La date est obligatoire.",
+        "missingTrackingUser": "Utilisateur introuvable pour le suivi."
+      },
+      "profileCard": {
+        "ageUnit": "{{value}} ans",
+        "weightUnit": "{{value}} kg",
+        "heightUnit": "{{value}} cm"
+      },
+      "current": {
+        "loading": "Chargement de tes recommandations.",
+        "empty": "Aucune recommandation pour le moment. Clique sur \"{{action}}\" pour commencer."
+      },
+      "disclaimer": "Ces recommandations sont indicatives et ne remplacent pas l'avis d'un professionnel de santé. Adapte toujours l'intensité à ton niveau et à ton ressenti.",
+      "tracking": {
+        "title": "Suivi de ton évolution",
+        "loading": "Chargement de tes mesures.",
+        "description": "Visualise ton poids et tes mesures dans le temps. Ajoute une première mesure depuis le formulaire à gauche.",
+        "empty": "Aucune mesure enregistrée pour le moment.",
+        "chartTitle": "Graphique d'évolution",
+        "chartWeight": "Poids (kg)",
+        "lastMeasure": "Dernière mesure : {{date}}",
+        "weightLabel": "Poids :",
+        "delta": "{{value}} kg",
+        "form": {
+          "date": "Date",
+          "weight": "Poids (kg)",
+          "waist": "Tour de taille (cm)",
+          "hips": "Tour de hanches (cm)",
+          "chest": "Tour de poitrine (cm)",
+          "notes": "Notes",
+          "weightPlaceholder": "Ex : 65.4",
+          "waistPlaceholder": "Ex : 72",
+          "hipsPlaceholder": "Ex : 95",
+          "chestPlaceholder": "Ex : 88",
+          "notesPlaceholder": "Ex : Exercices difficiles, peu d'énergie",
+          "submit": "Enregistrer la mesure"
+        }
+      },
+      "history": {
+        "emptyItem": "(contenu vide)",
+        "showMore": "Voir plus",
+        "showLess": "Voir moins"
+      }
     },
     "admin": {
       "title": "Espace administrateur",
@@ -215,14 +400,12 @@
       }
     }
   },
-
   "auth": {
     "hero": {
       "title": "Entraînez-vous avec l'IA, à votre rythme",
       "subtitle": "Programmes, défis et suivi intelligent"
     }
   },
-
   "chat": {
     "title": "Assistant Coach IA",
     "subtitle": "Discutez avec votre coach personnel alimenté par l'intelligence artificielle.",
@@ -235,6 +418,7 @@
     "error": "Une erreur est survenue. Réessayez dans quelques instants.",
     "history_title": "Conversations",
     "new": "Nouveau",
+    "new_chat": "+ Nouveau chat",
     "no_conversations": "Aucune conversation enregistrée pour l'instant.",
     "confirm_delete": "Voulez-vous vraiment supprimer cette conversation ?",
     "faq_title": "Questions fréquentes",
@@ -243,7 +427,6 @@
     "faq_3": "Quels aliments privilégier pour la prise de muscle ?",
     "faq_4": "Comment optimiser ma récupération après l'entraînement ?"
   },
-
   "welcome": "Bonjour, {{name}} !",
   "welcome_generic": "Bonjour !",
   "logout": "Déconnexion"

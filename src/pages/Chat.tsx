@@ -3,7 +3,16 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { askBot } from "../services/chatService";
 import type { ChatResp } from "../services/chatService";
-import { Bot, User as UserIcon, Send, MessageSquare, Sparkles, Plus, Trash2, Clock } from "lucide-react";
+import {
+  Bot,
+  User as UserIcon,
+  Send,
+  MessageSquare,
+  Sparkles,
+  Plus,
+  Trash2,
+  Clock,
+} from "lucide-react";
 
 type Msg = {
   id: string;
@@ -93,9 +102,9 @@ export default function Chat() {
     }
 
     try {
-    const historyForApi = [...msgs, userMsg];
+      const historyForApi = [...msgs, userMsg];
 
-    const res: ChatResp = await askBot(q, i18n.language, historyForApi);
+      const res: ChatResp = await askBot(q, i18n.language, historyForApi);
 
       const botMsg: Msg = {
         id: crypto.randomUUID(),
@@ -146,7 +155,11 @@ export default function Chat() {
   }
 
   function deleteChat(chatId: string) {
-    if (!window.confirm(t("chat.confirm_delete") as string || "¿Eliminar esta conversación?")) {
+    if (
+      !window.confirm(
+        (t("chat.confirm_delete") as string) || "¿Eliminar esta conversación?"
+      )
+    ) {
       return;
     }
 
@@ -170,10 +183,16 @@ export default function Chat() {
       {/* Efectos de fondo decorativos */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-purple-300/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-pink-300/30 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div
+          className="absolute -bottom-40 -left-40 w-96 h-96 bg-pink-300/30 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "2s" }}
+        ></div>
       </div>
-      
+
       {/* -------------------------------------------------
          PANEL IZQUIERDO – HISTORIAL
       --------------------------------------------------- */}
@@ -197,7 +216,7 @@ export default function Chat() {
           className="w-full mb-6 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 text-white py-3 px-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 flex items-center justify-center gap-2"
         >
           <Plus className="h-5 w-5" />
-          Nouveau Chat
+          {t("chat.new_chat") as string}
         </button>
 
         <div className="space-y-3">
@@ -237,9 +256,11 @@ export default function Chat() {
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <MessageSquare className={`h-4 w-4 ${
-                    h === activeChatId ? "text-purple-500" : "text-slate-400"
-                  }`} />
+                  <MessageSquare
+                    className={`h-4 w-4 ${
+                      h === activeChatId ? "text-purple-500" : "text-slate-400"
+                    }`}
+                  />
                   <span>{t("chat.history_title") as string}</span>
                 </div>
                 <div className="flex items-center gap-1 mt-1 text-xs text-slate-500">
@@ -266,14 +287,14 @@ export default function Chat() {
         {/* HEADER ESPECTACULAR */}
         <div className="relative overflow-hidden bg-gradient-to-br from-cyan-600 via-blue-600 to-purple-600 px-8 py-6 shrink-0 shadow-2xl border-b-2 border-white/30">
           {/* Patrón de fondo */}
-          <div 
+          <div
             className="absolute inset-0 opacity-10"
             style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-              backgroundSize: '60px 60px'
+              backgroundSize: "60px 60px",
             }}
           ></div>
-          
+
           <div className="relative z-10 flex items-center gap-5">
             <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center shadow-2xl border-2 border-white/30">
               <Bot className="h-8 w-8 text-white animate-pulse" />
@@ -284,7 +305,8 @@ export default function Chat() {
                 <Sparkles className="h-7 w-7 text-yellow-300 animate-pulse" />
               </h1>
               <p className="text-lg text-white/95 drop-shadow-lg mt-2">
-                {t("chat.subtitle") as string || "Conseils personnalisés • Disponible 24/7 • Intelligence artificielle"}
+                {(t("chat.subtitle") as string) ||
+                  "Conseils personnalisés • Disponible 24/7 • Intelligence artificielle"}
               </p>
             </div>
           </div>
@@ -309,11 +331,22 @@ export default function Chat() {
                 <div className="bg-white border-2 border-purple-200 rounded-2xl rounded-bl-sm px-5 py-4 shadow-md">
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1">
-                      <span className="h-2 w-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: "0s"}}></span>
-                      <span className="h-2 w-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: "0.2s"}}></span>
-                      <span className="h-2 w-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: "0.4s"}}></span>
+                      <span
+                        className="h-2 w-2 bg-purple-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "0s" }}
+                      ></span>
+                      <span
+                        className="h-2 w-2 bg-purple-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></span>
+                      <span
+                        className="h-2 w-2 bg-purple-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.4s" }}
+                      ></span>
                     </div>
-                    <span className="text-sm text-slate-600">{t("chat.typing") as string}</span>
+                    <span className="text-sm text-slate-600">
+                      {t("chat.typing") as string}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -344,7 +377,9 @@ export default function Chat() {
                 className="inline-flex items-center gap-2 px-6 py-4 rounded-2xl text-sm font-semibold text-white bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all"
               >
                 <Send className="h-5 w-5" />
-                <span className="hidden sm:inline">{t("chat.send") as string}</span>
+                <span className="hidden sm:inline">
+                  {t("chat.send") as string}
+                </span>
               </button>
             </div>
           </div>
@@ -386,7 +421,11 @@ function Bubble({ role, text }: { role: "user" | "assistant"; text: string }) {
   const isUser = role === "user";
 
   return (
-    <div className={`flex items-start gap-3 ${isUser ? "justify-end" : "justify-start"} animate-fadeIn`}>
+    <div
+      className={`flex items-start gap-3 ${
+        isUser ? "justify-end" : "justify-start"
+      } animate-fadeIn`}
+    >
       {!isUser && (
         <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shrink-0">
           <Bot className="h-5 w-5 text-white" />

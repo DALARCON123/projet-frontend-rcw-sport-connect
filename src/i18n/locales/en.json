@@ -13,6 +13,10 @@
     "logout": "Logout"
   },
 
+  "footer": {
+    "text": "© 2025 FIAI – Physical Activity Recommendation System. Built by Diana Alarcon, Ana Claudia and Lucas Bellinazzi."
+  },
+
   "home": {
     "hero": {
       "title_1": "Your fitness coach",
@@ -96,9 +100,14 @@
       "welcome": "Welcome, {{name}}. Here's your personalized training space.",
       "welcome_generic": "Welcome to your personalized training space.",
       "age": "Age",
+      "age_years": "years old",
+      "age_subtitle": "Current age used to adapt recommendations.",
       "weight": "Weight",
+      "weight_subtitle": "Helps estimate intensity and calories burned.",
       "height": "Height",
+      "height_subtitle": "Helps calculate your body indicators.",
       "goal": "Main goal",
+      "goal_subtitle": "Weight loss, fitness, performance...",
       "not_set": "Not set",
       "daily_goal": "Today's goal",
       "configure_goals": "Configure or update your profile to refine your daily goals.",
@@ -144,9 +153,133 @@
     "sports": {
       "title": "Personalized sports recommendations",
       "categories": "Sports categories",
+      "categoryNames": {
+        "Yoga": "Yoga",
+        "Cardio": "Cardio",
+        "HIIT": "HIIT",
+        "Musculation": "Strength Training",
+        "Étirements": "Stretching",
+        "Pilates": "Pilates",
+        "Danse Fitness": "Dance Fitness",
+        "Marche Active": "Power Walking"
+      },
       "selected_category": "Selected category",
+      "selected_prefix": "You selected {{category}}",
+      "choose_category": "Choose a category to view the information and PDF.",
+      "no_pdf": "No PDF configured for this category.",
+      "pdf_notice": "If the document does not display correctly,",
+      "pdf_link": "click here to open it in a new tab.",
       "videos": "Videos",
-      "watch_video": "Watch video"
+      "videos_for": "Videos: {{category}}",
+      "static_title": "Videos by sport type",
+      "static_subtitle": "Here are a few quick suggestions to train in Pilates, Yoga, cycling or Cardio HIIT.",
+      "watch_video": "Watch video",
+      "infos": {
+        "Yoga": {
+          "title": "The 5 pillars of yoga",
+          "items": [
+            "The path to well-being: harmonize body and mind every day.",
+            "Asanas: suitable physical exercises to strengthen and loosen the body.",
+            "Pranayama: proper breathing to better manage energy and stress.",
+            "Savasana: deep relaxation to recover and release tension.",
+            "Vedanta & Dhyana: positive thoughts and meditation to calm the mind.",
+            "Healthy eating: eat better to live better and support your practice."
+          ]
+        },
+        "Cardio": {
+          "title": "Benefits of cardiovascular training",
+          "items": [
+            "Improves heart health and reduces the risk of cardiovascular disease.",
+            "Helps maintain a healthy weight by burning many calories.",
+            "Boosts cognitive skills (attention, memory, problem solving).",
+            "Reduces anxiety and depression and improves overall mood.",
+            "Improves sleep quality and daytime energy levels.",
+            "Supports seniors' autonomy by strengthening balance and endurance."
+          ]
+        },
+        "HIIT": {
+          "title": "Benefits of HIIT",
+          "items": [
+            "Lets you train in little time with results comparable to longer sessions.",
+            "Burns many calories during the session and afterward thanks to the afterburn effect.",
+            "Can be done almost anywhere, often without specific equipment.",
+            "Greatly improves VO2 max and cardiovascular capacity.",
+            "Helps regulate blood sugar and improve insulin sensitivity.",
+            "Can reduce blood pressure and resting heart rate."
+          ]
+        },
+        "Musculation": {
+          "title": "Strength training benefits",
+          "items": [
+            "Increases strength and muscle mass for daily activities.",
+            "Strengthens bones and helps prevent osteoporosis.",
+            "Improves posture and protects the joints.",
+            "Speeds up resting metabolism, making weight control easier.",
+            "Helps regulate blood sugar and blood lipids.",
+            "Boosts self-confidence and body image."
+          ]
+        },
+        "Étirements": {
+          "title": "Why stretch?",
+          "items": [
+            "Improve flexibility and range of motion.",
+            "Reduce muscle tension and certain pains.",
+            "Prepare muscles for effort and lower the risk of injury.",
+            "Promote recovery after training.",
+            "Aid relaxation and stress management."
+          ]
+        },
+        "Pilates": {
+          "title": "Benefits of Pilates",
+          "items": [
+            "Strengthens deep muscles, especially the core.",
+            "Improves posture and body alignment.",
+            "Develops stability, balance and control of movements.",
+            "Can reduce and prevent lower back pain.",
+            "Works on breathing and body awareness.",
+            "Adapts to many fitness levels."
+          ]
+        },
+        "Danse Fitness": {
+          "title": "Why choose Dance Fitness?",
+          "items": [
+            "Offers a playful, rhythmic cardio workout.",
+            "Improves coordination, sense of rhythm and balance.",
+            "Helps burn calories while having fun.",
+            "Stimulates self-expression and confidence.",
+            "Reduces stress and improves mood thanks to music."
+          ]
+        },
+        "Marche Active": {
+          "title": "Benefits of power walking",
+          "items": [
+            "Gentle activity accessible to almost everyone.",
+            "Improves heart health and blood circulation.",
+            "Helps control weight when practiced regularly.",
+            "Strengthens muscles of the legs, hips and core.",
+            "Easily fits into the daily routine (commutes, leisure).",
+            "Supports mental health by reducing stress and clearing the mind."
+          ]
+        }
+      },
+      "staticVideos": {
+        "pilates": {
+          "sport": "Pilates",
+          "title": "Pilates - guided session"
+        },
+        "yoga": {
+          "sport": "Yoga",
+          "title": "Yoga - beginner"
+        },
+        "cycling": {
+          "sport": "Cycling",
+          "title": "Cycling - training ride"
+        },
+        "cardio": {
+          "sport": "Cardio HIIT",
+          "title": "Cardio HIIT - high intensity"
+        }
+      }
     },
     "reco": {
       "title": "Personalized recommendations",
@@ -161,7 +294,63 @@
       "empty": "Click the button above to generate your first recommendations.",
       "historyTitle": "Your recommendations history",
       "loadingHistory": "Updating...",
-      "historyEmpty": "No recommendations recorded yet."
+      "historyEmpty": "No recommendations recorded yet.",
+      "sendReport": "Send summary",
+      "report": {
+        "noUser": "User not found (missing uid).",
+        "noEmail": "No email found for this user.",
+        "success": "Report sent successfully to your email address.",
+        "error": "Error sending report: {{message}}"
+      },
+      "errors": {
+        "noUser": "User not found (missing uid).",
+        "history": "Unable to load recommendations history.",
+        "generate": "An error occurred while generating recommendations. Details: {{message}}",
+        "trackingLoad": "Unable to load tracking measurements. Try again later.",
+        "trackingSave": "Error while saving the measurement. Check the values.",
+        "missingDate": "Date is required.",
+        "missingTrackingUser": "User not found for tracking."
+      },
+      "profileCard": {
+        "ageUnit": "{{value}} yrs",
+        "weightUnit": "{{value}} kg",
+        "heightUnit": "{{value}} cm"
+      },
+      "current": {
+        "loading": "Loading your recommendations.",
+        "empty": "No recommendation for now. Click \"{{action}}\" to start."
+      },
+      "disclaimer": "These recommendations are indicative and do not replace medical advice. Always adapt the intensity to your level and how you feel.",
+      "tracking": {
+        "title": "Track your progress",
+        "loading": "Loading your measurements.",
+        "description": "Visualize your weight and measurements over time. Add your first measurement using the form on the left.",
+        "empty": "No measurement recorded yet.",
+        "chartTitle": "Progress chart",
+        "chartWeight": "Weight (kg)",
+        "lastMeasure": "Last measurement: {{date}}",
+        "weightLabel": "Weight:",
+        "delta": "{{value}} kg",
+        "form": {
+          "date": "Date",
+          "weight": "Weight (kg)",
+          "waist": "Waist (cm)",
+          "hips": "Hips (cm)",
+          "chest": "Chest (cm)",
+          "notes": "Notes",
+          "weightPlaceholder": "Ex: 65.4",
+          "waistPlaceholder": "Ex: 72",
+          "hipsPlaceholder": "Ex: 95",
+          "chestPlaceholder": "Ex: 88",
+          "notesPlaceholder": "Ex: Difficult exercises, low energy",
+          "submit": "Save measurement"
+        }
+      },
+      "history": {
+        "emptyItem": "(empty content)",
+        "showMore": "Show more",
+        "showLess": "Show less"
+      }
     },
     "admin": {
       "title": "Administrator space",
@@ -235,6 +424,7 @@
     "error": "An error occurred. Try again in a few moments.",
     "history_title": "Conversations",
     "new": "New",
+    "new_chat": "+ New chat",
     "no_conversations": "No conversations saved yet.",
     "confirm_delete": "Do you really want to delete this conversation?",
     "faq_title": "Frequently asked questions",

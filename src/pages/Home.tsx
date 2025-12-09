@@ -31,11 +31,11 @@ export default function Home() {
       <div className="absolute inset-0 z-0">
         {/* Patron de fondo (puedes reemplazar con imagen real) */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/95 via-slate-900/90 to-pink-900/95"></div>
-        <div 
+        <div
           className="absolute inset-0 opacity-20"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '60px 60px'
+            backgroundSize: "60px 60px",
           }}
         ></div>
       </div>
@@ -43,12 +43,17 @@ export default function Home() {
       {/* Efectos de fondo decorativos mejorados */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-purple-500/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/3 -left-40 w-[500px] h-[500px] bg-pink-500/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute -bottom-40 right-1/4 w-[550px] h-[550px] bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div
+          className="absolute top-1/3 -left-40 w-[500px] h-[500px] bg-pink-500/20 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute -bottom-40 right-1/4 w-[550px] h-[550px] bg-blue-500/20 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "2s" }}
+        ></div>
       </div>
 
       <main className="relative z-10">
-        
         {/* HERO - Pantalla Completa con glassmorphism */}
         <section className="min-h-screen flex items-center justify-center px-6 py-20">
           <div className="max-w-[1600px] mx-auto w-full">
@@ -56,19 +61,27 @@ export default function Home() {
               {/* Texto izquierda con glassmorphism */}
               <div className="space-y-8">
                 {/* Badge superior con glassmorphism */}
-                <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white/10 backdrop-blur-xl border-2 border-white/20 shadow-2xl animate-bounce" style={{animationDuration: '3s'}}>
+                <div
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white/10 backdrop-blur-xl border-2 border-white/20 shadow-2xl animate-bounce"
+                  style={{ animationDuration: "3s" }}
+                >
                   <Sparkles className="h-5 w-5 text-purple-300" />
-                  <span className="text-sm font-bold text-white">Intelligence Artificielle Avancée</span>
+                  <span className="text-sm font-bold text-white">
+                    Intelligence Artificielle Avancée
+                  </span>
                   <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
                 </div>
 
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold leading-tight">
-                  <span className="text-white drop-shadow-2xl">{t("home.hero.title_1")}</span>
-                  {" "}
+                  <span className="text-white drop-shadow-2xl">
+                    {t("home.hero.title_1")}
+                  </span>{" "}
                   <span className="block mt-3 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-pulse drop-shadow-2xl">
                     {t("home.hero.title_highlight")}
                   </span>
-                  <span className="block mt-3 text-white drop-shadow-2xl">{t("home.hero.title_2")}</span>
+                  <span className="block mt-3 text-white drop-shadow-2xl">
+                    {t("home.hero.title_2")}
+                  </span>
                 </h1>
 
                 <p className="text-xl md:text-2xl text-white/90 leading-relaxed max-w-2xl drop-shadow-lg">
@@ -134,7 +147,10 @@ export default function Home() {
                     {/* Efectos internos */}
                     <div className="absolute inset-0">
                       <div className="absolute top-10 right-10 h-48 w-48 rounded-full bg-purple-500/30 blur-3xl animate-pulse"></div>
-                      <div className="absolute bottom-10 left-10 h-56 w-56 rounded-full bg-pink-500/30 blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+                      <div
+                        className="absolute bottom-10 left-10 h-56 w-56 rounded-full bg-pink-500/30 blur-3xl animate-pulse"
+                        style={{ animationDelay: "1s" }}
+                      ></div>
                     </div>
 
                     {/* Contenido central */}
@@ -153,7 +169,9 @@ export default function Home() {
                           <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                             <Brain className="h-8 w-8 text-white" />
                           </div>
-                          <p className="text-xs font-bold text-white">IA Coach</p>
+                          <p className="text-xs font-bold text-white">
+                            IA Coach
+                          </p>
                         </div>
                         <div className="group flex flex-col items-center gap-3 p-5 rounded-2xl bg-white/10 backdrop-blur-xl border-2 border-white/20 shadow-xl hover:shadow-2xl hover:-translate-y-2 hover:bg-white/20 transition-all">
                           <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
@@ -185,10 +203,19 @@ export default function Home() {
                   </div>
 
                   {/* Elementos flotantes decorativos mejorados */}
-                  <div className="absolute -top-8 -right-8 h-28 w-28 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-2xl animate-bounce border-4 border-white/20" style={{animationDuration: '3s'}}>
+                  <div
+                    className="absolute -top-8 -right-8 h-28 w-28 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-2xl animate-bounce border-4 border-white/20"
+                    style={{ animationDuration: "3s" }}
+                  >
                     <Trophy className="h-14 w-14 text-white drop-shadow-xl" />
                   </div>
-                  <div className="absolute -bottom-8 -left-8 h-28 w-28 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-2xl animate-bounce border-4 border-white/20" style={{animationDuration: '3.5s', animationDelay: '0.5s'}}>
+                  <div
+                    className="absolute -bottom-8 -left-8 h-28 w-28 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-2xl animate-bounce border-4 border-white/20"
+                    style={{
+                      animationDuration: "3.5s",
+                      animationDelay: "0.5s",
+                    }}
+                  >
                     <Zap className="h-14 w-14 text-white drop-shadow-xl" />
                   </div>
                 </div>
@@ -203,7 +230,9 @@ export default function Home() {
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-purple-100 border-2 border-purple-300 mb-6 shadow-lg">
                 <Sparkles className="h-5 w-5 text-purple-600" />
-                <span className="text-sm font-bold text-purple-700">Fonctionnalités Puissantes</span>
+                <span className="text-sm font-bold text-purple-700">
+                  Fonctionnalités Puissantes
+                </span>
               </div>
               <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-700 via-pink-600 to-purple-700 bg-clip-text text-transparent mb-6">
                 {t("home.features.title")}
@@ -261,14 +290,19 @@ export default function Home() {
               {/* Efectos decorativos */}
               <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-pink-500/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+                <div
+                  className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-pink-500/20 rounded-full blur-3xl animate-pulse"
+                  style={{ animationDelay: "1s" }}
+                ></div>
               </div>
-              
+
               <div className="relative flex flex-col md:flex-row items-center justify-between gap-10 text-white">
                 <div className="text-center md:text-left space-y-6">
                   <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white/10 backdrop-blur-xl border-2 border-white/20 shadow-xl">
                     <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
-                    <span className="text-base font-bold">Commencez Gratuitement</span>
+                    <span className="text-base font-bold">
+                      Commencez Gratuitement
+                    </span>
                   </div>
                   <h2 className="text-5xl md:text-6xl font-bold drop-shadow-2xl">
                     {t("home.cta.title")}
@@ -296,10 +330,19 @@ export default function Home() {
         <div className="max-w-[1600px] mx-auto px-6 py-8 text-sm text-slate-600 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
             <Heart className="h-5 w-5 text-pink-500 fill-pink-500 animate-pulse" />
-            <span className="font-bold text-lg text-slate-800">Fait avec passion</span>
+            <span className="font-bold text-lg text-slate-800">
+              Fait avec passion
+            </span>
           </div>
-          <p className="text-base font-semibold text-slate-700">© 2025 FIAI – Système de Recommandation d'Activités Physiques.</p>
-          <p className="text-sm mt-2 text-slate-600">Développé par <span className="font-bold text-purple-600">Diana Alarcon</span>- <span className="font-bold text-purple-600">Ana Claudia</span> & <span className="font-bold text-purple-600">Lucas</span>.</p>
+          <p className="text-base font-semibold text-slate-700">
+            © 2025 FIAI – Système de Recommandation d'Activités Physiques.
+          </p>
+          <p className="text-sm mt-2 text-slate-600">
+            Développé par{" "}
+            <span className="font-bold text-purple-600">Diana Alarcon</span>-{" "}
+            <span className="font-bold text-purple-600">Ana Claudia</span> &{" "}
+            <span className="font-bold text-purple-600">Lucas</span>.
+          </p>
         </div>
       </footer>
     </div>
@@ -317,11 +360,15 @@ function FeatureCard({ icon, title, text, gradient }: FeatureProps) {
   return (
     <div className="group rounded-2xl border-2 border-white/60 bg-gradient-to-br from-white via-white to-slate-50/30 backdrop-blur-sm px-6 py-6 flex flex-col gap-4 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
       <div className="flex items-start gap-4">
-        <div className={`h-14 w-14 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform shrink-0`}>
+        <div
+          className={`h-14 w-14 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform shrink-0`}
+        >
           {icon}
         </div>
         <div className="flex-1">
-          <h3 className="font-bold text-lg text-slate-900 group-hover:text-purple-700 transition-colors">{title}</h3>
+          <h3 className="font-bold text-lg text-slate-900 group-hover:text-purple-700 transition-colors">
+            {title}
+          </h3>
         </div>
       </div>
       <p className="text-sm text-slate-600 leading-relaxed">{text}</p>

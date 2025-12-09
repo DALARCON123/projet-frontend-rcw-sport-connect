@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sportsClient } from "../services/apiClient";
 import useAuthStore from "../stores/useAuthStore";
 import type { SportActivity } from "../types/SportActivity";
 import { categoriesSport } from "../data/categories";
 
 function Sports() {
+  const { t } = useTranslation();
   const { userProfile } = useAuthStore();
 
   const [videos, setVideos] = useState<SportActivity[]>([]);
   const [categorie, setCategorie] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedCategoryImages, setSelectedCategoryImages] = useState<string[]>([]);
+  const [selectedCategoryImages, setSelectedCategoryImages] = useState<
+    string[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +34,7 @@ function Sports() {
     console.log("🎬 Cargando recomendaciones iniciales con params:", {
       age: userProfile.age ?? 30,
       poids: userProfile.weight ?? 60,
-      objectif: userProfile.mainGoal ?? "Bien-être"
+      objectif: userProfile.mainGoal ?? "Bien-être",
     });
 
     setLoading(true);
@@ -41,13 +45,21 @@ function Sports() {
         `/recommendations?${params}`
       )
       .then((res) => {
-        console.log("✅ Recomendación recibida:", res.categorie_recommandee, "con", res.videos.length, "videos");
+        console.log(
+          "✅ Recomendación recibida:",
+          res.categorie_recommandee,
+          "con",
+          res.videos.length,
+          "videos"
+        );
         console.log("📹 Primeros videos:", res.videos.slice(0, 2));
         setCategorie(res.categorie_recommandee);
         setVideos(res.videos);
-        
+
         // Encontrar la categoría y configurar sus imágenes
-        const cat = categoriesSport.find(c => c.titre === res.categorie_recommandee);
+        const cat = categoriesSport.find(
+          (c) => c.titre === res.categorie_recommandee
+        );
         if (cat && cat.images) {
           setSelectedCategoryImages(cat.images);
         }
@@ -65,8 +77,8 @@ function Sports() {
     if (selectedCategoryImages.length <= 1) return;
 
     const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => 
-        (prev + 1) % selectedCategoryImages.length
+      setCurrentImageIndex(
+        (prev) => (prev + 1) % selectedCategoryImages.length
       );
     }, 3000);
 
@@ -84,7 +96,7 @@ function Sports() {
 
     console.log("🎬 Cargando videos para:", nomCategorie, "con params:", {
       age: userProfile?.age ?? 30,
-      objectif: userProfile?.mainGoal ?? "Bien-être"
+      objectif: userProfile?.mainGoal ?? "Bien-être",
     });
 
     setLoading(true);
@@ -99,9 +111,9 @@ function Sports() {
         console.log("📹 Videos completos:", res.videos);
         setCategorie(res.categorie);
         setVideos(res.videos);
-        
+
         // Encontrar la categoría y configurar sus imágenes
-        const cat = categoriesSport.find(c => c.titre === nomCategorie);
+        const cat = categoriesSport.find((c) => c.titre === nomCategorie);
         if (cat && cat.images) {
           setSelectedCategoryImages(cat.images);
           setCurrentImageIndex(0); // Reiniciar al primer índice
@@ -119,28 +131,28 @@ function Sports() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-8 py-8">
-
         {/* HEADER ESPECTACULAR */}
         <div className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-600 rounded-3xl p-8 shadow-2xl border-2 border-white/30 mb-10">
           {/* Patrón de fondo */}
-          <div 
+          <div
             className="absolute inset-0 opacity-10"
             style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-              backgroundSize: '60px 60px'
+              backgroundSize: "60px 60px",
             }}
           ></div>
-          
+
           <div className="relative z-10 flex items-center gap-5">
             <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center text-4xl shadow-2xl border-2 border-white/30">
               🏋️‍♀️
             </div>
             <div>
               <h1 className="text-5xl font-black text-white drop-shadow-2xl">
-                Recommandations Sportives
+                {t("pages.sports.title")}
               </h1>
               <p className="text-lg text-white/95 drop-shadow-lg mt-2">
-                Vidéos adaptées • Entraînements personnalisés • Résultats garantis
+                Vidéos adaptées • Entraînements personnalisés • Résultats
+                garantis
               </p>
             </div>
           </div>
@@ -153,7 +165,7 @@ function Sports() {
               📦
             </div>
             <h2 className="text-2xl font-bold text-slate-800">
-              Catégories Sportives
+              {t("pages.sports.categories")}
             </h2>
           </div>
 
@@ -170,7 +182,9 @@ function Sports() {
                   className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700"
                   alt={cat.titre}
                   onError={(e) => {
-                    e.currentTarget.src = `https://via.placeholder.com/400x300/9333EA/FFFFFF?text=${encodeURIComponent(cat.titre)}`;
+                    e.currentTarget.src = `https://via.placeholder.com/400x300/9333EA/FFFFFF?text=${encodeURIComponent(
+                      cat.titre
+                    )}`;
                   }}
                 />
 
@@ -197,7 +211,7 @@ function Sports() {
                 🎯
               </div>
               <h2 className="text-2xl font-bold">
-                Catégorie Sélectionnée
+                {t("pages.sports.selected_category")}
               </h2>
             </div>
 
@@ -210,7 +224,9 @@ function Sports() {
                     alt={categorie}
                     className="w-full h-full object-cover transition-opacity duration-700"
                     onError={(e) => {
-                      e.currentTarget.src = `https://via.placeholder.com/400x300/9333EA/FFFFFF?text=${encodeURIComponent(categorie)}`;
+                      e.currentTarget.src = `https://via.placeholder.com/400x300/9333EA/FFFFFF?text=${encodeURIComponent(
+                        categorie
+                      )}`;
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-purple-900/40 to-transparent"></div>
@@ -219,8 +235,8 @@ function Sports() {
                       <div
                         key={idx}
                         className={`h-2 rounded-full transition-all duration-300 shadow-lg ${
-                          idx === currentImageIndex 
-                            ? "w-8 bg-white" 
+                          idx === currentImageIndex
+                            ? "w-8 bg-white"
                             : "w-2 bg-white/60 hover:bg-white/80"
                         }`}
                       />
@@ -234,17 +250,23 @@ function Sports() {
                 <div className="flex items-start gap-4">
                   <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-xl">
                     <span className="text-5xl">
-                      {categoriesSport.find(c => c.titre === categorie)?.icone || "🏋️"}
+                      {categoriesSport.find((c) => c.titre === categorie)
+                        ?.icone || "🏋️"}
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-3xl font-bold text-white drop-shadow-lg">{categorie}</h3>
+                    <h3 className="text-3xl font-bold text-white drop-shadow-lg">
+                      {categorie}
+                    </h3>
                     <p className="text-white/90 text-base mt-2 font-medium">
-                      {videos.length} vidéo{videos.length > 1 ? 's' : ''} personnalisée{videos.length > 1 ? 's' : ''}
+                      {videos.length} vidéo{videos.length > 1 ? "s" : ""}{" "}
+                      personnalisée{videos.length > 1 ? "s" : ""}
                     </p>
                     <div className="flex items-center gap-2 mt-3">
                       <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse"></div>
-                      <span className="text-white/80 text-sm">Recommandations actives</span>
+                      <span className="text-white/80 text-sm">
+                        Recommandations actives
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -260,7 +282,10 @@ function Sports() {
               🎥
             </div>
             <h2 className="text-2xl font-bold text-slate-800">
-              Vidéos Recommandées {categorie && <span className="text-purple-600">· {categorie}</span>}
+              {t("pages.sports.videos_recommended")}{" "}
+              {categorie && (
+                <span className="text-purple-600">· {categorie}</span>
+              )}
             </h2>
           </div>
 
@@ -269,7 +294,8 @@ function Sports() {
               <div className="text-5xl mb-3">⚠️</div>
               <p className="text-red-600 font-medium">{error}</p>
               <p className="text-gray-600 text-sm mt-2">
-                Vérifie que le service SPORTS est en cours d'exécution sur le port 8002
+                Vérifie que le service SPORTS est en cours d'exécution sur le
+                port 8002
               </p>
             </div>
           )}
@@ -278,17 +304,17 @@ function Sports() {
             <div className="text-center py-12 bg-purple-50 rounded-xl">
               <div className="text-6xl mb-4 animate-pulse">⏳</div>
               <p className="text-gray-600 text-lg font-medium">
-                Chargement des vidéos...
+                {t("pages.sports.loading_videos")}
               </p>
             </div>
           ) : videos.length === 0 && !error ? (
             <div className="text-center py-12 bg-purple-50 rounded-xl">
               <div className="text-6xl mb-4">🎬</div>
               <p className="text-gray-600 text-lg font-medium">
-                Sélectionne une catégorie sportive ci-dessus
+                {t("pages.sports.select_category_prompt")}
               </p>
               <p className="text-gray-500 text-sm mt-2">
-                L'IA te recommandera des vidéos YouTube adaptées à ton âge et tes objectifs
+                {t("pages.sports.ai_recommendation_info")}
               </p>
             </div>
           ) : videos.length > 0 ? (
@@ -304,14 +330,20 @@ function Sports() {
                       alt={v.title}
                       className="h-56 w-full object-cover group-hover:scale-110 transition-transform duration-700"
                       onError={(e) => {
-                        e.currentTarget.src = "https://via.placeholder.com/400x300/9333EA/FFFFFF?text=" + encodeURIComponent(categorie);
+                        e.currentTarget.src =
+                          "https://via.placeholder.com/400x300/9333EA/FFFFFF?text=" +
+                          encodeURIComponent(categorie);
                       }}
                     />
                     {/* Overlay con icono de play */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
                       <div className="bg-white rounded-full p-5 transform scale-75 group-hover:scale-100 transition-transform duration-300 shadow-2xl">
-                        <svg className="w-10 h-10 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                        <svg
+                          className="w-10 h-10 text-purple-600"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                         </svg>
                       </div>
                     </div>
@@ -320,7 +352,7 @@ function Sports() {
                     <h3 className="font-bold text-slate-800 text-lg line-clamp-2 min-h-[3.5rem] group-hover:text-purple-600 transition-colors">
                       {v.title}
                     </h3>
-                    
+
                     {v.category && (
                       <div className="flex items-center gap-2 mt-3">
                         <span className="h-1.5 w-1.5 rounded-full bg-purple-500"></span>
@@ -337,10 +369,14 @@ function Sports() {
                       className="flex items-center justify-center gap-2 mt-4 bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 
                       text-white text-center py-3 px-5 rounded-xl transition-all font-semibold shadow-lg hover:shadow-xl group-hover:scale-105"
                     >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                      <svg
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                       </svg>
-                      Regarder sur YouTube
+                      <span>{t("pages.sports.watch_youtube")}</span>
                     </a>
                   </div>
                 </div>
@@ -348,7 +384,6 @@ function Sports() {
             </div>
           ) : null}
         </div>
-
       </div>
     </div>
   );
