@@ -433,47 +433,64 @@ export default function RecoPage() {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-white via-slate-50 to-sky-50 px-8 py-8">
-      {/* Header */}
-      <header className="max-w-5xl mx-auto mb-6 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 flex items-center gap-2">
-            <Sparkles className="text-fuchsia-600 h-7 w-7" />
-            {t("pages.reco.title") || "Recommandations personnalisées"}
-          </h1>
-          <p className="text-sm text-slate-600 mt-1">
-            {t("pages.reco.subtitle") ||
-              "SportConnectIA analyse ton profil pour te proposer un plan d'entraînement, d'alimentation et de récupération sain."}
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 px-6 lg:px-8 py-10">
+      {/* Header espectacular con fondo degradado */}
+      <header className="max-w-[1600px] mx-auto mb-8">
+        <div className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 rounded-3xl p-8 shadow-2xl border-2 border-white/30">
+          {/* Patrón de fondo */}
+          <div 
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '60px 60px'
+            }}
+          ></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div className="flex items-center gap-5">
+              <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center shadow-2xl border-2 border-white/30">
+                <Sparkles className="text-white h-8 w-8 animate-pulse" />
+              </div>
+              <div>
+                <h1 className="text-5xl font-black text-white drop-shadow-2xl">
+                  {t("pages.reco.title") || "Recommandations IA"}
+                </h1>
+                <p className="text-lg text-white/95 drop-shadow-lg mt-2 max-w-2xl">
+                  {t("pages.reco.subtitle") ||
+                    "Coach intelligent • Plan personnalisé • Résultats garantis"}
+                </p>
+              </div>
+            </div>
 
-        <button
-          onClick={handleGenerate}
-          disabled={loadingReco}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-fuchsia-600 to-sky-600 px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-95 disabled:opacity-60 transition"
-        >
-          {loadingReco ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Brain className="h-4 w-4" />
-          )}
-          {t("pages.reco.generate") || "Générer mes recommandations IA"}
-        </button>
+            <button
+              onClick={handleGenerate}
+              disabled={loadingReco}
+              className="group inline-flex items-center gap-3 rounded-2xl bg-white hover:bg-white/95 px-8 py-4 text-base font-bold text-purple-600 shadow-2xl hover:shadow-white/50 hover:scale-105 disabled:opacity-60 disabled:hover:scale-100 transition-all"
+            >
+              {loadingReco ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <Brain className="h-6 w-6 group-hover:rotate-12 transition-transform" />
+              )}
+              {t("pages.reco.generate") || "Générer mon plan IA"}
+            </button>
+          </div>
+        </div>
       </header>
 
-      <main className="max-w-5xl mx-auto space-y-6">
+      <main className="max-w-[1600px] mx-auto space-y-8">
         {/* Perfil + métricas */}
-        <section className="grid md:grid-cols-4 gap-4">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <ProfileCard
             title={t("pages.reco.age") || "Âge"}
-            icon={<Activity className="h-4 w-4 text-fuchsia-600" />}
+            icon={<Activity className="h-5 w-5" />}
             value={
               displayProfile.age != null ? `${displayProfile.age} ans` : "—"
             }
           />
           <ProfileCard
             title={t("pages.reco.weight") || "Poids"}
-            icon={<Activity className="h-4 w-4 text-sky-600" />}
+            icon={<Activity className="h-5 w-5" />}
             value={
               displayProfile.weightKg != null
                 ? `${displayProfile.weightKg} kg`
@@ -482,7 +499,7 @@ export default function RecoPage() {
           />
           <ProfileCard
             title={t("pages.reco.height") || "Taille"}
-            icon={<Activity className="h-4 w-4 text-emerald-600" />}
+            icon={<Activity className="h-5 w-5" />}
             value={
               displayProfile.heightCm != null
                 ? `${displayProfile.heightCm} cm`
@@ -491,17 +508,24 @@ export default function RecoPage() {
           />
           <ProfileCard
             title={t("pages.reco.mainGoal") || "Objectif principal"}
-            icon={<Apple className="h-4 w-4 text-amber-500" />}
+            icon={<Apple className="h-5 w-5" />}
             value={displayProfile.mainGoal || "—"}
           />
         </section>
 
         {/* Recomendación actual en tarjetas */}
-        <section className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm p-5 space-y-4">
-          <h2 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
-            <Brain className="h-4 w-4 text-fuchsia-600" />
-            {t("pages.reco.latest") || "Recommandation IA actuelle"}
-          </h2>
+        <section className="rounded-3xl border-2 border-purple-200 bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 shadow-2xl p-8 space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
+              <Brain className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+                {t("pages.reco.latest") || "Ton Plan Personnalisé"}
+              </h2>
+              <p className="text-sm text-slate-600 mt-1">Généré par l'intelligence artificielle</p>
+            </div>
+          </div>
 
           {!latestReco ? (
             loadingReco ? (
@@ -521,41 +545,50 @@ export default function RecoPage() {
             </p>
           ) : (
             <>
-              <div className="grid md:grid-cols-3 gap-4 items-stretch">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
                 {sections.map((sec, idx) => {
                   const gradient =
                     sectionGradients[idx % sectionGradients.length];
                   const isLast = idx === sections.length - 1;
 
+                  const cardColors = [
+                    { accent: 'from-purple-500 to-pink-500', icon: 'bg-purple-100 text-purple-600', border: 'border-purple-200' },
+                    { accent: 'from-blue-500 to-cyan-500', icon: 'bg-blue-100 text-blue-600', border: 'border-blue-200' },
+                    { accent: 'from-emerald-500 to-teal-500', icon: 'bg-emerald-100 text-emerald-600', border: 'border-emerald-200' },
+                    { accent: 'from-amber-500 to-orange-500', icon: 'bg-amber-100 text-amber-600', border: 'border-amber-200' },
+                  ];
+                  
+                  const cardColor = cardColors[idx % cardColors.length];
+                  
                   return (
                     <div
                       key={`${sec.title}-${idx}`}
-                      className={`relative h-full overflow-hidden rounded-2xl border bg-gradient-to-br ${gradient} px-4 py-3 text-xs text-slate-800 shadow-md backdrop-blur-sm flex flex-col ${
-                        isLast ? "md:col-span-3" : ""
+                      className={`group relative h-full overflow-hidden rounded-3xl border-2 ${cardColor.border} bg-gradient-to-br ${gradient} px-7 py-6 text-sm text-slate-800 shadow-xl hover:shadow-2xl backdrop-blur-sm flex flex-col transition-all duration-300 hover:-translate-y-2 ${
+                        isLast ? "lg:col-span-3" : ""
                       }`}
                     >
-                      <span className="absolute left-0 top-4 h-8 w-[3px] rounded-r-full bg-gradient-to-b from-fuchsia-500 to-sky-500" />
+                      <span className={`absolute left-0 top-8 h-16 w-1.5 rounded-r-full bg-gradient-to-b ${cardColor.accent} shadow-lg`} />
 
-                      <div className="pl-2">
-                        <h3 className="text-sm font-semibold text-slate-900 mb-1 flex items-center gap-1">
-                          <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/70 shadow-sm">
-                            <Sparkles className="h-3 w-3 text-fuchsia-500" />
+                      <div className="pl-4">
+                        <h3 className="text-xl font-black text-slate-900 mb-4 flex items-center gap-3">
+                          <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${cardColor.icon} shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-transform`}>
+                            <Sparkles className="h-5 w-5" />
                           </span>
                           {sec.title || "Plan"}
                         </h3>
 
-                        <ul className="mt-2 space-y-1.5 text-[11px] leading-relaxed flex-1">
+                        <ul className="mt-3 space-y-2.5 text-sm leading-relaxed flex-1">
                           {sec.bullets.map((b, i) => (
-                            <li key={i} className="flex gap-2">
-                              <span className="mt-[5px] h-[5px] w-[5px] rounded-full bg-fuchsia-400/80 shrink-0" />
-                              <span>{b}</span>
+                            <li key={i} className="flex gap-3">
+                              <span className="mt-[6px] h-2 w-2 rounded-full bg-purple-500/70 shrink-0 shadow-sm" />
+                              <span className="text-slate-700">{b}</span>
                             </li>
                           ))}
                         </ul>
 
-                        <div className="mt-3 text-[10px] text-slate-400 flex items-center gap-1">
-                          <Sparkles className="h-3 w-3 text-fuchsia-400" />
-                          Coach IA • SportConnectIA
+                        <div className="mt-4 pt-3 border-t border-purple-200/50 text-xs text-slate-500 flex items-center gap-1.5">
+                          <Sparkles className="h-3.5 w-3.5 text-purple-400" />
+                          <span className="font-medium">Coach IA • SportConnectIA</span>
                         </div>
                       </div>
                     </div>
@@ -573,13 +606,20 @@ export default function RecoPage() {
         </section>
 
         {/* Seguimiento & gráficos */}
-        <section className="grid md:grid-cols-2 gap-5 items-start">
+        <section className="grid md:grid-cols-2 gap-6 items-start">
           {/* Formulario de seguimiento */}
-          <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-sky-50 via-white to-fuchsia-50 shadow-sm p-5">
-            <h2 className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
-              <Activity className="h-4 w-4 text-sky-600" />
-              Suivi de ton évolution
-            </h2>
+          <div className="rounded-3xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-white to-cyan-50 shadow-2xl p-7">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-xl">
+                <Activity className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-slate-900">
+                  Suivi de ton Évolution
+                </h2>
+                <p className="text-sm text-slate-600">Enregistre tes progrès</p>
+              </div>
+            </div>
 
             {trackingError && (
               <p className="text-xs text-red-500 mb-2">{trackingError}</p>
@@ -587,24 +627,25 @@ export default function RecoPage() {
 
             <form
               onSubmit={handleSaveMeasurement}
-              className="space-y-3 text-xs text-slate-700"
+              className="space-y-4 text-sm text-slate-700"
             >
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-[11px]">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700 flex items-center gap-2">
+                    <span className="h-5 w-5 rounded-lg bg-purple-100 grid place-items-center text-purple-600 text-xs">????</span>
                     Date
                   </label>
                   <input
                     type="date"
                     value={measureDate}
                     onChange={(e) => setMeasureDate(e.target.value)}
-                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-semibold"
                     required
                   />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-[11px]">
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700">
                     Poids (kg)
                   </label>
                   <input
@@ -612,13 +653,13 @@ export default function RecoPage() {
                     step="0.1"
                     value={measureWeight}
                     onChange={(e) => setMeasureWeight(e.target.value)}
-                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all"
                     placeholder="Ex: 64.5"
                   />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-[11px]">
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700">
                     Tour de taille (cm)
                   </label>
                   <input
@@ -626,13 +667,13 @@ export default function RecoPage() {
                     step="0.1"
                     value={measureWaist}
                     onChange={(e) => setMeasureWaist(e.target.value)}
-                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all"
                     placeholder="Ex: 80"
                   />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-[11px]">
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700">
                     Tour de hanches (cm)
                   </label>
                   <input
@@ -640,13 +681,13 @@ export default function RecoPage() {
                     step="0.1"
                     value={measureHips}
                     onChange={(e) => setMeasureHips(e.target.value)}
-                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all"
                     placeholder="Ex: 95"
                   />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-[11px]">
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700">
                     Tour de poitrine (cm)
                   </label>
                   <input
@@ -654,20 +695,20 @@ export default function RecoPage() {
                     step="0.1"
                     value={measureChest}
                     onChange={(e) => setMeasureChest(e.target.value)}
-                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all"
                     placeholder="Ex: 90"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="font-semibold text-[11px]">
+              <div className="flex flex-col gap-2">
+                <label className="font-bold text-sm text-slate-700">
                   Notes (comment tu te sens, séance, etc.)
                 </label>
                 <textarea
                   value={measureNotes}
                   onChange={(e) => setMeasureNotes(e.target.value)}
-                  className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400 min-h-[60px]"
+                  className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all min-h-[80px]"
                   placeholder="Ex: Séance facile, bonne énergie…"
                 />
               </div>
@@ -675,12 +716,12 @@ export default function RecoPage() {
               <button
                 type="submit"
                 disabled={savingMeasurement}
-                className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-600 to-fuchsia-600 px-4 py-2 text-[11px] font-semibold text-white shadow hover:opacity-95 disabled:opacity-60 transition"
+                className="group mt-6 w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 hover:from-blue-600 hover:via-cyan-600 hover:to-teal-600 px-8 py-4 text-base font-bold text-white shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100 transition-all"
               >
                 {savingMeasurement ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
-                  <Sparkles className="h-3 w-3" />
+                  <Sparkles className="h-5 w-5 group-hover:rotate-12 transition-transform" />
                 )}
                 Enregistrer la mesure
               </button>
@@ -694,12 +735,19 @@ export default function RecoPage() {
           </div>
 
           {/* Gráficos */}
-          <div className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm p-5">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
-                <History className="h-4 w-4 text-emerald-600" />
-                Graphique d’évolution
-              </h2>
+          <div className="rounded-3xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-teal-50 shadow-2xl p-7">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-xl">
+                  <History className="h-7 w-7 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900">
+                    Graphique d'Évolution
+                  </h2>
+                  <p className="text-sm text-slate-600">Visualise tes progrès</p>
+                </div>
+              </div>
               {latestMeasure && (
                 <div className="text-[10px] text-slate-500 text-right">
                   <p>
@@ -780,13 +828,20 @@ export default function RecoPage() {
         </section>
 
         {/* Historial de recomendaciones IA */}
-        <section className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <History className="h-4 w-4 text-sky-600" />
-              {t("pages.reco.historyTitle") ||
-                "Historique de tes recommandations"}
-            </h2>
+        <section className="rounded-3xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-purple-50 shadow-2xl p-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-xl">
+                <History className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  {t("pages.reco.historyTitle") ||
+                    "Historique de tes Recommandations"}
+                </h2>
+                <p className="text-sm text-slate-600 mt-1">Toutes tes générations précédentes</p>
+              </div>
+            </div>
             {loadingHistory && (
               <span className="text-xs text-slate-400 flex items-center gap-1">
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -834,17 +889,26 @@ type ProfileCardProps = {
 };
 
 function ProfileCard({ title, icon, value }: ProfileCardProps) {
+  const colorSchemes = [
+    { bg: 'from-purple-500 to-pink-500', text: 'from-purple-600 to-pink-600', border: 'border-purple-200 hover:border-purple-400' },
+    { bg: 'from-blue-500 to-cyan-500', text: 'from-blue-600 to-cyan-600', border: 'border-blue-200 hover:border-blue-400' },
+    { bg: 'from-emerald-500 to-teal-500', text: 'from-emerald-600 to-teal-600', border: 'border-emerald-200 hover:border-emerald-400' },
+    { bg: 'from-amber-500 to-orange-500', text: 'from-amber-600 to-orange-600', border: 'border-amber-200 hover:border-amber-400' },
+  ];
+  
+  const scheme = colorSchemes[Math.floor(Math.random() * colorSchemes.length)];
+  
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm p-4 flex flex-col gap-1">
+    <div className={`group rounded-2xl border-2 ${scheme.border} bg-white shadow-xl hover:shadow-2xl p-6 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-1`}>
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+        <p className="text-sm font-bold uppercase tracking-wider text-slate-600">
           {title}
         </p>
-        <span className="h-7 w-7 rounded-full bg-slate-50 border border-slate-100 grid place-items-center">
+        <span className={`h-12 w-12 rounded-xl bg-gradient-to-br ${scheme.bg} grid place-items-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-transform`}>
           {icon}
         </span>
       </div>
-      <p className="text-lg font-bold text-slate-900 mt-1">{value}</p>
+      <p className={`text-3xl font-black bg-gradient-to-r ${scheme.text} bg-clip-text text-transparent mt-1`}>{value}</p>
     </div>
   );
 }

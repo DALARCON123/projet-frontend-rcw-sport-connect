@@ -1,3 +1,4 @@
+//FormInput.tsx
 import React from 'react'
 type Props = React.InputHTMLAttributes<HTMLInputElement> & { label: string }
 export default function FormInput({ label, ...rest }: Props) {

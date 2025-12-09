@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 
 /**
  * Décode un token JWT et renvoie true si l'utilisateur est administrateur.
- * On vérifie les champs is_admin ou role === "admin" dans la charge utile.
  */
 function isAdminFromToken(token: string | null): boolean {
   if (!token) return false;
@@ -41,9 +40,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  /**
-   * Soumission du formulaire de connexion.
-   */
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
@@ -56,13 +52,11 @@ export default function Login() {
     try {
       setLoading(true);
 
-      // Appel au microservice d'authentification
       const res = await loginUser({
         email: form.email,
         password: form.password,
       });
 
-      // Récupération du token (retourné par l'API ou déjà stocké par loginUser)
       const token =
         (res as any)?.access_token ??
         (res as any)?.token ??
@@ -72,26 +66,25 @@ export default function Login() {
         throw new Error("Le jeton JWT n'a pas été reçu.");
       }
 
-      // Sauvegarde du token au cas où loginUser ne l'aurait pas déjà fait
+      // token
       localStorage.setItem("token", token);
 
-      // Sauvegarde du nom et de l'email pour le navbar
+      // 👇 IMPORTANTE: guardar e-mail (e opcionalmente nome) para o Reco.tsx
+      localStorage.setItem("user_email", form.email.trim());
+
+      // se o saveUserSnapshotFromToken já salva user_name, mantemos:
       saveUserSnapshotFromToken();
 
-      // Détection admin à partir du token
       const estAdminDepuisToken = isAdminFromToken(token);
 
-      // Fallback simple : email spécifique de l'admin
       const emailLower = form.email.trim().toLowerCase();
       const estAdminParEmail = emailLower === "dianaalarcon@teccart.com";
 
       const estAdmin = estAdminDepuisToken || estAdminParEmail;
 
       if (estAdmin) {
-        // Redirection vers l'espace administrateur
         nav("/admin/users");
       } else {
-        // Logique classique pour les utilisateurs normaux
         const hasProfile = !!localStorage.getItem("profile_v1");
         nav(hasProfile ? "/dashboard" : "/onboarding");
       }
@@ -126,31 +119,35 @@ export default function Login() {
           onChange={(v) => setForm({ ...form, password: v })}
         />
 
-        {err && <p className="text-sm text-red-600">{err}</p>}
+        {err && (
+          <div className="rounded-xl bg-red-50 border-2 border-red-200 px-4 py-3 flex items-start gap-3">
+            <span className="text-red-600 text-xl">⚠️</span>
+            <p className="text-sm text-red-700 font-medium">{err}</p>
+          </div>
+        )}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold text-white bg-slate-900 hover:bg-slate-800 transition shadow-lg disabled:opacity-60"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-4 font-bold text-white bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
         >
-          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+          {loading && <Loader2 className="h-5 w-5 animate-spin" />}
           {t("pages.login.cta") as string}
         </button>
 
-        <p className="text-sm text-slate-600">
-          {t("nav.register") as string}{" "}
-          <Link to="/register" className="underline">
-            {t("pages.register.title") as string}
-          </Link>
-        </p>
+        <div className="pt-2 text-center">
+          <p className="text-sm text-slate-600">
+            {t("nav.register") as string}{" "}
+            <Link to="/register" className="font-bold text-purple-600 hover:text-pink-600 transition-colors underline decoration-2 underline-offset-2">
+              {t("pages.register.title") as string}
+            </Link>
+          </p>
+        </div>
       </form>
     </AuthLayout>
   );
 }
 
-/**
- * Champ de formulaire avec icône à gauche.
- */
 function Field({
   icon,
   type,
@@ -165,12 +162,12 @@ function Field({
   onChange: (v: string) => void;
 }) {
   return (
-    <label className="relative block">
-      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+    <label className="relative block group">
+      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-purple-600 transition-colors">
         {icon}
       </span>
       <input
-        className="w-full rounded-xl border border-slate-200 bg-white/80 pl-10 pr-3 py-3 outline-none focus:ring-2 focus:ring-sky-400"
+        className="w-full rounded-xl border-2 border-slate-200 bg-white pl-12 pr-4 py-3.5 outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-400 transition-all text-slate-900 placeholder:text-slate-400"
         type={type}
         placeholder={placeholder}
         value={value}

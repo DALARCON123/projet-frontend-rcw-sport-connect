@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 export default function Tracking() {
   const { t } = useTranslation();
-  const email = (localStorage.getItem("user_email") || "").toLowerCase();
+  const email = (localStorage.getItem("tecnologyana@gmail.com") || "").toLowerCase();
   const [rows, setRows] = useState<Measurement[]>([]);
   const [weight, setWeight] = useState<string>("");
 
