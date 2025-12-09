@@ -13,6 +13,10 @@
     "logout": "Cerrar sesión"
   },
 
+  "footer": {
+    "text": "© 2025 FIAI – Sistema de Recomendación de Actividades Físicas. Desarrollado por Diana Alarcon, Ana Claudia y Lucas Bellinazzi."
+  },
+
   "home": {
     "hero": {
       "title_1": "Tu entrenador fitness",

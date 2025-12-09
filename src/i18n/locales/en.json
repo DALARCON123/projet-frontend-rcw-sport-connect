@@ -13,6 +13,10 @@
     "logout": "Logout"
   },
 
+  "footer": {
+    "text": "© 2025 FIAI – Physical Activity Recommendation System. Built by Diana Alarcon, Ana Claudia and Lucas Bellinazzi."
+  },
+
   "home": {
     "hero": {
       "title_1": "Your fitness coach",
