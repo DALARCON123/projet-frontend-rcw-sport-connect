@@ -249,7 +249,10 @@ export default function RecoPage() {
       }
     } catch (e: any) {
       console.error("Erreur loadHistory:", e);
-      setError("Impossible de charger l'historique des recommandations.");
+      setError(
+        t("pages.reco.errors.history") ||
+          "Impossible de charger l'historique des recommandations."
+      );
     } finally {
       setLoadingHistory(false);
     }
@@ -272,7 +275,8 @@ export default function RecoPage() {
     } catch (e: any) {
       console.error("Erreur loadMeasurements:", e);
       setTrackingError(
-        "Impossible de charger les mesures de suivi. Réessaie plus tard."
+        t("pages.reco.errors.trackingLoad") ||
+          "Impossible de charger les mesures de suivi. Réessaie plus tard."
       );
     } finally {
       setLoadingMeasurements(false);
@@ -281,7 +285,10 @@ export default function RecoPage() {
 
 async function handleGenerate() {
   if (!userId) {
-    setError("Utilisateur introuvable (uid manquant).");
+    setError(
+      t("pages.reco.errors.noUser") ||
+        "Utilisateur introuvable (uid manquant)."
+    );
     return;
   }
 
@@ -345,8 +352,9 @@ async function handleGenerate() {
   } catch (e: any) {
     console.error("Erreur handleGenerate:", e);
     setError(
-      "Une erreur est survenue lors de la génération des recommandations. Détails: " +
-        e.message
+      t("pages.reco.errors.generate", { message: e.message }) ||
+        "Une erreur est survenue lors de la génération des recommandations. Détails: " +
+          e.message
     );
   } finally {
     setLoadingReco(false);
@@ -357,7 +365,10 @@ async function handleGenerate() {
     setReportStatus(null);
 
     if (!userId) {
-      setReportStatus("Utilisateur introuvable (uid manquant).");
+      setReportStatus(
+        t("pages.reco.report.noUser") ||
+          "Utilisateur introuvable (uid manquant)."
+      );
       return;
     }
 
@@ -365,7 +376,10 @@ async function handleGenerate() {
       profile?.email || localStorage.getItem("tecnologyana@gmail.com") || "";
 
     if (!email) {
-      setReportStatus("Aucun email trouvé pour cet utilisateur.");
+      setReportStatus(
+        t("pages.reco.report.noEmail") ||
+          "Aucun email trouvé pour cet utilisateur."
+      );
       return;
     }
 
@@ -395,11 +409,15 @@ async function handleGenerate() {
 
       const data = await resp.json();
       console.log("✅ Rapport envoyé:", data);
-      setReportStatus("Rapport envoyé avec succès à ton adresse e-mail.");
+      setReportStatus(
+        t("pages.reco.report.success") ||
+          "Rapport envoyé avec succès à ton adresse e-mail."
+      );
     } catch (e: any) {
       console.error("Erreur handleSendReport:", e);
       setReportStatus(
-        "Une erreur est survenue lors de l'envoi du rapport : " + e.message
+        t("pages.reco.report.error", { message: e.message }) ||
+          "Une erreur est survenue lors de l'envoi du rapport : " + e.message
       );
     } finally {
       setSendingReport(false);
@@ -409,11 +427,14 @@ async function handleGenerate() {
   async function handleSaveMeasurement(e: React.FormEvent) {
     e.preventDefault();
     if (!trackingKey) {
-      setTrackingError("Utilisateur introuvable pour le suivi.");
+      setTrackingError(
+        t("pages.reco.errors.missingTrackingUser") ||
+          "Utilisateur introuvable pour le suivi."
+      );
       return;
     }
     if (!measureDate) {
-      setTrackingError("La date est obligatoire.");
+      setTrackingError(t("pages.reco.errors.missingDate") || "La date est obligatoire.");
       return;
     }
 
@@ -456,7 +477,8 @@ async function handleGenerate() {
     } catch (e: any) {
       console.error("Erreur handleSaveMeasurement:", e);
       setTrackingError(
-        "Erreur lors de l’enregistrement de la mesure. Vérifie les valeurs."
+        t("pages.reco.errors.trackingSave") ||
+          "Erreur lors de l’enregistrement de la mesure. Vérifie les valeurs."
       );
     } finally {
       setSavingMeasurement(false);
@@ -524,7 +546,7 @@ async function handleGenerate() {
             ) : (
               <Mail className="h-4 w-4" />
             )}
-            Envoyer un résumé
+            {t("pages.reco.sendReport") || "Envoyer un résumé"}
           </button>
         </div>
       </header>
@@ -536,33 +558,42 @@ async function handleGenerate() {
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div className="rounded-2xl bg-white/80 border border-slate-100 shadow-sm px-4 py-3">
               <p className="text-xs text-slate-500 uppercase tracking-wide">
-                Âge
+                {t("pages.reco.age")}
               </p>
               <p className="mt-1 text-lg font-semibold text-slate-900 flex items-center gap-1">
                 <Activity className="h-4 w-4 text-fuchsia-500" />
-                {displayProfile.age ?? "—"} ans
+                {t("pages.reco.profileCard.ageUnit", {
+                  value: displayProfile.age ?? "—",
+                }) ||
+                  `${displayProfile.age ?? "—"} ans`}
               </p>
             </div>
             <div className="rounded-2xl bg-white/80 border border-slate-100 shadow-sm px-4 py-3">
               <p className="text-xs text-slate-500 uppercase tracking-wide">
-                Poids
+                {t("pages.reco.weight")}
               </p>
               <p className="mt-1 text-lg font-semibold text-slate-900 flex items-center gap-1">
                 <Apple className="h-4 w-4 text-emerald-500" />
-                {displayProfile.weightKg ?? "—"} kg
+                {t("pages.reco.profileCard.weightUnit", {
+                  value: displayProfile.weightKg ?? "—",
+                }) ||
+                  `${displayProfile.weightKg ?? "—"} kg`}
               </p>
             </div>
             <div className="rounded-2xl bg-white/80 border border-slate-100 shadow-sm px-4 py-3">
               <p className="text-xs text-slate-500 uppercase tracking-wide">
-                Taille
+                {t("pages.reco.height")}
               </p>
               <p className="mt-1 text-lg font-semibold text-slate-900">
-                {displayProfile.heightCm ?? "—"} cm
+                {t("pages.reco.profileCard.heightUnit", {
+                  value: displayProfile.heightCm ?? "—",
+                }) ||
+                  `${displayProfile.heightCm ?? "—"} cm`}
               </p>
             </div>
             <div className="rounded-2xl bg-white/80 border border-slate-100 shadow-sm px-4 py-3">
               <p className="text-xs text-slate-500 uppercase tracking-wide">
-                Objectif principal
+                {t("pages.reco.mainGoal")}
               </p>
               <p className="mt-1 text-lg font-semibold text-slate-900">
                 {displayProfile.mainGoal ?? "—"}
@@ -577,22 +608,24 @@ async function handleGenerate() {
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-fuchsia-500" />
               <h2 className="text-sm font-semibold text-slate-900">
-                Recommandation IA actuelle
+                {t("pages.reco.latest") || "Recommandation IA actuelle"}
               </h2>
             </div>
           </div>
 
           {loadingHistory && !latestReco && (
             <p className="text-sm text-slate-500">
-              Chargement de tes recommandations…
+              {t("pages.reco.current.loading") ||
+                "Chargement de tes recommandations…"}
             </p>
           )}
 
           {!loadingHistory && sections.length === 0 && (
             <p className="text-sm text-slate-500">
-              Aucune recommandation pour le moment. Clique sur{" "}
-              <span className="font-semibold">“Générer mes recommandations IA”</span>{" "}
-              pour commencer.
+              {t("pages.reco.current.empty", {
+                action: t("pages.reco.generate"),
+              }) ||
+                'Aucune recommandation pour le moment. Clique sur “Générer mes recommandations IA” pour commencer.'}
             </p>
           )}
 
@@ -624,9 +657,8 @@ async function handleGenerate() {
           )}
 
           <p className="mt-4 text-[11px] text-slate-400">
-            Ces recommandations sont indicatives et ne remplacent pas l'avis d'un
-            professionnel de la santé. Adapte toujours l'intensité à ton niveau et à
-            ton ressenti.
+            {t("pages.reco.disclaimer") ||
+              "Ces recommandations sont indicatives et ne remplacent pas l'avis d'un professionnel de santé. Adapte toujours l'intensité à ton niveau et à ton ressenti."}
           </p>
         </section>
 
@@ -636,14 +668,14 @@ async function handleGenerate() {
           <div className="rounded-3xl bg-white/80 border border-slate-100 shadow-sm p-5">
             <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-1">
               <Activity className="h-4 w-4 text-sky-500" />
-              Suivi de ton évolution
+              {t("pages.reco.tracking.title") || "Suivi de ton évolution"}
             </h2>
             {trackingError && (
               <p className="text-xs text-red-500 mb-2">{trackingError}</p>
             )}
             {loadingMeasurements && (
               <p className="text-xs text-slate-500 mb-2">
-                Chargement de tes mesures…
+                {t("pages.reco.tracking.loading") || "Chargement de tes mesures…"}
               </p>
             )}
 
@@ -652,7 +684,9 @@ async function handleGenerate() {
               className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-700"
             >
               <div className="flex flex-col gap-1">
-                <label className="font-medium">Date</label>
+                <label className="font-medium">
+                  {t("pages.reco.tracking.form.date") || "Date"}
+                </label>
                 <input
                   type="date"
                   value={measureDate}
@@ -662,61 +696,83 @@ async function handleGenerate() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="font-medium">Poids (kg)</label>
+                <label className="font-medium">
+                  {t("pages.reco.tracking.form.weight") || "Poids (kg)"}
+                </label>
                 <input
                   type="number"
                   step="0.1"
                   value={measureWeight}
                   onChange={(e) => setMeasureWeight(e.target.value)}
                   className="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-                  placeholder="Ex: 65.4"
+                  placeholder={
+                    t("pages.reco.tracking.form.weightPlaceholder") || "Ex: 65.4"
+                  }
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="font-medium">Tour de taille (cm)</label>
+                <label className="font-medium">
+                  {t("pages.reco.tracking.form.waist") || "Tour de taille (cm)"}
+                </label>
                 <input
                   type="number"
                   step="0.1"
                   value={measureWaist}
                   onChange={(e) => setMeasureWaist(e.target.value)}
                   className="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-                  placeholder="Ex: 72"
+                  placeholder={
+                    t("pages.reco.tracking.form.waistPlaceholder") || "Ex: 72"
+                  }
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="font-medium">Tour de hanches (cm)</label>
+                <label className="font-medium">
+                  {t("pages.reco.tracking.form.hips") || "Tour de hanches (cm)"}
+                </label>
                 <input
                   type="number"
                   step="0.1"
                   value={measureHips}
                   onChange={(e) => setMeasureHips(e.target.value)}
                   className="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-                  placeholder="Ex: 95"
+                  placeholder={
+                    t("pages.reco.tracking.form.hipsPlaceholder") || "Ex: 95"
+                  }
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="font-medium">Tour de poitrine (cm)</label>
+                <label className="font-medium">
+                  {t("pages.reco.tracking.form.chest") ||
+                    "Tour de poitrine (cm)"}
+                </label>
                 <input
                   type="number"
                   step="0.1"
                   value={measureChest}
                   onChange={(e) => setMeasureChest(e.target.value)}
                   className="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-                  placeholder="Ex: 88"
+                  placeholder={
+                    t("pages.reco.tracking.form.chestPlaceholder") || "Ex: 88"
+                  }
                 />
               </div>
 
               <div className="sm:col-span-2 flex flex-col gap-1">
-                <label className="font-medium">Notes</label>
+                <label className="font-medium">
+                  {t("pages.reco.tracking.form.notes") || "Notes"}
+                </label>
                 <textarea
                   value={measureNotes}
                   onChange={(e) => setMeasureNotes(e.target.value)}
                   rows={2}
                   className="rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-400/60"
-                  placeholder="Ex: Exercices difficiles, un energie"
+                  placeholder={
+                    t("pages.reco.tracking.form.notesPlaceholder") ||
+                    "Ex: Exercices difficiles, peu d'énergie"
+                  }
                 />
               </div>
 
@@ -729,7 +785,7 @@ async function handleGenerate() {
                   {savingMeasurement && (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   )}
-                  Enregistrer la mesure
+                  {t("pages.reco.tracking.form.submit") || "Enregistrer la mesure"}
                 </button>
               </div>
             </form>
@@ -738,19 +794,26 @@ async function handleGenerate() {
               <div className="mt-4 rounded-2xl bg-slate-50 border border-slate-100 px-3 py-2 text-xs text-slate-600 flex items-center justify-between gap-2">
                 <div>
                   <p className="font-semibold text-slate-800">
-                    Dernière mesure : {latestMeasure.date}
+                    {t("pages.reco.tracking.lastMeasure", {
+                      date: latestMeasure.date,
+                    }) || `Dernière mesure : ${latestMeasure.date}`}
                   </p>
                   <p>
-                    Poids :{" "}
+                    {t("pages.reco.tracking.weightLabel") || "Poids :"}{" "}
                     <span className="font-semibold">
-                      {latestMeasure.weight_kg ?? "—"} kg
+                      {t("pages.reco.profileCard.weightUnit", {
+                        value: latestMeasure.weight_kg ?? "—",
+                      }) ||
+                        `${latestMeasure.weight_kg ?? "—"} kg`}
                     </span>
                   </p>
                 </div>
                 {deltaWeight != null && (
                   <div className="flex items-center gap-1 text-emerald-600 font-semibold">
                     <TrendingDown className="h-4 w-4" />
-                    {deltaWeight.toFixed(1)} kg
+                    {t("pages.reco.tracking.delta", {
+                      value: deltaWeight.toFixed(1),
+                    }) || `${deltaWeight.toFixed(1)} kg`}
                   </div>
                 )}
               </div>
@@ -761,16 +824,17 @@ async function handleGenerate() {
           <div className="rounded-3xl bg-white/80 border border-slate-100 shadow-sm p-5">
             <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-1">
               <Activity className="h-4 w-4 text-emerald-500" />
-              Graphique d’évolution
+              {t("pages.reco.tracking.chartTitle") || "Graphique d'évolution"}
             </h2>
             <p className="text-[11px] text-slate-500 mb-2">
-              Visualise ton poids et tes mesures dans le temps. Ajoute une
-              première mesure depuis le formulaire à gauche.
+              {t("pages.reco.tracking.description") ||
+                "Visualise ton poids et tes mesures dans le temps. Ajoute une première mesure depuis le formulaire à gauche."}
             </p>
 
             {chartData.length === 0 ? (
               <div className="h-56 flex items-center justify-center text-xs text-slate-400">
-                Aucune mesure enregistrée pour le moment.
+                {t("pages.reco.tracking.empty") ||
+                  "Aucune mesure enregistrée pour le moment."}
               </div>
             ) : (
               <div className="h-64">
@@ -784,7 +848,7 @@ async function handleGenerate() {
                     <Line
                       type="monotone"
                       dataKey="weight_kg"
-                      name="Poids (kg)"
+                      name={t("pages.reco.tracking.chartWeight") || "Poids (kg)"}
                       dot={false}
                     />
                   </LineChart>
@@ -799,19 +863,20 @@ async function handleGenerate() {
           <div className="flex items-center gap-2 mb-3">
             <History className="h-4 w-4 text-slate-600" />
             <h2 className="text-sm font-semibold text-slate-900">
-              Historique de tes recommandations
+              {t("pages.reco.historyTitle") || "Historique de tes recommandations"}
             </h2>
           </div>
 
           {loadingHistory && history.length === 0 && (
             <p className="text-xs text-slate-500">
-              Chargement de l'historique…
+              {t("pages.reco.loadingHistory") || "Chargement de l'historique…"}
             </p>
           )}
 
           {!loadingHistory && history.length === 0 && (
             <p className="text-xs text-slate-500">
-              Aucune recommandation enregistrée pour le moment.
+              {t("pages.reco.historyEmpty") ||
+                "Aucune recommandation enregistrée pour le moment."}
             </p>
           )}
 
@@ -833,11 +898,15 @@ async function handleGenerate() {
                     </p>
 
                     <p className={isExpanded ? "" : "line-clamp-3"}>
-                      {item.answer || "(contenu vide)"}
+                      {item.answer ||
+                        t("pages.reco.history.emptyItem") ||
+                        "(contenu vide)"}
                     </p>
 
                     <p className="mt-1 text-[11px] text-sky-600 font-medium">
-                      {isExpanded ? "Voir moins ▲" : "Voir plus ▼"}
+                      {isExpanded
+                        ? t("pages.reco.history.showLess") || "Voir moins"
+                        : t("pages.reco.history.showMore") || "Voir plus"}
                     </p>
                   </li>
                 );

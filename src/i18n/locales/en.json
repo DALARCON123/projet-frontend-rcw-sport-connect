@@ -165,7 +165,63 @@
       "empty": "Click the button above to generate your first recommendations.",
       "historyTitle": "Your recommendations history",
       "loadingHistory": "Updating...",
-      "historyEmpty": "No recommendations recorded yet."
+      "historyEmpty": "No recommendations recorded yet.",
+      "sendReport": "Send summary",
+      "report": {
+        "noUser": "User not found (missing uid).",
+        "noEmail": "No email found for this user.",
+        "success": "Report sent successfully to your email address.",
+        "error": "Error sending report: {{message}}"
+      },
+      "errors": {
+        "noUser": "User not found (missing uid).",
+        "history": "Unable to load recommendations history.",
+        "generate": "An error occurred while generating recommendations. Details: {{message}}",
+        "trackingLoad": "Unable to load tracking measurements. Try again later.",
+        "trackingSave": "Error while saving the measurement. Check the values.",
+        "missingDate": "Date is required.",
+        "missingTrackingUser": "User not found for tracking."
+      },
+      "profileCard": {
+        "ageUnit": "{{value}} yrs",
+        "weightUnit": "{{value}} kg",
+        "heightUnit": "{{value}} cm"
+      },
+      "current": {
+        "loading": "Loading your recommendations.",
+        "empty": "No recommendation for now. Click \"{{action}}\" to start."
+      },
+      "disclaimer": "These recommendations are indicative and do not replace medical advice. Always adapt the intensity to your level and how you feel.",
+      "tracking": {
+        "title": "Track your progress",
+        "loading": "Loading your measurements.",
+        "description": "Visualize your weight and measurements over time. Add your first measurement using the form on the left.",
+        "empty": "No measurement recorded yet.",
+        "chartTitle": "Progress chart",
+        "chartWeight": "Weight (kg)",
+        "lastMeasure": "Last measurement: {{date}}",
+        "weightLabel": "Weight:",
+        "delta": "{{value}} kg",
+        "form": {
+          "date": "Date",
+          "weight": "Weight (kg)",
+          "waist": "Waist (cm)",
+          "hips": "Hips (cm)",
+          "chest": "Chest (cm)",
+          "notes": "Notes",
+          "weightPlaceholder": "Ex: 65.4",
+          "waistPlaceholder": "Ex: 72",
+          "hipsPlaceholder": "Ex: 95",
+          "chestPlaceholder": "Ex: 88",
+          "notesPlaceholder": "Ex: Difficult exercises, low energy",
+          "submit": "Save measurement"
+        }
+      },
+      "history": {
+        "emptyItem": "(empty content)",
+        "showMore": "Show more",
+        "showLess": "Show less"
+      }
     },
     "admin": {
       "title": "Administrator space",

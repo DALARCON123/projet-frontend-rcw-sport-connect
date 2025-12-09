@@ -165,7 +165,63 @@
       "empty": "Clique no botão acima para gerar suas primeiras recomendações.",
       "historyTitle": "Histórico de suas recomendações",
       "loadingHistory": "Atualizando...",
-      "historyEmpty": "Nenhuma recomendação registrada ainda."
+      "historyEmpty": "Nenhuma recomendação registrada ainda.",
+      "sendReport": "Enviar resumo",
+      "report": {
+        "noUser": "Usuário não encontrado (uid ausente).",
+        "noEmail": "Nenhum email encontrado para este usuário.",
+        "success": "Relatório enviado com sucesso para seu email.",
+        "error": "Erro ao enviar o relatório: {{message}}"
+      },
+      "errors": {
+        "noUser": "Usuário não encontrado (uid ausente).",
+        "history": "Não foi possível carregar o histórico de recomendações.",
+        "generate": "Ocorreu um erro ao gerar as recomendações. Detalhes: {{message}}",
+        "trackingLoad": "Não foi possível carregar as medições de acompanhamento. Tente novamente mais tarde.",
+        "trackingSave": "Erro ao salvar a medição. Verifique os valores.",
+        "missingDate": "A data é obrigatória.",
+        "missingTrackingUser": "Usuário não encontrado para o acompanhamento."
+      },
+      "profileCard": {
+        "ageUnit": "{{value}} anos",
+        "weightUnit": "{{value}} kg",
+        "heightUnit": "{{value}} cm"
+      },
+      "current": {
+        "loading": "Carregando suas recomendações.",
+        "empty": "Nenhuma recomendação por enquanto. Clique em \"{{action}}\" para começar."
+      },
+      "disclaimer": "Essas recomendações são indicativas e não substituem conselho médico. Ajuste sempre a intensidade ao seu nível e ao seu bem-estar.",
+      "tracking": {
+        "title": "Acompanhe sua evolução",
+        "loading": "Carregando suas medições.",
+        "description": "Visualize seu peso e medidas ao longo do tempo. Adicione a primeira medição usando o formulário à esquerda.",
+        "empty": "Nenhuma medição registrada ainda.",
+        "chartTitle": "Gráfico de evolução",
+        "chartWeight": "Peso (kg)",
+        "lastMeasure": "Última medição: {{date}}",
+        "weightLabel": "Peso:",
+        "delta": "{{value}} kg",
+        "form": {
+          "date": "Data",
+          "weight": "Peso (kg)",
+          "waist": "Cintura (cm)",
+          "hips": "Quadril (cm)",
+          "chest": "Peito (cm)",
+          "notes": "Notas",
+          "weightPlaceholder": "Ex: 65.4",
+          "waistPlaceholder": "Ex: 72",
+          "hipsPlaceholder": "Ex: 95",
+          "chestPlaceholder": "Ex: 88",
+          "notesPlaceholder": "Ex: Exercícios difíceis, pouca energia",
+          "submit": "Salvar medição"
+        }
+      },
+      "history": {
+        "emptyItem": "(conteúdo vazio)",
+        "showMore": "Ver mais",
+        "showLess": "Ver menos"
+      }
     },
     "admin": {
       "title": "Espaço do administrador",

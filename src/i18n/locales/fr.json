@@ -165,7 +165,63 @@
       "empty": "Clique sur le bouton ci-dessus pour générer tes premières recommandations.",
       "historyTitle": "Historique de tes recommandations",
       "loadingHistory": "Mise à jour...",
-      "historyEmpty": "Aucune recommandation enregistrée pour le moment."
+      "historyEmpty": "Aucune recommandation enregistrée pour le moment.",
+      "sendReport": "Envoyer un résumé",
+      "report": {
+        "noUser": "Utilisateur introuvable (uid manquant).",
+        "noEmail": "Aucun email trouvé pour cet utilisateur.",
+        "success": "Rapport envoyé avec succès à ton adresse e-mail.",
+        "error": "Erreur lors de l'envoi du rapport : {{message}}"
+      },
+      "errors": {
+        "noUser": "Utilisateur introuvable (uid manquant).",
+        "history": "Impossible de charger l'historique des recommandations.",
+        "generate": "Une erreur est survenue lors de la génération des recommandations. Détails : {{message}}",
+        "trackingLoad": "Impossible de charger les mesures de suivi. Réessaie plus tard.",
+        "trackingSave": "Erreur lors de l'enregistrement de la mesure. Vérifie les valeurs.",
+        "missingDate": "La date est obligatoire.",
+        "missingTrackingUser": "Utilisateur introuvable pour le suivi."
+      },
+      "profileCard": {
+        "ageUnit": "{{value}} ans",
+        "weightUnit": "{{value}} kg",
+        "heightUnit": "{{value}} cm"
+      },
+      "current": {
+        "loading": "Chargement de tes recommandations.",
+        "empty": "Aucune recommandation pour le moment. Clique sur \"{{action}}\" pour commencer."
+      },
+      "disclaimer": "Ces recommandations sont indicatives et ne remplacent pas l'avis d'un professionnel de santé. Adapte toujours l'intensité à ton niveau et à ton ressenti.",
+      "tracking": {
+        "title": "Suivi de ton évolution",
+        "loading": "Chargement de tes mesures.",
+        "description": "Visualise ton poids et tes mesures dans le temps. Ajoute une première mesure depuis le formulaire à gauche.",
+        "empty": "Aucune mesure enregistrée pour le moment.",
+        "chartTitle": "Graphique d'évolution",
+        "chartWeight": "Poids (kg)",
+        "lastMeasure": "Dernière mesure : {{date}}",
+        "weightLabel": "Poids :",
+        "delta": "{{value}} kg",
+        "form": {
+          "date": "Date",
+          "weight": "Poids (kg)",
+          "waist": "Tour de taille (cm)",
+          "hips": "Tour de hanches (cm)",
+          "chest": "Tour de poitrine (cm)",
+          "notes": "Notes",
+          "weightPlaceholder": "Ex : 65.4",
+          "waistPlaceholder": "Ex : 72",
+          "hipsPlaceholder": "Ex : 95",
+          "chestPlaceholder": "Ex : 88",
+          "notesPlaceholder": "Ex : Exercices difficiles, peu d'énergie",
+          "submit": "Enregistrer la mesure"
+        }
+      },
+      "history": {
+        "emptyItem": "(contenu vide)",
+        "showMore": "Voir plus",
+        "showLess": "Voir moins"
+      }
     },
     "admin": {
       "title": "Espace administrateur",
