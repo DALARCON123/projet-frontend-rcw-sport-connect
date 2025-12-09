@@ -433,37 +433,48 @@ export default function RecoPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-pink-50/20 px-6 lg:px-8 py-10">
-      {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 px-6 lg:px-8 py-10">
+      {/* Header espectacular con fondo degradado */}
       <header className="max-w-[1600px] mx-auto mb-8">
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/60 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-              <Sparkles className="text-white h-7 w-7" />
+        <div className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 rounded-3xl p-8 shadow-2xl border-2 border-white/30">
+          {/* Patrón de fondo */}
+          <div 
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '60px 60px'
+            }}
+          ></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div className="flex items-center gap-5">
+              <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center shadow-2xl border-2 border-white/30">
+                <Sparkles className="text-white h-8 w-8 animate-pulse" />
+              </div>
+              <div>
+                <h1 className="text-5xl font-black text-white drop-shadow-2xl">
+                  {t("pages.reco.title") || "Recommandations IA"}
+                </h1>
+                <p className="text-lg text-white/95 drop-shadow-lg mt-2 max-w-2xl">
+                  {t("pages.reco.subtitle") ||
+                    "Coach intelligent • Plan personnalisé • Résultats garantis"}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-700 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                {t("pages.reco.title") || "Recommandations Personnalisées"}
-              </h1>
-              <p className="text-base text-slate-600 mt-1">
-                {t("pages.reco.subtitle") ||
-                  "SportConnectIA analyse ton profil pour te proposer un plan d'entraînement, d'alimentation et de récupération sain."}
-              </p>
-            </div>
-          </div>
 
-          <button
-            onClick={handleGenerate}
-            disabled={loadingReco}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 hover:from-purple-700 hover:via-purple-600 hover:to-pink-600 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:scale-105 disabled:opacity-60 disabled:hover:scale-100 transition-all"
-          >
-            {loadingReco ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <Brain className="h-5 w-5" />
-            )}
-            {t("pages.reco.generate") || "Générer mes recommandations IA"}
-          </button>
+            <button
+              onClick={handleGenerate}
+              disabled={loadingReco}
+              className="group inline-flex items-center gap-3 rounded-2xl bg-white hover:bg-white/95 px-8 py-4 text-base font-bold text-purple-600 shadow-2xl hover:shadow-white/50 hover:scale-105 disabled:opacity-60 disabled:hover:scale-100 transition-all"
+            >
+              {loadingReco ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <Brain className="h-6 w-6 group-hover:rotate-12 transition-transform" />
+              )}
+              {t("pages.reco.generate") || "Générer mon plan IA"}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -503,14 +514,17 @@ export default function RecoPage() {
         </section>
 
         {/* Recomendación actual en tarjetas */}
-        <section className="rounded-3xl border border-white/60 bg-white/80 backdrop-blur-sm shadow-xl p-8 space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-md">
-              <Brain className="h-6 w-6 text-white" />
+        <section className="rounded-3xl border-2 border-purple-200 bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 shadow-2xl p-8 space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
+              <Brain className="h-7 w-7 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-800">
-              {t("pages.reco.latest") || "Recommandation IA Actuelle"}
-            </h2>
+            <div>
+              <h2 className="text-3xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+                {t("pages.reco.latest") || "Ton Plan Personnalisé"}
+              </h2>
+              <p className="text-sm text-slate-600 mt-1">Généré par l'intelligence artificielle</p>
+            </div>
           </div>
 
           {!latestReco ? (
@@ -537,19 +551,28 @@ export default function RecoPage() {
                     sectionGradients[idx % sectionGradients.length];
                   const isLast = idx === sections.length - 1;
 
+                  const cardColors = [
+                    { accent: 'from-purple-500 to-pink-500', icon: 'bg-purple-100 text-purple-600', border: 'border-purple-200' },
+                    { accent: 'from-blue-500 to-cyan-500', icon: 'bg-blue-100 text-blue-600', border: 'border-blue-200' },
+                    { accent: 'from-emerald-500 to-teal-500', icon: 'bg-emerald-100 text-emerald-600', border: 'border-emerald-200' },
+                    { accent: 'from-amber-500 to-orange-500', icon: 'bg-amber-100 text-amber-600', border: 'border-amber-200' },
+                  ];
+                  
+                  const cardColor = cardColors[idx % cardColors.length];
+                  
                   return (
                     <div
                       key={`${sec.title}-${idx}`}
-                      className={`group relative h-full overflow-hidden rounded-2xl border border-purple-200 bg-gradient-to-br ${gradient} px-6 py-5 text-sm text-slate-800 shadow-lg hover:shadow-2xl backdrop-blur-sm flex flex-col transition-all duration-300 hover:-translate-y-1 ${
+                      className={`group relative h-full overflow-hidden rounded-3xl border-2 ${cardColor.border} bg-gradient-to-br ${gradient} px-7 py-6 text-sm text-slate-800 shadow-xl hover:shadow-2xl backdrop-blur-sm flex flex-col transition-all duration-300 hover:-translate-y-2 ${
                         isLast ? "lg:col-span-3" : ""
                       }`}
                     >
-                      <span className="absolute left-0 top-6 h-12 w-1 rounded-r-full bg-gradient-to-b from-purple-500 to-pink-500 shadow-md" />
+                      <span className={`absolute left-0 top-8 h-16 w-1.5 rounded-r-full bg-gradient-to-b ${cardColor.accent} shadow-lg`} />
 
-                      <div className="pl-3">
-                        <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-                          <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white/80 shadow-md group-hover:scale-110 transition-transform">
-                            <Sparkles className="h-4 w-4 text-purple-500" />
+                      <div className="pl-4">
+                        <h3 className="text-xl font-black text-slate-900 mb-4 flex items-center gap-3">
+                          <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${cardColor.icon} shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-transform`}>
+                            <Sparkles className="h-5 w-5" />
                           </span>
                           {sec.title || "Plan"}
                         </h3>
@@ -583,16 +606,19 @@ export default function RecoPage() {
         </section>
 
         {/* Seguimiento & gráficos */}
-        <section className="grid md:grid-cols-2 gap-5 items-start">
+        <section className="grid md:grid-cols-2 gap-6 items-start">
           {/* Formulario de seguimiento */}
-          <div className="rounded-2xl border border-white/60 bg-gradient-to-br from-blue-50/80 via-white to-purple-50/80 backdrop-blur-sm shadow-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md">
-                <Activity className="h-5 w-5 text-white" />
+          <div className="rounded-3xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-white to-cyan-50 shadow-2xl p-7">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-xl">
+                <Activity className="h-7 w-7 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-slate-800">
-                Suivi de ton Évolution
-              </h2>
+              <div>
+                <h2 className="text-2xl font-black text-slate-900">
+                  Suivi de ton Évolution
+                </h2>
+                <p className="text-sm text-slate-600">Enregistre tes progrès</p>
+              </div>
             </div>
 
             {trackingError && (
@@ -601,24 +627,25 @@ export default function RecoPage() {
 
             <form
               onSubmit={handleSaveMeasurement}
-              className="space-y-3 text-xs text-slate-700"
+              className="space-y-4 text-sm text-slate-700"
             >
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-[11px]">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700 flex items-center gap-2">
+                    <span className="h-5 w-5 rounded-lg bg-purple-100 grid place-items-center text-purple-600 text-xs">????</span>
                     Date
                   </label>
                   <input
                     type="date"
                     value={measureDate}
                     onChange={(e) => setMeasureDate(e.target.value)}
-                    className="rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-semibold"
                     required
                   />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-[11px]">
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700">
                     Poids (kg)
                   </label>
                   <input
@@ -626,13 +653,13 @@ export default function RecoPage() {
                     step="0.1"
                     value={measureWeight}
                     onChange={(e) => setMeasureWeight(e.target.value)}
-                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all"
                     placeholder="Ex: 64.5"
                   />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-[11px]">
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700">
                     Tour de taille (cm)
                   </label>
                   <input
@@ -640,13 +667,13 @@ export default function RecoPage() {
                     step="0.1"
                     value={measureWaist}
                     onChange={(e) => setMeasureWaist(e.target.value)}
-                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all"
                     placeholder="Ex: 80"
                   />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-[11px]">
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700">
                     Tour de hanches (cm)
                   </label>
                   <input
@@ -654,13 +681,13 @@ export default function RecoPage() {
                     step="0.1"
                     value={measureHips}
                     onChange={(e) => setMeasureHips(e.target.value)}
-                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all"
                     placeholder="Ex: 95"
                   />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-[11px]">
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-sm text-slate-700">
                     Tour de poitrine (cm)
                   </label>
                   <input
@@ -668,20 +695,20 @@ export default function RecoPage() {
                     step="0.1"
                     value={measureChest}
                     onChange={(e) => setMeasureChest(e.target.value)}
-                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400"
+                    className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all"
                     placeholder="Ex: 90"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="font-semibold text-[11px]">
+              <div className="flex flex-col gap-2">
+                <label className="font-bold text-sm text-slate-700">
                   Notes (comment tu te sens, séance, etc.)
                 </label>
                 <textarea
                   value={measureNotes}
                   onChange={(e) => setMeasureNotes(e.target.value)}
-                  className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-400 min-h-[60px]"
+                  className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all min-h-[80px]"
                   placeholder="Ex: Séance facile, bonne énergie…"
                 />
               </div>
@@ -689,12 +716,12 @@ export default function RecoPage() {
               <button
                 type="submit"
                 disabled={savingMeasurement}
-                className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:scale-105 disabled:opacity-60 disabled:hover:scale-100 transition-all"
+                className="group mt-6 w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 hover:from-blue-600 hover:via-cyan-600 hover:to-teal-600 px-8 py-4 text-base font-bold text-white shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100 transition-all"
               >
                 {savingMeasurement ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
-                  <Sparkles className="h-4 w-4" />
+                  <Sparkles className="h-5 w-5 group-hover:rotate-12 transition-transform" />
                 )}
                 Enregistrer la mesure
               </button>
@@ -708,15 +735,18 @@ export default function RecoPage() {
           </div>
 
           {/* Gráficos */}
-          <div className="rounded-2xl border border-white/60 bg-white/80 backdrop-blur-sm shadow-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md">
-                  <History className="h-5 w-5 text-white" />
+          <div className="rounded-3xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-teal-50 shadow-2xl p-7">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-xl">
+                  <History className="h-7 w-7 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-slate-800">
-                  Graphique d'Évolution
-                </h2>
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900">
+                    Graphique d'Évolution
+                  </h2>
+                  <p className="text-sm text-slate-600">Visualise tes progrès</p>
+                </div>
               </div>
               {latestMeasure && (
                 <div className="text-[10px] text-slate-500 text-right">
@@ -798,16 +828,19 @@ export default function RecoPage() {
         </section>
 
         {/* Historial de recomendaciones IA */}
-        <section className="rounded-3xl border border-white/60 bg-white/80 backdrop-blur-sm shadow-xl p-8">
+        <section className="rounded-3xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 via-white to-purple-50 shadow-2xl p-8">
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-md">
-                <History className="h-6 w-6 text-white" />
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-xl">
+                <History className="h-7 w-7 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-slate-800">
-                {t("pages.reco.historyTitle") ||
-                  "Historique de tes Recommandations"}
-              </h2>
+              <div>
+                <h2 className="text-3xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  {t("pages.reco.historyTitle") ||
+                    "Historique de tes Recommandations"}
+                </h2>
+                <p className="text-sm text-slate-600 mt-1">Toutes tes générations précédentes</p>
+              </div>
             </div>
             {loadingHistory && (
               <span className="text-xs text-slate-400 flex items-center gap-1">
@@ -856,17 +889,26 @@ type ProfileCardProps = {
 };
 
 function ProfileCard({ title, icon, value }: ProfileCardProps) {
+  const colorSchemes = [
+    { bg: 'from-purple-500 to-pink-500', text: 'from-purple-600 to-pink-600', border: 'border-purple-200 hover:border-purple-400' },
+    { bg: 'from-blue-500 to-cyan-500', text: 'from-blue-600 to-cyan-600', border: 'border-blue-200 hover:border-blue-400' },
+    { bg: 'from-emerald-500 to-teal-500', text: 'from-emerald-600 to-teal-600', border: 'border-emerald-200 hover:border-emerald-400' },
+    { bg: 'from-amber-500 to-orange-500', text: 'from-amber-600 to-orange-600', border: 'border-amber-200 hover:border-amber-400' },
+  ];
+  
+  const scheme = colorSchemes[Math.floor(Math.random() * colorSchemes.length)];
+  
   return (
-    <div className="group rounded-2xl border border-slate-200 hover:border-purple-300 bg-white shadow-lg hover:shadow-2xl p-6 flex flex-col gap-2 transition-all duration-300 hover:-translate-y-1">
+    <div className={`group rounded-2xl border-2 ${scheme.border} bg-white shadow-xl hover:shadow-2xl p-6 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-1`}>
       <div className="flex items-center justify-between">
-        <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+        <p className="text-sm font-bold uppercase tracking-wider text-slate-600">
           {title}
         </p>
-        <span className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 grid place-items-center text-white shadow-md group-hover:scale-110 transition-transform">
+        <span className={`h-12 w-12 rounded-xl bg-gradient-to-br ${scheme.bg} grid place-items-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-transform`}>
           {icon}
         </span>
       </div>
-      <p className="text-2xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mt-1">{value}</p>
+      <p className={`text-3xl font-black bg-gradient-to-r ${scheme.text} bg-clip-text text-transparent mt-1`}>{value}</p>
     </div>
   );
 }

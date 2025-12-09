@@ -117,19 +117,32 @@ function Sports() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-pink-50/20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-8 py-8">
 
-        {/* TITRE PRINCIPAL */}
-        <div className="flex items-center gap-4 mb-10">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl shadow-lg">
-            🏋️‍♀️
-          </div>
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-700 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Recommandations Sportives
-            </h1>
-            <p className="text-slate-600 text-sm mt-1">Découvre des vidéos adaptées à tes objectifs</p>
+        {/* HEADER ESPECTACULAR */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-600 rounded-3xl p-8 shadow-2xl border-2 border-white/30 mb-10">
+          {/* Patrón de fondo */}
+          <div 
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '60px 60px'
+            }}
+          ></div>
+          
+          <div className="relative z-10 flex items-center gap-5">
+            <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center text-4xl shadow-2xl border-2 border-white/30">
+              🏋️‍♀️
+            </div>
+            <div>
+              <h1 className="text-5xl font-black text-white drop-shadow-2xl">
+                Recommandations Sportives
+              </h1>
+              <p className="text-lg text-white/95 drop-shadow-lg mt-2">
+                Vidéos adaptées • Entraînements personnalisés • Résultats garantis
+              </p>
+            </div>
           </div>
         </div>
 

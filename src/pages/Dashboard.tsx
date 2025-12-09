@@ -79,22 +79,31 @@ export default function Dashboard() {
   const goal = profile?.goal;
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-pink-50/20">
+    <section className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-8 py-10 space-y-8">
-        {/* TÍTULO + BIENVENIDA */}
-        <header className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/60">
-          <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-              <Activity className="h-7 w-7 text-white" />
+        {/* HEADER ESPECTACULAR */}
+        <header className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-8 shadow-2xl border-2 border-white/30">
+          {/* Patrón de fondo */}
+          <div 
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '60px 60px'
+            }}
+          ></div>
+          
+          <div className="relative z-10 flex items-center gap-5">
+            <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center shadow-2xl border-2 border-white/30">
+              <Activity className="h-8 w-8 text-white animate-pulse" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-700 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-5xl font-black text-white drop-shadow-2xl">
                 Tableau de Bord
               </h1>
-              <p className="mt-1 text-base text-slate-600">
+              <p className="text-lg text-white/95 drop-shadow-lg mt-2">
                 {name
-                  ? `Bienvenue, ${name}! Voici ton espace d'entraînement personnalisé.`
-                  : "Bienvenue sur votre espace d'entraînement personnalisé."}
+                  ? `Bienvenue, ${name}! • Ton espace personnalisé • Atteins tes objectifs`
+                  : "Espace personnalisé • Suivi intelligent • Résultats garantis"}
               </p>
             </div>
           </div>

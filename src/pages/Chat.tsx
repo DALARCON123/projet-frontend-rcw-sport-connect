@@ -164,11 +164,12 @@ export default function Chat() {
   const faqKeys = ["chat.faq_1", "chat.faq_2", "chat.faq_3", "chat.faq_4"];
 
   return (
-    <div className="w-full h-[calc(100vh-4rem)] flex overflow-hidden bg-gradient-to-br from-slate-50 via-purple-50/30 to-pink-50/20 relative">
+    <div className="w-full h-[calc(100vh-4rem)] flex overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative">
       {/* Efectos de fondo decorativos */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-purple-300/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-pink-300/20 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-purple-300/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-pink-300/30 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
       </div>
       
       {/* -------------------------------------------------
@@ -176,15 +177,17 @@ export default function Chat() {
       --------------------------------------------------- */}
       <aside className="relative z-10 w-96 border-r border-white/60 bg-white/80 backdrop-blur-xl p-6 overflow-y-auto shadow-xl">
         <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-              <MessageSquare className="text-white h-5 w-5" />
+          <div className="flex items-center gap-3 mb-3">
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center shadow-lg animate-pulse">
+              <MessageSquare className="text-white h-6 w-6" />
             </div>
-            <h2 className="text-xl font-bold bg-gradient-to-r from-purple-700 to-pink-600 bg-clip-text text-transparent">
-              Assistant Coach IA
-            </h2>
+            <div>
+              <h2 className="text-2xl font-black bg-gradient-to-r from-purple-700 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+                Coach IA
+              </h2>
+              <p className="text-xs text-slate-600">Assistant intelligent</p>
+            </div>
           </div>
-          <p className="text-sm text-slate-600 ml-13">Tes conversations intelligentes</p>
         </div>
 
         <button
@@ -258,19 +261,28 @@ export default function Chat() {
          PANEL DERECHO – CHAT + INPUT + FAQ
       --------------------------------------------------- */}
       <main className="relative z-10 flex-1 flex flex-col overflow-hidden min-h-0">
-        {/* Header */}
-        <div className="px-8 py-6 border-b border-white/60 bg-white/80 backdrop-blur-xl shrink-0 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg animate-pulse">
-              <Bot className="text-white h-7 w-7" />
+        {/* HEADER ESPECTACULAR */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-cyan-600 via-blue-600 to-purple-600 px-8 py-6 shrink-0 shadow-2xl border-b-2 border-white/30">
+          {/* Patrón de fondo */}
+          <div 
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '60px 60px'
+            }}
+          ></div>
+          
+          <div className="relative z-10 flex items-center gap-5">
+            <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center shadow-2xl border-2 border-white/30">
+              <Bot className="h-8 w-8 text-white animate-pulse" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-700 via-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-2">
+              <h1 className="text-5xl font-black text-white drop-shadow-2xl flex items-center gap-3">
                 Assistant Coach IA
-                <Sparkles className="h-6 w-6 text-purple-500 animate-pulse" />
+                <Sparkles className="h-7 w-7 text-yellow-300 animate-pulse" />
               </h1>
-              <p className="text-slate-600 text-base mt-1">
-                {t("chat.subtitle") as string}
+              <p className="text-lg text-white/95 drop-shadow-lg mt-2">
+                {t("chat.subtitle") as string || "Conseils personnalisés • Disponible 24/7 • Intelligence artificielle"}
               </p>
             </div>
           </div>
